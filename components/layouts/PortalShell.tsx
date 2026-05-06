@@ -108,8 +108,8 @@ export function PortalShell({ children }: PortalShellProps) {
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <LanguageSwitcher locale={locale} onChange={setLocale} t={t} ariaLabel={t.ui.languageSwitcherLabel} />
-          <ThemeToggle theme={theme} onToggle={toggleTheme} t={t} ariaLabel={t.ui.themeToggleLabel} />
+          <LanguageSwitcher locale={locale} onChange={setLocale} t={t} compact onAfterChange={() => setMenuOpen(false)} ariaLabel={t.ui.languageSwitcherLabel} />
+          <ThemeToggle theme={theme} onToggle={toggleTheme} t={t} compact ariaLabel={t.ui.themeToggleLabel} />
         </div>
         <div className="flex flex-wrap gap-2">
           <Link href="/" className={buttonClassName({ variant: "secondary", className: "flex-1" })} onClick={() => setMenuOpen(false)}>

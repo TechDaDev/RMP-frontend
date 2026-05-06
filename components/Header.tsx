@@ -55,8 +55,8 @@ export function Header({
         </nav>
 
         <div className="hidden items-center gap-2 lg:flex">
-          <LanguageSwitcher locale={locale} onChange={onLocaleChange} t={t} ariaLabel={t.ui.languageSwitcherLabel} />
-          <ThemeToggle theme={theme} onToggle={onThemeToggle} t={t} ariaLabel={t.ui.themeToggleLabel} />
+          <LanguageSwitcher locale={locale} onChange={onLocaleChange} t={t} compact ariaLabel={t.ui.languageSwitcherLabel} />
+          <ThemeToggle theme={theme} onToggle={onThemeToggle} t={t} compact ariaLabel={t.ui.themeToggleLabel} />
           <a href="/login" className="btn-primary px-5 py-2 text-sm">
             {t.nav.cta}
           </a>
@@ -93,11 +93,10 @@ export function Header({
           <div className="flex flex-wrap items-center gap-2 border-t border-[var(--color-border)] pt-3">
             <LanguageSwitcher
               locale={locale}
-              onChange={(value) => {
-                onLocaleChange(value);
-                setMenuOpen(false);
-              }}
+              onChange={onLocaleChange}
               t={t}
+              compact
+              onAfterChange={() => setMenuOpen(false)}
               ariaLabel={t.ui.languageSwitcherLabel}
             />
             <ThemeToggle
@@ -107,6 +106,7 @@ export function Header({
                 setMenuOpen(false);
               }}
               t={t}
+              compact
               ariaLabel={t.ui.themeToggleLabel}
             />
             <a href="/login" className="btn-primary w-full sm:w-auto" onClick={() => setMenuOpen(false)}>

@@ -149,6 +149,8 @@ export interface Translations {
   theme: {
     light: string;
     dark: string;
+    shortLight: string;
+    shortDark: string;
   };
   ui: {
     phaseBadge: string;
@@ -162,5 +164,7 @@ export interface Translations {
     openPortalNavigation: string;
     closePortalNavigation: string;
     portalNavigation: string;
+    languageMenu: string;
+    currentLanguage: string;
   };
 }

@@ -288,11 +288,13 @@ export const translations: Record<Locale, Translations> = {
     theme: {
       light: "الوضع النهاري",
       dark: "الوضع الليلي",
+      shortLight: "نهاري",
+      shortDark: "ليلي",
     },
     ui: {
       phaseBadge: "منصة طبية رقمية آمنة",
       languageSwitcherLabel: "تبديل اللغة",
-      themeToggleLabel: "تبديل المظهر",
+      themeToggleLabel: "تبديل الوضع",
       openMenu: "فتح القائمة",
       closeMenu: "إغلاق القائمة",
       primaryNavigation: "التنقل الرئيسي",
@@ -301,6 +303,8 @@ export const translations: Record<Locale, Translations> = {
       openPortalNavigation: "فتح تنقل البوابة",
       closePortalNavigation: "إغلاق تنقل البوابة",
       portalNavigation: "تنقل البوابة",
+      languageMenu: "قائمة اللغات",
+      currentLanguage: "اللغة الحالية",
     },
   },
   ku: {
@@ -583,11 +587,13 @@ export const translations: Record<Locale, Translations> = {
     theme: {
       light: "دۆخی ڕووناک",
       dark: "دۆخی تاریک",
+      shortLight: "ڕووناک",
+      shortDark: "تاریک",
     },
     ui: {
       phaseBadge: "پلاتفۆرمی پزیشکی دیجیتاڵی پارێزراو",
       languageSwitcherLabel: "گۆڕینی زمان",
-      themeToggleLabel: "گۆڕینی دیمەن",
+      themeToggleLabel: "گۆڕینی دۆخ",
       openMenu: "کردنەوەی لیست",
       closeMenu: "داخستنی لیست",
       primaryNavigation: "گەڕانی سەرەکی",
@@ -596,6 +602,8 @@ export const translations: Record<Locale, Translations> = {
       openPortalNavigation: "کردنەوەی گەڕانی پۆرتاڵ",
       closePortalNavigation: "داخستنی گەڕانی پۆرتاڵ",
       portalNavigation: "گەڕانی پۆرتاڵ",
+      languageMenu: "لیستی زمانەکان",
+      currentLanguage: "زمانی ئێستا",
     },
   },
   en: {
@@ -878,6 +886,8 @@ export const translations: Record<Locale, Translations> = {
     theme: {
       light: "Light Mode",
       dark: "Dark Mode",
+      shortLight: "Light",
+      shortDark: "Dark",
     },
     ui: {
       phaseBadge: "Secure Digital Medical Platform",
@@ -891,6 +901,8 @@ export const translations: Record<Locale, Translations> = {
       openPortalNavigation: "Open portal navigation",
       closePortalNavigation: "Close portal navigation",
       portalNavigation: "Portal navigation",
+      languageMenu: "Language menu",
+      currentLanguage: "Current language",
     },
   },
 };

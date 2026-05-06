@@ -29,9 +29,9 @@ export function PublicAuthLayout({ title, subtitle, children }: PublicAuthLayout
           <Link href="/" className="focus-ring rounded-xl">
             <Logo locale={locale} />
           </Link>
-          <div className="flex flex-wrap items-center gap-2">
-            <LanguageSwitcher locale={locale} onChange={setLocale} t={t} ariaLabel={t.ui.languageSwitcherLabel} />
-            <ThemeToggle theme={theme} onToggle={toggleTheme} t={t} ariaLabel={t.ui.themeToggleLabel} />
+          <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+            <LanguageSwitcher locale={locale} onChange={setLocale} t={t} compact ariaLabel={t.ui.languageSwitcherLabel} />
+            <ThemeToggle theme={theme} onToggle={toggleTheme} t={t} compact ariaLabel={t.ui.themeToggleLabel} />
             <Link href="/" className={buttonClassName({ variant: "secondary" })}>
               {t.common.backToHome}
             </Link>

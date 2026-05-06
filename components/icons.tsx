@@ -68,6 +68,22 @@ export function CloseIcon(p: IconProps) {
   );
 }
 
+export function ChevronDownIcon(p: IconProps) {
+  return (
+    <Base {...p}>
+      <polyline points="6 9 12 15 18 9" />
+    </Base>
+  );
+}
+
+export function CheckIcon(p: IconProps) {
+  return (
+    <Base {...p}>
+      <polyline points="20 6 9 17 4 12" />
+    </Base>
+  );
+}
+
 export function PatientIcon(p: IconProps) {
   return (
     <Base {...p}>
