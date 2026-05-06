@@ -1,6 +1,6 @@
 "use client";
 
-import { AppPreferencesProvider, useAppPreferences } from "@/components/AppPreferencesProvider";
+import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
@@ -16,11 +16,7 @@ import {
 } from "@/components/sections";
 
 export default function Home() {
-  return (
-    <AppPreferencesProvider>
-      <LandingPage />
-    </AppPreferencesProvider>
-  );
+  return <LandingPage />;
 }
 
 function LandingPage() {

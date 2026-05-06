@@ -12,7 +12,7 @@ export function FinalCTASection({ t }: FinalCTASectionProps) {
           <p className="mx-auto max-w-3xl text-lg font-medium leading-8 text-[var(--color-text)]">
             {t.finalCta.tagline}
           </p>
-          <a href="#home" className="btn-primary mt-6 inline-flex">
+          <a href="/login" className="btn-primary mt-6 inline-flex">
             {t.finalCta.btn}
           </a>
         </div>

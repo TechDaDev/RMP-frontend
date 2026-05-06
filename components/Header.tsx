@@ -57,7 +57,7 @@ export function Header({
         <div className="hidden items-center gap-2 lg:flex">
           <LanguageSwitcher locale={locale} onChange={onLocaleChange} t={t} ariaLabel={t.ui.languageSwitcherLabel} />
           <ThemeToggle theme={theme} onToggle={onThemeToggle} t={t} ariaLabel={t.ui.themeToggleLabel} />
-          <a href="#cta" className="btn-primary px-5 py-2 text-sm">
+          <a href="/login" className="btn-primary px-5 py-2 text-sm">
             {t.nav.cta}
           </a>
         </div>
@@ -109,7 +109,7 @@ export function Header({
               t={t}
               ariaLabel={t.ui.themeToggleLabel}
             />
-            <a href="#cta" className="btn-primary w-full sm:w-auto" onClick={() => setMenuOpen(false)}>
+            <a href="/login" className="btn-primary w-full sm:w-auto" onClick={() => setMenuOpen(false)}>
               {t.nav.cta}
             </a>
           </div>

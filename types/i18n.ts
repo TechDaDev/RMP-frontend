@@ -59,6 +59,88 @@ export interface Translations {
     description: string;
     copyright: string;
   };
+  auth: {
+    loginTitle: string;
+    loginSubtitle: string;
+    emailLabel: string;
+    passwordLabel: string;
+    rememberMe: string;
+    enterPlatform: string;
+    forgotPassword: string;
+    noAccount: string;
+    createAccount: string;
+    registerTitle: string;
+    registerSubtitle: string;
+    chooseAccountType: string;
+    continue: string;
+    haveAccount: string;
+    nameLabel: string;
+    registerAction: string;
+    loginPreviewNotice: string;
+    registerPreviewNotice: string;
+  };
+  portal: {
+    dashboard: string;
+    profile: string;
+    notifications: string;
+    messages: string;
+    settings: string;
+    logout: string;
+    previewNotice: string;
+    demoUser: string;
+    entryTitle: string;
+    entrySubtitle: string;
+    currentRole: string;
+    chooseRole: string;
+    roleAutoRoutingNotice: string;
+  };
+  roles: {
+    patient: string;
+    doctor: string;
+    pharmacist: string;
+    laboratory: string;
+    admin: string;
+  };
+  dashboards: {
+    previewNotice: string;
+    patientTitle: string;
+    patientSubtitle: string;
+    doctorTitle: string;
+    doctorSubtitle: string;
+    pharmacistTitle: string;
+    pharmacistSubtitle: string;
+    laboratoryTitle: string;
+    laboratorySubtitle: string;
+    adminTitle: string;
+    adminSubtitle: string;
+    modules: {
+      consultations: string;
+      prescriptions: string;
+      labResults: string;
+      messages: string;
+      patients: string;
+      labRequests: string;
+      prescriptionReview: string;
+      medicationDispensing: string;
+      dispensingLog: string;
+      testRequests: string;
+      uploadResults: string;
+      sentResults: string;
+      users: string;
+      staffVerification: string;
+      knowledgeBase: string;
+      auditLog: string;
+      systemStatus: string;
+    };
+  };
+  common: {
+    backToHome: string;
+    previewBadge: string;
+    uiOnlyBadge: string;
+    viewPreview: string;
+    previewLogin: string;
+    accountType: string;
+  };
   lang: {
     ar: string;
     ku: string;
@@ -77,5 +159,8 @@ export interface Translations {
     primaryNavigation: string;
     mobileMenu: string;
     heroFlowLabel: string;
+    openPortalNavigation: string;
+    closePortalNavigation: string;
+    portalNavigation: string;
   };
 }

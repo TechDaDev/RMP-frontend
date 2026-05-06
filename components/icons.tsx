@@ -1,6 +1,6 @@
 import type { ReactNode, SVGProps } from "react";
 
-type IconProps = SVGProps<SVGSVGElement> & { size?: number };
+export type IconProps = SVGProps<SVGSVGElement> & { size?: number };
 
 function Base({ size = 20, children, ...props }: IconProps & { children: ReactNode }) {
   return (
@@ -175,6 +175,54 @@ export function PulseIcon(p: IconProps) {
   return (
     <Base {...p}>
       <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+    </Base>
+  );
+}
+
+export function GridIcon(p: IconProps) {
+  return (
+    <Base {...p}>
+      <rect x="3" y="3" width="7" height="7" rx="1.5" />
+      <rect x="14" y="3" width="7" height="7" rx="1.5" />
+      <rect x="3" y="14" width="7" height="7" rx="1.5" />
+      <rect x="14" y="14" width="7" height="7" rx="1.5" />
+    </Base>
+  );
+}
+
+export function UserIcon(p: IconProps) {
+  return (
+    <Base {...p}>
+      <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+      <circle cx="12" cy="7" r="4" />
+    </Base>
+  );
+}
+
+export function BellIcon(p: IconProps) {
+  return (
+    <Base {...p}>
+      <path d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 10-12 0v3.2a2 2 0 01-.6 1.4L4 17h5" />
+      <path d="M10 21a2 2 0 004 0" />
+    </Base>
+  );
+}
+
+export function SettingsIcon(p: IconProps) {
+  return (
+    <Base {...p}>
+      <circle cx="12" cy="12" r="3" />
+      <path d="M19.4 15a1.7 1.7 0 00.34 1.87l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.7 1.7 0 00-1.87-.34 1.7 1.7 0 00-1 1.54V21a2 2 0 01-4 0v-.09a1.7 1.7 0 00-1-1.54 1.7 1.7 0 00-1.87.34l-.06.06A2 2 0 014.34 17l.06-.06A1.7 1.7 0 004.74 15a1.7 1.7 0 00-1.54-1H3a2 2 0 010-4h.09a1.7 1.7 0 001.54-1 1.7 1.7 0 00-.34-1.87L4.23 7.1A2 2 0 017.06 4.3l.06.06a1.7 1.7 0 001.87.34H9A1.7 1.7 0 0010 3.17V3a2 2 0 014 0v.09a1.7 1.7 0 001 1.54h.07a1.7 1.7 0 001.87-.34l.06-.06a2 2 0 012.83 2.83l-.06.06a1.7 1.7 0 00-.34 1.87V9c0 .67.39 1.28 1 1.54H21a2 2 0 010 4h-.09a1.7 1.7 0 00-1.54 1z" />
+    </Base>
+  );
+}
+
+export function LogOutIcon(p: IconProps) {
+  return (
+    <Base {...p}>
+      <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+      <polyline points="16 17 21 12 16 7" />
+      <line x1="21" y1="12" x2="9" y2="12" />
     </Base>
   );
 }

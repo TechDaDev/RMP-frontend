@@ -26,8 +26,33 @@ function isLocale(value: string | null): value is Locale {
 }
 
 export function AppPreferencesProvider({ children }: { children: React.ReactNode }) {
-  const [locale, setLocale] = useState<Locale>(defaultLocale);
-  const [theme, setTheme] = useState<Theme>("light");
+  const [locale, setLocaleState] = useState<Locale>(defaultLocale);
+  const [theme, setThemeState] = useState<Theme>("light");
+
+  function applyLocale(nextLocale: Locale) {
+    setLocaleState(nextLocale);
+
+    if (typeof document !== "undefined") {
+      document.documentElement.setAttribute("lang", nextLocale);
+      document.documentElement.setAttribute("dir", localeDirection[nextLocale]);
+    }
+
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(languageStorageKey, nextLocale);
+    }
+  }
+
+  function applyTheme(nextTheme: Theme) {
+    setThemeState(nextTheme);
+
+    if (typeof document !== "undefined") {
+      document.documentElement.classList.toggle("dark", nextTheme === "dark");
+    }
+
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(themeStorageKey, nextTheme);
+    }
+  }
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
@@ -35,13 +60,13 @@ export function AppPreferencesProvider({ children }: { children: React.ReactNode
       const storedTheme = window.localStorage.getItem(themeStorageKey);
 
       if (isLocale(storedLocale)) {
-        setLocale(storedLocale);
+        applyLocale(storedLocale);
       }
 
       if (storedTheme === "light" || storedTheme === "dark") {
-        setTheme(storedTheme);
+        applyTheme(storedTheme);
       } else {
-        setTheme(detectPreferredTheme());
+        applyTheme(detectPreferredTheme());
       }
     });
 
@@ -50,26 +75,15 @@ export function AppPreferencesProvider({ children }: { children: React.ReactNode
     };
   }, []);
 
-  useEffect(() => {
-    document.documentElement.setAttribute("lang", locale);
-    document.documentElement.setAttribute("dir", localeDirection[locale]);
-    window.localStorage.setItem(languageStorageKey, locale);
-  }, [locale]);
-
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", theme === "dark");
-    window.localStorage.setItem(themeStorageKey, theme);
-  }, [theme]);
-
   const value = useMemo<AppPreferencesContextValue>(
     () => ({
       locale,
       theme,
       t: getTranslation(locale),
-      setLocale,
-      setTheme,
+      setLocale: applyLocale,
+      setTheme: applyTheme,
       toggleTheme: () => {
-        setTheme((prev) => (prev === "light" ? "dark" : "light"));
+        applyTheme(theme === "light" ? "dark" : "light");
       },
     }),
     [locale, theme],
