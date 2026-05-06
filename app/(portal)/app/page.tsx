@@ -1,17 +1,38 @@
 "use client";
 
-import Link from "next/link";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
+import { useAuth } from "@/components/auth/AuthProvider";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
-import { EmptyState } from "@/components/ui/EmptyState";
-import { buttonClassName } from "@/components/ui/Button";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { buttonClassName } from "@/components/ui/Button";
 import { portalRoles, roleMetadata } from "@/lib/roles";
+import Link from "next/link";
+
+const roleRouteMap: Record<string, string> = {
+  patient: "/app/patient",
+  doctor: "/app/doctor",
+  pharmacist: "/app/pharmacist",
+  laboratorian: "/app/lab",
+};
 
 export default function PortalEntryPage() {
   const { locale, t } = useAppPreferences();
+  const { user } = useAuth();
+  const router = useRouter();
 
+  useEffect(() => {
+    if (user) {
+      const route = roleRouteMap[user.user_type];
+      if (route) {
+        router.replace(route);
+      }
+    }
+  }, [user, router]);
+
+  // Show role cards as fallback (staff / admin or unknown role)
   return (
     <div className="space-y-6">
       <PageHeader
@@ -44,8 +65,6 @@ export default function PortalEntryPage() {
           );
         })}
       </div>
-
-      <EmptyState title={t.portal.roleAutoRoutingNotice} description={t.portal.previewNotice} />
     </div>
   );
 }

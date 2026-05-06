@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
+import { useAuth } from "@/components/auth/AuthProvider";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Logo } from "@/components/Logo";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -38,10 +40,17 @@ function activeRoleFromPath(pathname: string): UserRole | undefined {
 
 export function PortalShell({ children }: PortalShellProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const { locale, theme, t, setLocale, toggleTheme } = useAppPreferences();
+  const { user, logout, verification } = useAuth();
   const activeRole = activeRoleFromPath(pathname);
   const currentRoleLabel = activeRole ? roleMetadata[activeRole].labels[locale] : t.portal.chooseRole;
+
+  function handleLogout() {
+    logout();
+    router.push("/login");
+  }
 
   const sidebar = (
     <div className="flex h-full flex-col gap-5">
@@ -97,14 +106,14 @@ export function PortalShell({ children }: PortalShellProps) {
         })}
       </nav>
 
-      <div className="mt-auto space-y-3 rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+        <div className="mt-auto space-y-3 rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
         <div className="flex items-center gap-3">
           <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--color-surface-alt)] text-[var(--color-primary)]">
             <UserIcon size={18} />
           </span>
           <div>
-            <p className="text-sm font-bold text-[var(--color-text)]">{t.portal.demoUser}</p>
-            <p className="text-xs text-[var(--color-muted)]">{currentRoleLabel}</p>
+            <p className="text-sm font-bold text-[var(--color-text)]">{user ? user.full_name ?? `${user.first_name} ${user.last_name}`.trim() : t.portal.demoUser}</p>
+            <p className="text-xs text-[var(--color-muted)]">{user ? user.email : currentRoleLabel}</p>
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -115,10 +124,14 @@ export function PortalShell({ children }: PortalShellProps) {
           <Link href="/" className={buttonClassName({ variant: "secondary", className: "flex-1" })} onClick={() => setMenuOpen(false)}>
             {t.common.backToHome}
           </Link>
-          <Link href="/login" className={buttonClassName({ variant: "ghost", className: "flex-1" })} onClick={() => setMenuOpen(false)}>
+          <button
+            type="button"
+            className={buttonClassName({ variant: "ghost", className: "flex-1" })}
+            onClick={() => { setMenuOpen(false); handleLogout(); }}
+          >
             <LogOutIcon size={16} />
             {t.portal.logout}
-          </Link>
+          </button>
         </div>
       </div>
     </div>
@@ -166,9 +179,22 @@ export function PortalShell({ children }: PortalShellProps) {
             </div>
           </header>
 
-          <div className="rounded-[2rem] border border-[color:color-mix(in_srgb,var(--color-accent)_20%,transparent)] bg-[color:color-mix(in_srgb,var(--color-accent)_8%,var(--color-surface))] px-4 py-3 text-sm font-medium text-[var(--color-text)]">
-            {t.portal.previewNotice}
-          </div>
+          {/* Verification / info banner */}
+          {verification?.required && !verification.is_approved ? (
+            verification.status === "pending" ? (
+              <div role="status" className="rounded-[2rem] border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200">
+                <span className="font-bold">{t.auth.verificationPendingTitle}:</span> {t.auth.verificationPendingDesc}
+              </div>
+            ) : verification.status === "rejected" ? (
+              <div role="alert" className="rounded-[2rem] border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300">
+                <span className="font-bold">{t.auth.verificationRejectedTitle}:</span> {t.auth.verificationRejectedDesc}
+              </div>
+            ) : verification.status === "suspended" ? (
+              <div role="alert" className="rounded-[2rem] border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300">
+                <span className="font-bold">{t.auth.verificationSuspendedTitle}:</span> {t.auth.verificationSuspendedDesc}
+              </div>
+            ) : null
+          ) : null}
 
           <main id="portal-content" className="flex-1 pb-6">
             {children}
