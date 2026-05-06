@@ -7,6 +7,7 @@ import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { PublicAuthLayout } from "@/components/layouts/PublicAuthLayout";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { PasswordInput } from "@/components/ui/PasswordInput";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { registerService } from "@/lib/auth/authService";
 import { registrationRoles, roleMetadata } from "@/lib/roles";
@@ -22,6 +23,7 @@ export default function RegisterPage() {
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (loading) return;
     setError(null);
     setLoading(true);
 
@@ -44,7 +46,9 @@ export default function RegisterPage() {
       router.push(`/activate?email=${encodeURIComponent(email)}`);
     } catch (err) {
       if (err instanceof ApiError) {
-        if (err.fieldErrors) {
+        if (err.status === 0) {
+          setError(t.auth.networkError);
+        } else if (err.fieldErrors) {
           const messages = Object.values(err.fieldErrors).flat().join(" ");
           setError(messages || t.auth.errorGeneric);
         } else {
@@ -66,7 +70,7 @@ export default function RegisterPage() {
           description={t.auth.registerSubtitle}
         />
 
-        <form className="space-y-5" onSubmit={handleSubmit}>
+        <form className="space-y-5" onSubmit={handleSubmit} noValidate>
           <div className="space-y-3">
             <label className="text-sm font-semibold text-[var(--color-text)]">{t.auth.chooseAccountType}</label>
             <div className="grid gap-3 sm:grid-cols-2">
@@ -98,12 +102,49 @@ export default function RegisterPage() {
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <Input id="register-first-name" name="first_name" label={t.auth.firstNameLabel} placeholder={t.auth.firstNameLabel} required />
-            <Input id="register-last-name" name="last_name" label={t.auth.lastNameLabel} placeholder={t.auth.lastNameLabel} required />
+            <Input
+              id="register-first-name"
+              name="first_name"
+              label={t.auth.firstNameLabel}
+              placeholder={t.auth.firstNameLabel}
+              required
+              autoComplete="given-name"
+            />
+            <Input
+              id="register-last-name"
+              name="last_name"
+              label={t.auth.lastNameLabel}
+              placeholder={t.auth.lastNameLabel}
+              required
+              autoComplete="family-name"
+            />
           </div>
-          <Input id="register-email" name="email" type="email" label={t.auth.emailLabel} placeholder="name@example.com" required dir="ltr" />
-          <Input id="register-password" name="password" type="password" label={t.auth.passwordLabel} placeholder="••••••••" required dir="ltr" />
-          <Input id="register-password-confirm" name="password_confirm" type="password" label={t.auth.passwordConfirmLabel} placeholder="••••••••" required dir="ltr" />
+          <Input
+            id="register-email"
+            name="email"
+            type="email"
+            label={t.auth.emailLabel}
+            placeholder="name@example.com"
+            required
+            dir="ltr"
+            autoComplete="email"
+          />
+          <PasswordInput
+            id="register-password"
+            name="password"
+            label={t.auth.passwordLabel}
+            placeholder="••••••••"
+            required
+            autoComplete="new-password"
+          />
+          <PasswordInput
+            id="register-password-confirm"
+            name="password_confirm"
+            label={t.auth.passwordConfirmLabel}
+            placeholder="••••••••"
+            required
+            autoComplete="new-password"
+          />
 
           {error ? (
             <p role="alert" className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300">
@@ -117,7 +158,10 @@ export default function RegisterPage() {
         </form>
 
         <p className="text-sm text-[var(--color-muted)]">
-          {t.auth.haveAccount} <Link href="/login" className="font-semibold text-[var(--color-primary)] hover:underline">{t.auth.loginTitle}</Link>
+          {t.auth.haveAccount}{" "}
+          <Link href="/login" className="font-semibold text-[var(--color-primary)] hover:underline">
+            {t.auth.loginTitle}
+          </Link>
         </p>
       </div>
     </PublicAuthLayout>

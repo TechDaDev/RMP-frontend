@@ -250,6 +250,10 @@ export const translations: Record<Locale, Translations> = {
       activating: "جارٍ التفعيل...",
       sendingReset: "جارٍ الإرسال...",
       logoutAction: "تسجيل الخروج",
+      networkError: "تعذّر الاتصال. يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.",
+      showPassword: "إظهار كلمة المرور",
+      hidePassword: "إخفاء كلمة المرور",
+      verificationApprovedBadge: "موثّق",
     },
     portal: {
       dashboard: "لوحة التحكم",
@@ -582,6 +586,10 @@ export const translations: Record<Locale, Translations> = {
       activating: "چالاککردن...",
       sendingReset: "نێردن...",
       logoutAction: "چوونەدەرەوە",
+      networkError: "پەیوەندی سەرنەخستەوە. تکایە پەیوەندی ئینتەرنێتی خۆت بپشکنە و دووبارە هەوڵ بدەوە.",
+      showPassword: "پاسووردەکە پیشان بدە",
+      hidePassword: "پاسووردەکە بشارەوە",
+      verificationApprovedBadge: "تایبەتمەندکراو",
     },
     portal: {
       dashboard: "داشبۆرد",
@@ -914,6 +922,10 @@ export const translations: Record<Locale, Translations> = {
       activating: "Activating...",
       sendingReset: "Sending...",
       logoutAction: "Logout",
+      networkError: "Connection failed. Please check your network and try again.",
+      showPassword: "Show password",
+      hidePassword: "Hide password",
+      verificationApprovedBadge: "Verified",
     },
     portal: {
       dashboard: "Dashboard",

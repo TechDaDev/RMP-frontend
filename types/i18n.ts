@@ -111,6 +111,10 @@ export interface Translations {
     activating: string;
     sendingReset: string;
     logoutAction: string;
+    networkError: string;
+    showPassword: string;
+    hidePassword: string;
+    verificationApprovedBadge: string;
   };
   portal: {
     dashboard: string;

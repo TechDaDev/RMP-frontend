@@ -180,7 +180,11 @@ export function PortalShell({ children }: PortalShellProps) {
           </header>
 
           {/* Verification / info banner */}
-          {verification?.required && !verification.is_approved ? (
+          {verification?.required && verification.is_approved === true ? (
+            <div role="status" className="rounded-[2rem] border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700 dark:border-green-800 dark:bg-green-950 dark:text-green-300">
+              ✓ {t.auth.verificationApprovedBadge}
+            </div>
+          ) : verification?.required && !verification.is_approved ? (
             verification.status === "pending" ? (
               <div role="status" className="rounded-[2rem] border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200">
                 <span className="font-bold">{t.auth.verificationPendingTitle}:</span> {t.auth.verificationPendingDesc}

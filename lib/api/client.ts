@@ -1,5 +1,5 @@
 import { apiUrl } from "@/lib/api/config";
-import { throwApiError } from "@/lib/api/errors";
+import { ApiError, throwApiError } from "@/lib/api/errors";
 import { getAccessToken } from "@/lib/auth/tokenStorage";
 
 type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
@@ -38,11 +38,20 @@ export async function apiRequest<T>(
     }
   }
 
-  const response = await fetch(apiUrl(path), {
-    method: resolvedMethod,
-    headers,
-    body: body !== undefined ? JSON.stringify(body) : undefined,
-  });
+  let response: Response;
+  try {
+    response = await fetch(apiUrl(path), {
+      method: resolvedMethod,
+      headers,
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+    });
+  } catch {
+    // Network failure, DNS error, backend offline, etc.
+    throw new ApiError(
+      "Connection failed. Please check your network and try again.",
+      0,
+    );
+  }
 
   if (!response.ok) {
     await throwApiError(response);

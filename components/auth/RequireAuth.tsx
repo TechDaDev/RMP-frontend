@@ -3,6 +3,7 @@
 import { useEffect, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { AppLoading } from "@/components/ui/AppLoading";
 
 interface RequireAuthProps {
   children: ReactNode;
@@ -10,7 +11,8 @@ interface RequireAuthProps {
 
 /**
  * Redirects unauthenticated users to /login.
- * Shows nothing while the initial auth check is in progress.
+ * Shows a full-screen loading indicator while the initial auth check runs
+ * to prevent a flash of protected content before the token resolves.
  */
 export function RequireAuth({ children }: RequireAuthProps) {
   const { isAuthenticated, loading } = useAuth();
@@ -23,8 +25,7 @@ export function RequireAuth({ children }: RequireAuthProps) {
   }, [loading, isAuthenticated, router]);
 
   if (loading) {
-    // Avoid flash of content; return null until token check resolves
-    return null;
+    return <AppLoading />;
   }
 
   if (!isAuthenticated) {

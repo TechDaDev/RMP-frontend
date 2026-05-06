@@ -14,9 +14,10 @@ import {
   logoutService,
   getCurrentProfileService,
 } from "@/lib/auth/authService";
-import { getAccessToken } from "@/lib/auth/tokenStorage";
+import { getAccessToken, clearTokens } from "@/lib/auth/tokenStorage";
 import type { BackendUser, ProfileVerification } from "@/types/backend";
 import type { LoginRequest } from "@/types/backend";
+import { ApiError } from "@/lib/api/errors";
 
 interface AuthState {
   user: BackendUser | null;
@@ -50,7 +51,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         verification: profile.verification,
         loading: false,
       });
-    } catch {
+    } catch (err) {
+      // If the stored token is invalid/expired, purge it immediately so
+      // subsequent page loads don't re-attempt and get stuck.
+      if (err instanceof ApiError && err.status === 401) {
+        clearTokens();
+      }
       setState({ user: null, verification: null, loading: false });
     }
   }, []);

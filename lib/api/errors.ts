@@ -48,7 +48,9 @@ export async function throwApiError(response: Response): Promise<never> {
   // Shape A: { success: false, message, errors }
   if (body && typeof body === "object" && "success" in body) {
     const b = body as { success: boolean; message?: string; errors?: Record<string, string[]> };
-    const msg = b.message ?? `HTTP ${response.status}`;
+    // Promote non_field_errors into the message when no dedicated message is set
+    const nonFieldErrors = b.errors?.non_field_errors?.join(" ");
+    const msg = b.message ?? nonFieldErrors ?? `HTTP ${response.status}`;
     throw new ApiError(msg, response.status, b.errors);
   }
 

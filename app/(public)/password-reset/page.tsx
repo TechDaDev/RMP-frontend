@@ -19,6 +19,7 @@ export default function PasswordResetPage() {
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (loading) return;
     setError(null);
     setLoading(true);
 
@@ -31,7 +32,11 @@ export default function PasswordResetPage() {
       setSent(true);
     } catch (err) {
       if (err instanceof ApiError) {
-        setError(err.message || t.auth.errorGeneric);
+        if (err.status === 0) {
+          setError(t.auth.networkError);
+        } else {
+          setError(err.message || t.auth.errorGeneric);
+        }
       } else {
         setError(t.auth.errorGeneric);
       }
@@ -58,8 +63,8 @@ export default function PasswordResetPage() {
             </Link>
           </div>
         ) : (
-          <form className="space-y-4" onSubmit={handleSubmit}>
-            <Input id="reset-email" name="email" type="email" label={t.auth.emailLabel} placeholder="name@example.com" required dir="ltr" />
+          <form className="space-y-4" onSubmit={handleSubmit} noValidate>
+            <Input id="reset-email" name="email" type="email" label={t.auth.emailLabel} placeholder="name@example.com" required dir="ltr" autoComplete="email" />
 
             {error ? (
               <p role="alert" className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300">

@@ -24,6 +24,7 @@ function ActivateForm() {
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (loading) return;
     setError(null);
     setLoading(true);
 
@@ -36,9 +37,10 @@ function ActivateForm() {
       router.push("/login");
     } catch (err) {
       if (err instanceof ApiError) {
-        const details = err.fieldErrors;
-        if (details) {
-          setError(Object.values(details).flat().join(" "));
+        if (err.status === 0) {
+          setError(t.auth.networkError);
+        } else if (err.fieldErrors) {
+          setError(Object.values(err.fieldErrors).flat().join(" "));
         } else {
           setError(err.message || t.auth.errorGeneric);
         }
@@ -51,15 +53,19 @@ function ActivateForm() {
   }
 
   async function handleResend() {
-    if (!emailParam) return;
+    if (!emailParam || resending) return;
     setResendMessage(null);
     setError(null);
     setResending(true);
     try {
       await resendActivationOtpService({ email: emailParam });
       setResendMessage(t.auth.resendOtpSent);
-    } catch {
-      setError(t.auth.errorGeneric);
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 0) {
+        setError(t.auth.networkError);
+      } else {
+        setError(t.auth.errorGeneric);
+      }
     } finally {
       setResending(false);
     }
@@ -70,7 +76,7 @@ function ActivateForm() {
       <div className="space-y-6">
         <PageHeader title={t.auth.activateTitle} description={t.auth.activateSubtitle} />
 
-        <form className="space-y-4" onSubmit={handleSubmit}>
+        <form className="space-y-4" onSubmit={handleSubmit} noValidate>
           <Input
             id="activate-email"
             name="email"
@@ -79,6 +85,7 @@ function ActivateForm() {
             defaultValue={emailParam}
             required
             dir="ltr"
+            autoComplete="email"
           />
           <Input
             id="activate-code"
@@ -88,6 +95,8 @@ function ActivateForm() {
             required
             dir="ltr"
             maxLength={6}
+            inputMode="numeric"
+            autoComplete="one-time-code"
           />
 
           {error ? (

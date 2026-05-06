@@ -2,20 +2,34 @@
 
 This plan defines implementation order after Phase 1 API contract mapping.
 
-## Phase 2 — Auth Integration
+## Phase 2 — Auth Integration ✅ COMPLETE (commit f68ae06)
 
-1. Create API base config and request wrapper.
-2. Implement auth endpoints:
+1. Create API base config and request wrapper. ✅
+2. Implement auth endpoints: ✅
    - register
    - activate account (OTP)
    - resend activation OTP
    - login
    - password reset request/confirm
-3. Add current-user bootstrap (`GET /api/accounts/me/`).
-4. Add route guards for authenticated vs anonymous routes.
-5. Add role-based redirect from `/app` to role route.
-6. Add refresh/logout flow after runtime verification of canonical backend endpoints.
-7. Add response normalizer supporting both `status` and `success` envelopes.
+3. Add current-user bootstrap (`GET /api/accounts/me/`). ✅
+4. Add route guards for authenticated vs anonymous routes. ✅
+5. Add role-based redirect from `/app` to role route. ✅
+6. Add refresh/logout flow after runtime verification of canonical backend endpoints. ✅
+7. Add response normalizer supporting both `status` and `success` envelopes. ✅
+
+## Phase 2.1 — Auth QA and UX Hardening ✅ COMPLETE
+
+- Network error normalization (`ApiError` with `status: 0` for offline/unreachable)
+- `non_field_errors` promoted to message in error normalizer
+- Token auto-clear on 401 in `AuthProvider`
+- `AppLoading` spinner during auth check in `RequireAuth`
+- `RequireRole` per-role guard components + per-role layout files
+- `PasswordInput` component with show/hide toggle and RTL-safe padding
+- `autoComplete` attributes on all auth forms
+- `noValidate` + `if (loading) return` guards on all form submit handlers
+- Verified badge (green) for approved professionals in PortalShell
+- i18n: 4 new strings across ar/ku/en
+- See `docs/AUTH_QA_REPORT.md` for full test results and remaining risks
 
 ## Phase 3 — Profile and Verification
 
