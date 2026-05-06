@@ -1,0 +1,106 @@
+# Frontend Integration Plan
+
+This plan defines implementation order after Phase 1 API contract mapping.
+
+## Phase 2 — Auth Integration
+
+1. Create API base config and request wrapper.
+2. Implement auth endpoints:
+   - register
+   - activate account (OTP)
+   - resend activation OTP
+   - login
+   - password reset request/confirm
+3. Add current-user bootstrap (`GET /api/accounts/me/`).
+4. Add route guards for authenticated vs anonymous routes.
+5. Add role-based redirect from `/app` to role route.
+6. Add refresh/logout flow after runtime verification of canonical backend endpoints.
+7. Add response normalizer supporting both `status` and `success` envelopes.
+
+## Phase 3 — Profile and Verification
+
+1. Build `/app/profile` page and profile completion UX.
+2. Integrate `GET /api/profiles/me/` and role profile PATCH endpoints.
+3. Add verification pending banners and action locks for doctor/pharmacist/laboratorian.
+4. Gate role workflows by verification status.
+
+## Phase 4 — Patient Portal
+
+1. Consultation creation/list/detail.
+2. Consultation messaging and read-state updates.
+3. Prescriptions list/detail (without medication items).
+4. Lab orders and released-only lab results.
+5. Patient medical record view.
+6. Enforce privacy display constraints in UI.
+
+## Phase 5 — Doctor Portal
+
+1. Pending/assigned consultation queues.
+2. Accept/respond/close consultation flow.
+3. Assigned patient medical record view.
+4. Prescription create/detail/cancel workflows.
+5. Lab order create/detail/cancel workflows.
+6. Lab result review/release workflows.
+7. Doctor RAG support tools.
+
+## Phase 6 — Pharmacist Portal
+
+1. Prescription scan workflow.
+2. Pending item display and dispensing workflow.
+3. Verification-gated action enforcement.
+
+## Phase 7 — Laboratory Portal
+
+1. Lab order scan workflow.
+2. Complete lab order items.
+3. Create/correct lab results.
+4. Verification-gated action enforcement.
+
+## Phase 8 — Admin/Staff Portal
+
+1. Knowledge base document operations.
+2. Chunk browsing and search tools.
+3. RAG feedback review.
+4. RAG analytics and dataset export.
+5. Staff-only access control and audit-safe UI.
+
+## Phase 9 — Realtime
+
+1. User notification WebSocket integration.
+2. Consultation chat WebSocket integration.
+3. Event-to-REST revalidation strategy.
+4. Fallback polling for degraded socket state.
+
+## Risks and Mitigations
+
+### 1) Token storage policy
+- Risk: insecure localStorage token usage.
+- Mitigation: use secure token handling strategy defined in Phase 2; clear tokens on failed refresh/logout.
+
+### 2) Envelope inconsistency
+- Risk: docs show both `status` and `success` response styles.
+- Mitigation: normalize both forms in one frontend response parser.
+
+### 3) Login payload inconsistency
+- Risk: tokens may be returned as `data.access`/`data.refresh` or nested under `data.tokens`.
+- Mitigation: support both shapes in auth parser until runtime contract is verified.
+
+### 4) Endpoint naming drift
+- Risk: older guide paths differ from endpoint inventory.
+- Mitigation: implement from API_REFERENCE + ENDPOINT_INVENTORY and maintain a conflict list.
+
+### 5) File upload behavior
+- Risk: multipart handling and file size validation mismatch.
+- Mitigation: central multipart helper, frontend validation, and clear upload error handling.
+
+### 6) Privacy display rules
+- Risk: accidental disclosure of restricted medical details.
+- Mitigation: role-based render guards and serializer-driven assumptions documented in mapping.
+
+## Runtime Contract Verification Required at Phase 2 Start
+
+Before coding business logic, verify live backend responses with curl/Postman for:
+1. Login response shape (tokens nesting).
+2. Envelope fields (`status` vs `success`).
+3. Presence and path of refresh/logout endpoints.
+4. Any remaining legacy aliases from the integration guide.
