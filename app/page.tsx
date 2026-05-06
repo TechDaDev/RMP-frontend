@@ -20,34 +20,49 @@ function isLocale(value: string): value is Locale {
 }
 
 export default function Home() {
-  const [locale, setLocale] = useState<Locale>(() => {
-    if (typeof window === "undefined") {
-      return defaultLocale;
-    }
-    const storedLocale = window.localStorage.getItem(languageStorageKey);
-    return storedLocale && isLocale(storedLocale) ? storedLocale : defaultLocale;
-  });
-  const [theme, setTheme] = useState<Theme>(() => {
-    if (typeof window === "undefined") {
-      return "light";
-    }
-    const storedTheme = window.localStorage.getItem(themeStorageKey);
-    if (storedTheme === "light" || storedTheme === "dark") {
-      return storedTheme;
-    }
-    return detectPreferredTheme();
-  });
+  const [locale, setLocale] = useState<Locale>(defaultLocale);
+  const [theme, setTheme] = useState<Theme>("light");
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
+    const frame = window.requestAnimationFrame(() => {
+      const storedLocale = window.localStorage.getItem(languageStorageKey);
+      const storedTheme = window.localStorage.getItem(themeStorageKey);
+
+      if (storedLocale && isLocale(storedLocale)) {
+        setLocale(storedLocale);
+      }
+
+      if (storedTheme === "light" || storedTheme === "dark") {
+        setTheme(storedTheme);
+      } else {
+        setTheme(detectPreferredTheme());
+      }
+
+      setHydrated(true);
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated) {
+      return;
+    }
     window.localStorage.setItem(languageStorageKey, locale);
     document.documentElement.setAttribute("lang", locale);
     document.documentElement.setAttribute("dir", localeDirection[locale]);
-  }, [locale]);
+  }, [locale, hydrated]);
 
   useEffect(() => {
+    if (!hydrated) {
+      return;
+    }
     window.localStorage.setItem(themeStorageKey, theme);
     document.documentElement.classList.toggle("dark", theme === "dark");
-  }, [theme]);
+  }, [theme, hydrated]);
 
   const t = useMemo(() => getTranslation(locale), [locale]);
   const previewLabels: Record<Locale, { title: string; status: string }[]> = {

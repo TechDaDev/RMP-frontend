@@ -17,7 +17,9 @@ export function ThemeToggle({ theme, onToggle, t }: ThemeToggleProps) {
       aria-label="Toggle theme"
       className="inline-flex h-10 items-center rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm font-medium text-[var(--color-text)] transition hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]"
     >
-      {theme === "dark" ? t.theme.light : t.theme.dark}
+      <span suppressHydrationWarning>
+        {theme === "dark" ? t.theme.light : t.theme.dark}
+      </span>
     </button>
   );
 }
