@@ -1,0 +1,594 @@
+import type { Locale, Translations } from "@/types/i18n";
+
+export const defaultLocale: Locale = "ar";
+
+export const localeDirection: Record<Locale, "rtl" | "ltr"> = {
+  ar: "rtl",
+  ku: "rtl",
+  en: "ltr",
+};
+
+export const translations: Record<Locale, Translations> = {
+  ar: {
+    nav: {
+      home: "الرئيسية",
+      features: "المزايا",
+      whoItServes: "لمن المنصة؟",
+      security: "الأمان",
+      howItWorks: "آلية العمل",
+      faq: "الأسئلة الشائعة",
+      cta: "ابدأ لاحقًا",
+    },
+    hero: {
+      title: "منصة طبية رقمية تربط الرعاية الصحية من البداية إلى المتابعة",
+      subtitle:
+        "منصة الرافدين الطبية الرقمية تساعد على تنظيم التواصل بين المريض والطبيب والمختبر والصيدلية، مع التركيز على الأمان، الخصوصية، وسهولة الوصول.",
+      exploreBtn: "استكشف المنصة",
+      howBtn: "تعرف على آلية العمل",
+    },
+    trust: {
+      title: "مؤشرات الثقة",
+      items: [
+        {
+          label: "خصوصية البيانات",
+          desc: "إدارة دقيقة للوصول إلى المعلومات الطبية الحساسة.",
+        },
+        {
+          label: "وصول منظم",
+          desc: "صلاحيات واضحة لكل دور لضمان استخدام منضبط.",
+        },
+        {
+          label: "تواصل آمن",
+          desc: "قنوات تواصل مصممة لحماية سرية الرعاية.",
+        },
+        {
+          label: "متابعة طبية",
+          desc: "استمرارية في الرعاية عبر رحلة المريض كاملة.",
+        },
+      ],
+    },
+    features: {
+      title: "المزايا الأساسية",
+      subtitle:
+        "واجهة موحدة لتنسيق خدمات الرعاية الصحية بين الأطراف المختلفة.",
+      items: [
+        {
+          title: "الاستشارات",
+          desc: "تنظيم طلبات الاستشارة والمتابعة الطبية بوضوح.",
+        },
+        {
+          title: "الوصفات",
+          desc: "إدارة وصفات رقمية بأسلوب منظم وسهل المتابعة.",
+        },
+        {
+          title: "طلبات ونتائج المختبر",
+          desc: "ربط طلبات الفحوصات ومتابعة النتائج ضمن نفس المسار.",
+        },
+        {
+          title: "سجلات المرضى",
+          desc: "عرض منظم للمعلومات الطبية لدعم القرار العلاجي.",
+        },
+        {
+          title: "مراسلة آمنة",
+          desc: "تبادل معلومات الرعاية ضمن قنوات محمية.",
+        },
+        {
+          title: "دعم طبي معرفي",
+          desc: "محتوى مرجعي يساعد الفرق الطبية على العمل بكفاءة.",
+        },
+      ],
+    },
+    whoItServes: {
+      title: "لمن المنصة؟",
+      subtitle: "مصممة لخدمة أطراف المنظومة الصحية بشكل متكامل.",
+      items: [
+        {
+          title: "للمرضى",
+          desc: "وصول أوضح للمعلومات والمتابعة من أي جهاز.",
+        },
+        {
+          title: "للأطباء",
+          desc: "تدفق عملي منظم للاستشارات والخطط العلاجية.",
+        },
+        {
+          title: "للصيدليات",
+          desc: "تنسيق صرف الوصفات ضمن سياق طبي موثوق.",
+        },
+        {
+          title: "للمختبرات",
+          desc: "إدارة الطلبات والنتائج بطريقة مترابطة وشفافة.",
+        },
+      ],
+    },
+    security: {
+      title: "الأمان والخصوصية",
+      subtitle: "مصممة بمبادئ الأمان والخصوصية من البداية.",
+      tagline:
+        "بنية تشغيلية تدعم الاستخدام الآمن للمعلومات الطبية بين الجهات المعنية.",
+      items: [
+        {
+          label: "وصول منضبط",
+          desc: "التحكم بمن يمكنه الاطلاع على كل نوع من البيانات.",
+        },
+        {
+          label: "صلاحيات مبنية على الأدوار",
+          desc: "توزيع المسؤوليات حسب طبيعة العمل لكل مستخدم.",
+        },
+        {
+          label: "سجلات تدقيق",
+          desc: "تتبع الأنشطة لدعم الشفافية وتحسين الحوكمة.",
+        },
+        {
+          label: "إدارة آمنة للوثائق",
+          desc: "تنظيم مشاركة الوثائق الطبية وفق سياسات حماية واضحة.",
+        },
+        {
+          label: "تواصل طبي محمي",
+          desc: "قنوات مراسلة تراعي سرية التواصل الطبي.",
+        },
+      ],
+    },
+    howItWorks: {
+      title: "آلية العمل",
+      subtitle: "تدفق واضح من الطلب الأول حتى المتابعة.",
+      steps: [
+        {
+          title: "1. يقدم المريض الطلب أو الاستشارة",
+          desc: "يبدأ المسار عبر طلب منظم داخل المنصة.",
+        },
+        {
+          title: "2. يراجع الطبيب ويستجيب",
+          desc: "يتم تقييم الحالة وتقديم التوجيه المناسب.",
+        },
+        {
+          title: "3. تنفيذ إجراءات المختبر أو الصيدلية عند الحاجة",
+          desc: "تتصل الجهات ذات الصلة ضمن نفس الرحلة العلاجية.",
+        },
+        {
+          title: "4. متابعة المريض بشكل آمن",
+          desc: "تستمر المتابعة عبر سجل موحد وموثوق.",
+        },
+      ],
+    },
+    preview: {
+      title: "نظرة على المنصة",
+      subtitle: "تصور واجهة تشغيلية رقمية بدون بيانات حقيقية.",
+    },
+    faq: {
+      title: "الأسئلة الشائعة",
+      subtitle: "إجابات سريعة على الأسئلة الأساسية.",
+      items: [
+        {
+          q: "هل هذه المنصة بديل عن المستشفيات؟",
+          a: "لا، المنصة تدعم تنظيم التواصل والإجراءات الرقمية ولا تستبدل الرعاية السريرية المباشرة.",
+        },
+        {
+          q: "هل يمكن للمريض الوصول من الهاتف؟",
+          a: "نعم، الواجهة متجاوبة ومهيأة للاستخدام على الهواتف والأجهزة اللوحية.",
+        },
+        {
+          q: "هل يوجد تطبيق iOS؟",
+          a: "في المرحلة الحالية يمكن لمستخدمي iPhone استخدام نسخة الويب المتجاوبة، وسيتم التخطيط لتطبيق iOS لاحقًا.",
+        },
+        {
+          q: "كيف تتم حماية الخصوصية؟",
+          a: "يتم اعتماد وصول منظم وصلاحيات بحسب الدور مع ممارسات أمان وخصوصية ضمن بنية المنصة.",
+        },
+        {
+          q: "متى ستكون المنصة متاحة؟",
+          a: "المنصة حالياً في مرحلة الإطلاق الأولي، وسيتم الإعلان عن الجدول الزمني قريبًا.",
+        },
+      ],
+    },
+    finalCta: {
+      tagline:
+        "الرعاية الصحية الرقمية تبدأ من تنظيم الوصول الآمن للمعلومة الطبية.",
+      btn: "قريبًا",
+    },
+    footer: {
+      description:
+        "منصة رقمية موحدة لربط المرضى ومقدمي الرعاية ضمن تجربة موثوقة وآمنة.",
+      copyright:
+        "© 2026 منصة الرافدين الطبية الرقمية. جميع الحقوق محفوظة.",
+    },
+    lang: {
+      ar: "العربية",
+      ku: "کوردی",
+      en: "English",
+    },
+    theme: {
+      light: "فاتح",
+      dark: "داكن",
+    },
+  },
+  ku: {
+    nav: {
+      home: "سەرەکی",
+      features: "تایبەتمەندییەکان",
+      whoItServes: "بۆ کێیە؟",
+      security: "ئاسایش",
+      howItWorks: "چۆن کاردەکات",
+      faq: "پرسیارە باوەکان",
+      cta: "بەم زووانە",
+    },
+    hero: {
+      title:
+        "پلاتفۆرمێکی پزیشکی دیجیتاڵی بۆ بەستنەوەی چاودێری تەندروستی لە ڕاوێژەوە تا بەدواداچوون",
+      subtitle:
+        "پلاتفۆرمی پزیشکی دیجیتاڵی ڕافیدەین یارمەتی ڕێکخستنی پەیوەندی نێوان نەخۆش، پزیشک، تاقیگە و دەرمانخانە دەدات، بە جەختکردنەوە لەسەر ئاسایش، تایبەتمەندی و ئاسانکاری.",
+      exploreBtn: "پلاتفۆرمەکە ببینە",
+      howBtn: "بزانە چۆن کاردەکات",
+    },
+    trust: {
+      title: "نیشانەکانی متمانە",
+      items: [
+        {
+          label: "تایبەتمەندی داتا",
+          desc: "پاراستنی زانیاری پزیشکی بە کۆنترۆڵی ورد.",
+        },
+        {
+          label: "دەستگەیشتنی ڕێکخراو",
+          desc: "دەسەڵات بەپێی ڕۆڵ بۆ بەکارهێنانی ڕێکوپێک.",
+        },
+        {
+          label: "پەیوەندی پارێزراو",
+          desc: "هێڵی پەیوەندی تایبەتی بۆ کاری پزیشکی.",
+        },
+        {
+          label: "بەدواداچوونی پزیشکی",
+          desc: "بەردەوامی چاودێری لە هەموو قۆناغەکاندا.",
+        },
+      ],
+    },
+    features: {
+      title: "تایبەتمەندییە سەرەکییەکان",
+      subtitle:
+        "ڕووکارێکی یەکگرتوو بۆ ڕێکخستنی خزمەتگوزاریی تەندروستی.",
+      items: [
+        {
+          title: "ڕاوێژ",
+          desc: "ڕێکخستنی داواکاری ڕاوێژ و بەدواداچوون بە ڕوونی.",
+        },
+        {
+          title: "ڕەچەتە",
+          desc: "بەڕێوەبردنی ڕەچەتەی دیجیتاڵی بە شێوەیەکی ئاسان.",
+        },
+        {
+          title: "داواکاری و ئەنجامی تاقیکردنەوە",
+          desc: "بەستنەوەی تاقیکردنەوەکان لە هەمان ڕێڕەودا.",
+        },
+        {
+          title: "تۆماری نەخۆش",
+          desc: "پیشاندانی زانیاری پزیشکی بۆ هاوکاری بڕیاردان.",
+        },
+        {
+          title: "نامەگۆڕینی پارێزراو",
+          desc: "ئاڵوگۆڕی زانیاری تەندروستی لە ژێر پاراستندا.",
+        },
+        {
+          title: "پشتگیری پزیشکیی زانیاری-بنیاد",
+          desc: "سەرچاوەی یارمەتیدەر بۆ تیمە پزیشکییەکان.",
+        },
+      ],
+    },
+    whoItServes: {
+      title: "بۆ کێیە؟",
+      subtitle: "بۆ هەموو لایەنە سەرەکییەکانی سیستەمی تەندروستی.",
+      items: [
+        {
+          title: "بۆ نەخۆشان",
+          desc: "دەستگەیشتنێکی ئاسانتر بۆ بەدواداچوون و زانیاری.",
+        },
+        {
+          title: "بۆ پزیشکان",
+          desc: "ڕێڕەوێکی کارا بۆ ڕاوێژ و پلانی چارەسەر.",
+        },
+        {
+          title: "بۆ دەرمانخانەکان",
+          desc: "هاوتاکردنی ڕەچەتەکان لە چوارچێوەیەکی متمانەپێکراودا.",
+        },
+        {
+          title: "بۆ تاقیگەکان",
+          desc: "بەڕێوەبردنی داواکاری و ئەنجام بە شێوەیەکی پەیوەست.",
+        },
+      ],
+    },
+    security: {
+      title: "ئاسایش و تایبەتمەندی",
+      subtitle: "لە بنەڕەتەوە بە بنەماکانی ئاسایش و تایبەتمەندی دیزاین کراوە.",
+      tagline:
+        "بنکەیەکی کارپێکراو بۆ بەکارهێنانی پارێزراوی زانیاری پزیشکی.",
+      items: [
+        {
+          label: "دەستگەیشتنی کۆنترۆڵکراو",
+          desc: "دیاریکردنی ئەوەی کێ بتوانێت چ زانیارییەک ببینێت.",
+        },
+        {
+          label: "دەسەڵاتی بەپێی ڕۆڵ",
+          desc: "پەیوەستکردنی مافەکان بە جۆری ئەرکی بەکارهێنەر.",
+        },
+        {
+          label: "تۆماری چاودێری",
+          desc: "تۆمارکردنی چالاکییەکان بۆ ڕوونی و باشترکردنی سیستەم.",
+        },
+        {
+          label: "بەڕێوەبردنی پارێزراوی بەڵگەنامە",
+          desc: "هاوبەشکردنی بەڵگەنامەی پزیشکی بە ڕێسای پاراستنی دیاریکراو.",
+        },
+        {
+          label: "پەیوەندی پزیشکی پارێزراو",
+          desc: "کەناڵی نامەگۆڕین کە نهێنیی پەیوەندی پارێزراو دەکات.",
+        },
+      ],
+    },
+    howItWorks: {
+      title: "چۆن کاردەکات",
+      subtitle: "ڕێڕەوێکی ڕوون لە داواکاری یەکەمەوە تا بەدواداچوون.",
+      steps: [
+        {
+          title: "1. نەخۆش داواکاری یان ڕاوێژ دەنێرێت",
+          desc: "دەستپێکردنی ڕێڕەوەکە لە ناو پلاتفۆرمدا.",
+        },
+        {
+          title: "2. پزیشک پشکنین دەکات و وەڵام دەدات",
+          desc: "هەڵسەنگاندنی دۆخ و ناردنی ڕێنمایی پێویست.",
+        },
+        {
+          title: "3. کاری تاقیگە/دەرمانخانە ئەنجام دەدرێت کاتێک پێویستە",
+          desc: "لایەنە پەیوەندیدارەکان لە هەمان ڕێڕەوی چارەسەردا پەیوەست دەبن.",
+        },
+        {
+          title: "4. نەخۆش بە شێوەیەکی پارێزراو بەدواداچوون دەکات",
+          desc: "بەردەوامبوون لە چاودێری بە تۆمارێکی یەکگرتوو.",
+        },
+      ],
+    },
+    preview: {
+      title: "پێشبینینی پلاتفۆرم",
+      subtitle: "نموونەی ڕووکارێکی کارپێکراو بەبێ داتای ڕاستەقینە.",
+    },
+    faq: {
+      title: "پرسیارە باوەکان",
+      subtitle: "وەڵامی خێرا بۆ گرنگترین پرسیارەکان.",
+      items: [
+        {
+          q: "ئەم پلاتفۆرمە جێگرەوەی نەخۆشخانەیە؟",
+          a: "نەخێر، پلاتفۆرمەکە بۆ ڕێکخستنی پەیوەندی و پرۆسەی دیجیتاڵە و جێگرەوەی چاودێری ڕاستەوخۆ نابێت.",
+        },
+        {
+          q: "نەخۆش دەتوانێت لە مۆبایلەوە دەستگەیشتن بکات؟",
+          a: "بەڵێ، ڕووکارەکە وەڵامدەرەوەیە و بۆ مۆبایل و تابلێت ئامادە کراوە.",
+        },
+        {
+          q: "ئەپی iOS هەیە؟",
+          a: "لە ئێستادا بەکارهێنەرانی iPhone دەتوانن وەشانی وێبی وەڵامدەرەوە بەکاربهێنن، و ئەپی تایبەتی iOS دواتر دەتوانرێت پلان بکرێت.",
+        },
+        {
+          q: "تایبەتمەندی چۆن پارێزراو دەبێت؟",
+          a: "بە دەستگەیشتنی ڕێکخراو، دەسەڵاتی بەپێی ڕۆڵ و بنەماکانی ئاسایش لە ناو دیزاینەکەدا.",
+        },
+        {
+          q: "کەی پلاتفۆرمەکە بەردەست دەبێت؟",
+          a: "ئێستا لە قۆناغی ئامادەکاریی سەرەتاییدایە و کاتی فەرمی بە زوویی ڕادەگەیەنرێت.",
+        },
+      ],
+    },
+    finalCta: {
+      tagline:
+        "چاودێری تەندروستی دیجیتاڵی لە دەستگەیشتنی پارێزراو و ڕێکخراو بە زانیاری پزیشکی دەستپێدەکات.",
+      btn: "بەم زووانە",
+    },
+    footer: {
+      description:
+        "پلاتفۆرمێکی یەکگرتوو بۆ بەستنەوەی نەخۆش و دابینکەرانی چاودێری بە شێوەیەکی متمانەپێکراو.",
+      copyright:
+        "© 2026 پلاتفۆرمی پزیشکی دیجیتاڵی ڕافیدەین. هەموو مافەکان پارێزراون.",
+    },
+    lang: {
+      ar: "العربية",
+      ku: "کوردی",
+      en: "English",
+    },
+    theme: {
+      light: "ڕووناک",
+      dark: "تاریک",
+    },
+  },
+  en: {
+    nav: {
+      home: "Home",
+      features: "Features",
+      whoItServes: "Who It Serves",
+      security: "Security",
+      howItWorks: "How It Works",
+      faq: "FAQ",
+      cta: "Coming Soon",
+    },
+    hero: {
+      title:
+        "A digital medical platform connecting healthcare from consultation to follow-up",
+      subtitle:
+        "Al-Rafidain Digital Medical Platform helps organize communication between patients, doctors, laboratories, and pharmacies with a focus on security, privacy, and accessibility.",
+      exploreBtn: "Explore the Platform",
+      howBtn: "See How It Works",
+    },
+    trust: {
+      title: "Trust Indicators",
+      items: [
+        {
+          label: "Data Privacy",
+          desc: "Sensitive medical information is handled with strict access control.",
+        },
+        {
+          label: "Controlled Access",
+          desc: "Role-aware access keeps workflows organized and accountable.",
+        },
+        {
+          label: "Secure Communication",
+          desc: "Clinical communication flows through protected channels.",
+        },
+        {
+          label: "Medical Follow-up",
+          desc: "Continuity of care is supported across every stage.",
+        },
+      ],
+    },
+    features: {
+      title: "Core Features",
+      subtitle:
+        "One professional interface for structured healthcare collaboration.",
+      items: [
+        {
+          title: "Consultations",
+          desc: "Structured consultation and follow-up management.",
+        },
+        {
+          title: "Prescriptions",
+          desc: "Organized digital prescription workflows for safer continuity.",
+        },
+        {
+          title: "Lab Orders & Results",
+          desc: "Connected testing requests and results in one timeline.",
+        },
+        {
+          title: "Patient Records",
+          desc: "Unified patient context to support better clinical decisions.",
+        },
+        {
+          title: "Secure Messaging",
+          desc: "Protected communication for care coordination.",
+        },
+        {
+          title: "Knowledge-Based Medical Support",
+          desc: "Practical reference support for healthcare teams.",
+        },
+      ],
+    },
+    whoItServes: {
+      title: "Who It Serves",
+      subtitle: "Built for all core participants in the care ecosystem.",
+      items: [
+        {
+          title: "For Patients",
+          desc: "Clearer access to care updates and medical information.",
+        },
+        {
+          title: "For Doctors",
+          desc: "A streamlined workspace for consultations and care plans.",
+        },
+        {
+          title: "For Pharmacies",
+          desc: "Aligned prescription handling in a trusted clinical flow.",
+        },
+        {
+          title: "For Laboratories",
+          desc: "Structured order and result exchange across stakeholders.",
+        },
+      ],
+    },
+    security: {
+      title: "Security & Privacy",
+      subtitle: "Designed around security and privacy principles from the beginning.",
+      tagline:
+        "Operational safeguards help protect medical information throughout the care journey.",
+      items: [
+        {
+          label: "Controlled access",
+          desc: "Granular visibility control over medical data.",
+        },
+        {
+          label: "Role-based permissions",
+          desc: "Permissions are assigned according to user responsibilities.",
+        },
+        {
+          label: "Audit logs",
+          desc: "Actions are traceable to improve transparency and governance.",
+        },
+        {
+          label: "Secure document handling",
+          desc: "Medical documents are managed with protected sharing flows.",
+        },
+        {
+          label: "Protected medical communication",
+          desc: "Clinical communication is routed through secure channels.",
+        },
+      ],
+    },
+    howItWorks: {
+      title: "How It Works",
+      subtitle: "A clear process from first request to secure follow-up.",
+      steps: [
+        {
+          title: "1. Patient submits a request or consultation",
+          desc: "The care journey starts with a structured intake.",
+        },
+        {
+          title: "2. Doctor reviews and responds",
+          desc: "The clinician evaluates the request and provides guidance.",
+        },
+        {
+          title: "3. Lab/pharmacy workflows are handled when needed",
+          desc: "Relevant partners are engaged inside the same care flow.",
+        },
+        {
+          title: "4. Patient follows up securely",
+          desc: "Follow-up continues with protected, organized access.",
+        },
+      ],
+    },
+    preview: {
+      title: "Platform Preview",
+      subtitle: "A conceptual interface sample with no real patient data.",
+    },
+    faq: {
+      title: "FAQ",
+      subtitle: "Quick answers to common questions.",
+      items: [
+        {
+          q: "Is this a replacement for hospitals?",
+          a: "No. The platform supports digital coordination and communication, but it does not replace direct clinical care.",
+        },
+        {
+          q: "Can patients access from phone?",
+          a: "Yes. The interface is fully responsive for phones and tablets.",
+        },
+        {
+          q: "Is there an iOS app?",
+          a: "At this stage, iPhone users can use the responsive web version. A dedicated iOS app can be planned later.",
+        },
+        {
+          q: "How is privacy handled?",
+          a: "The platform uses controlled access, role-based permissions, and privacy-oriented design practices.",
+        },
+        {
+          q: "When will the platform be available?",
+          a: "This is an early launch phase, and timeline details will be announced soon.",
+        },
+      ],
+    },
+    finalCta: {
+      tagline:
+        "Digital healthcare starts with secure, organized access to medical information.",
+      btn: "Coming Soon",
+    },
+    footer: {
+      description:
+        "A unified digital platform connecting patients and healthcare providers with trust and clarity.",
+      copyright:
+        "© 2026 Al-Rafidain Digital Medical Platform. All rights reserved.",
+    },
+    lang: {
+      ar: "العربية",
+      ku: "کوردی",
+      en: "English",
+    },
+    theme: {
+      light: "Light",
+      dark: "Dark",
+    },
+  },
+};
+
+export function getTranslation(locale: Locale): Translations {
+  return translations[locale] || translations[defaultLocale];
+}
