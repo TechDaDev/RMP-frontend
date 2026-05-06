@@ -10,7 +10,7 @@ interface FooterProps {
 
 export function Footer({ locale, t, onLocaleChange }: FooterProps) {
   return (
-    <footer className="mt-16 border-t border-[var(--color-border)] py-10">
+    <footer className="mt-16 border-t border-[var(--color-border)] py-10" aria-label="Footer">
       <div className="container-grid grid gap-8 md:grid-cols-2 lg:grid-cols-4">
         <div className="lg:col-span-2">
           <Logo locale={locale} />
@@ -19,7 +19,7 @@ export function Footer({ locale, t, onLocaleChange }: FooterProps) {
           </p>
         </div>
 
-        <div>
+        <div aria-label={t.ui.primaryNavigation}>
           <h3 className="mb-3 text-sm font-semibold text-[var(--color-text)]">
             {t.nav.features}
           </h3>
@@ -48,7 +48,7 @@ export function Footer({ locale, t, onLocaleChange }: FooterProps) {
         </div>
 
         <div className="space-y-4">
-          <LanguageSwitcher locale={locale} onChange={onLocaleChange} t={t} />
+          <LanguageSwitcher locale={locale} onChange={onLocaleChange} t={t} ariaLabel={t.ui.languageSwitcherLabel} />
           <p className="text-xs text-[var(--color-muted)]">{t.footer.copyright}</p>
         </div>
       </div>

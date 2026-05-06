@@ -153,6 +153,13 @@ export const translations: Record<Locale, Translations> = {
     preview: {
       title: "نظرة على المنصة",
       subtitle: "تصور واجهة تشغيلية رقمية بدون بيانات حقيقية.",
+      items: [
+        { title: "الاستشارة", status: "بانتظار رد الطبيب" },
+        { title: "نتيجة المختبر", status: "قيد المعالجة" },
+        { title: "الوصفة", status: "جاهزة للمراجعة" },
+        { title: "إشعار", status: "تحديث آمن جديد" },
+        { title: "شارة الأمان", status: "تواصل طبي محمي" },
+      ],
     },
     faq: {
       title: "الأسئلة الشائعة",
@@ -197,8 +204,18 @@ export const translations: Record<Locale, Translations> = {
       en: "English",
     },
     theme: {
-      light: "فاتح",
-      dark: "داكن",
+      light: "الوضع النهاري",
+      dark: "الوضع الليلي",
+    },
+    ui: {
+      phaseBadge: "المرحلة 0 - صفحة هبوط",
+      languageSwitcherLabel: "تبديل اللغة",
+      themeToggleLabel: "تبديل المظهر",
+      openMenu: "فتح القائمة",
+      closeMenu: "إغلاق القائمة",
+      primaryNavigation: "التنقل الرئيسي",
+      mobileMenu: "قائمة التنقل للجوال",
+      heroFlowLabel: "تدفق الرعاية الصحية المتصل",
     },
   },
   ku: {
@@ -346,6 +363,13 @@ export const translations: Record<Locale, Translations> = {
     preview: {
       title: "پێشبینینی پلاتفۆرم",
       subtitle: "نموونەی ڕووکارێکی کارپێکراو بەبێ داتای ڕاستەقینە.",
+      items: [
+        { title: "ڕاوێژ", status: "چاوەڕێی وەڵامی پزیشک" },
+        { title: "ئەنجامی تاقیگە", status: "لە ژێر کارکردن" },
+        { title: "ڕەچەتە", status: "ئامادەی پشکنینە" },
+        { title: "ئاگادارکردنەوە", status: "نوێکردنەوەیەکی پارێزراو" },
+        { title: "نیشانی ئاسایش", status: "پەیوەندی پزیشکی پارێزراو" },
+      ],
     },
     faq: {
       title: "پرسیارە باوەکان",
@@ -390,8 +414,18 @@ export const translations: Record<Locale, Translations> = {
       en: "English",
     },
     theme: {
-      light: "ڕووناک",
-      dark: "تاریک",
+      light: "دۆخی ڕووناک",
+      dark: "دۆخی تاریک",
+    },
+    ui: {
+      phaseBadge: "قۆناغی 0 - لاپەڕەی پێشوازیکردن",
+      languageSwitcherLabel: "گۆڕینی زمان",
+      themeToggleLabel: "گۆڕینی دیمەن",
+      openMenu: "کردنەوەی لیست",
+      closeMenu: "داخستنی لیست",
+      primaryNavigation: "گەڕانی سەرەکی",
+      mobileMenu: "لیستی گەڕان بۆ مۆبایل",
+      heroFlowLabel: "ڕێڕەوی پەیوەستکراوی چاودێری تەندروستی",
     },
   },
   en: {
@@ -539,6 +573,13 @@ export const translations: Record<Locale, Translations> = {
     preview: {
       title: "Platform Preview",
       subtitle: "A conceptual interface sample with no real patient data.",
+      items: [
+        { title: "Consultation", status: "Awaiting doctor response" },
+        { title: "Lab Result", status: "In progress" },
+        { title: "Prescription", status: "Ready for review" },
+        { title: "Notification", status: "New secure update" },
+        { title: "Security Badge", status: "Protected medical communication" },
+      ],
     },
     faq: {
       title: "FAQ",
@@ -583,8 +624,18 @@ export const translations: Record<Locale, Translations> = {
       en: "English",
     },
     theme: {
-      light: "Light",
-      dark: "Dark",
+      light: "Light Mode",
+      dark: "Dark Mode",
+    },
+    ui: {
+      phaseBadge: "Phase 0 - Landing Page",
+      languageSwitcherLabel: "Switch language",
+      themeToggleLabel: "Toggle theme",
+      openMenu: "Open menu",
+      closeMenu: "Close menu",
+      primaryNavigation: "Primary navigation",
+      mobileMenu: "Mobile navigation menu",
+      heroFlowLabel: "Connected healthcare flow",
     },
   },
 };

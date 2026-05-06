@@ -1,93 +1,44 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { AppPreferencesProvider, useAppPreferences } from "@/components/AppPreferencesProvider";
 import { FeatureCard } from "@/components/FeatureCard";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { SectionHeader } from "@/components/SectionHeader";
-import { defaultLocale, getTranslation, localeDirection } from "@/lib/i18n";
-import {
-  detectPreferredTheme,
-  languageStorageKey,
-  themeStorageKey,
-  type Theme,
-} from "@/lib/theme";
-import type { Locale } from "@/types/i18n";
-
-function isLocale(value: string): value is Locale {
-  return value === "ar" || value === "ku" || value === "en";
-}
+import type { ReactNode } from "react";
 
 export default function Home() {
-  const [locale, setLocale] = useState<Locale>(defaultLocale);
-  const [theme, setTheme] = useState<Theme>("light");
-  const [hydrated, setHydrated] = useState(false);
+  return (
+    <AppPreferencesProvider>
+      <LandingPage />
+    </AppPreferencesProvider>
+  );
+}
 
-  useEffect(() => {
-    const frame = window.requestAnimationFrame(() => {
-      const storedLocale = window.localStorage.getItem(languageStorageKey);
-      const storedTheme = window.localStorage.getItem(themeStorageKey);
-
-      if (storedLocale && isLocale(storedLocale)) {
-        setLocale(storedLocale);
-      }
-
-      if (storedTheme === "light" || storedTheme === "dark") {
-        setTheme(storedTheme);
-      } else {
-        setTheme(detectPreferredTheme());
-      }
-
-      setHydrated(true);
-    });
-
-    return () => {
-      window.cancelAnimationFrame(frame);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!hydrated) {
-      return;
-    }
-    window.localStorage.setItem(languageStorageKey, locale);
-    document.documentElement.setAttribute("lang", locale);
-    document.documentElement.setAttribute("dir", localeDirection[locale]);
-  }, [locale, hydrated]);
-
-  useEffect(() => {
-    if (!hydrated) {
-      return;
-    }
-    window.localStorage.setItem(themeStorageKey, theme);
-    document.documentElement.classList.toggle("dark", theme === "dark");
-  }, [theme, hydrated]);
-
-  const t = useMemo(() => getTranslation(locale), [locale]);
-  const previewLabels: Record<Locale, { title: string; status: string }[]> = {
-    ar: [
-      { title: "الاستشارة", status: "بانتظار رد الطبيب" },
-      { title: "نتيجة المختبر", status: "قيد المعالجة" },
-      { title: "الوصفة", status: "جاهزة للمراجعة" },
-      { title: "إشعار", status: "تحديث آمن جديد" },
-      { title: "شارة الأمان", status: "تواصل طبي محمي" },
-    ],
-    ku: [
-      { title: "ڕاوێژ", status: "چاوەڕێی وەڵامی پزیشک" },
-      { title: "ئەنجامی تاقیگە", status: "لە ژێر کارکردن" },
-      { title: "ڕەچەتە", status: "ئامادەی پشکنینە" },
-      { title: "ئاگادارکردنەوە", status: "نوێکردنەوەیەکی پارێزراو" },
-      { title: "نیشانی ئاسایش", status: "پەیوەندی پزیشکی پارێزراو" },
-    ],
-    en: [
-      { title: "Consultation", status: "Awaiting doctor response" },
-      { title: "Lab Result", status: "In progress" },
-      { title: "Prescription", status: "Ready for review" },
-      { title: "Notification", status: "New secure update" },
-      { title: "Security Badge", status: "Protected medical communication" },
-    ],
+function icon(kind: "trust" | "feature" | "audience" | "security"): ReactNode {
+  const paths = {
+    trust: "M12 3l7 3v6c0 5-3.4 9.8-7 11-3.6-1.2-7-6-7-11V6l7-3z",
+    feature: "M12 3a9 9 0 100 18 9 9 0 000-18zm0 4v10m-5-5h10",
+    audience: "M12 12a4 4 0 100-8 4 4 0 000 8zm-7 8a7 7 0 0114 0",
+    security: "M7 12h10M9 8h6m-8 8h10m2-13v18",
   };
+
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" aria-hidden="true">
+      <path
+        d={paths[kind]}
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function LandingPage() {
+  const { locale, theme, t, setLocale, toggleTheme } = useAppPreferences();
 
   return (
     <>
@@ -95,19 +46,19 @@ export default function Home() {
         locale={locale}
         t={t}
         theme={theme}
-        onThemeToggle={() => setTheme((prev) => (prev === "light" ? "dark" : "light"))}
+        onThemeToggle={toggleTheme}
         onLocaleChange={setLocale}
       />
 
       <main>
         <Hero t={t} locale={locale} />
 
-        <section className="section-space">
+        <section className="section-space" aria-label={t.trust.title}>
           <div className="container-grid">
             <SectionHeader title={t.trust.title} subtitle={t.security.tagline} />
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               {t.trust.items.map((item) => (
-                <FeatureCard key={item.label} title={item.label} desc={item.desc} icon="T" />
+                <FeatureCard key={item.label} title={item.label} desc={item.desc} icon={icon("trust")} />
               ))}
             </div>
           </div>
@@ -118,7 +69,7 @@ export default function Home() {
             <SectionHeader title={t.features.title} subtitle={t.features.subtitle} />
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {t.features.items.map((item) => (
-                <FeatureCard key={item.title} title={item.title} desc={item.desc} />
+                <FeatureCard key={item.title} title={item.title} desc={item.desc} icon={icon("feature")} />
               ))}
             </div>
           </div>
@@ -129,7 +80,7 @@ export default function Home() {
             <SectionHeader title={t.whoItServes.title} subtitle={t.whoItServes.subtitle} />
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {t.whoItServes.items.map((item) => (
-                <FeatureCard key={item.title} title={item.title} desc={item.desc} icon="O" />
+                <FeatureCard key={item.title} title={item.title} desc={item.desc} icon={icon("audience")} />
               ))}
             </div>
           </div>
@@ -146,7 +97,7 @@ export default function Home() {
             />
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {t.security.items.map((item) => (
-                <FeatureCard key={item.label} title={item.label} desc={item.desc} icon="S" />
+                <FeatureCard key={item.label} title={item.label} desc={item.desc} icon={icon("security")} />
               ))}
             </div>
           </div>
@@ -178,24 +129,24 @@ export default function Home() {
             <SectionHeader title={t.preview.title} subtitle={t.preview.subtitle} />
             <div className="grid gap-4 rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-[var(--card-shadow-lg)] lg:grid-cols-5">
               <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-4 lg:col-span-2">
-                <p className="text-xs font-medium text-[var(--color-muted)]">{previewLabels[locale][0].title}</p>
-                <p className="mt-2 text-sm text-[var(--color-text)]">{previewLabels[locale][0].status}</p>
+                <p className="text-xs font-medium text-[var(--color-muted)]">{t.preview.items[0].title}</p>
+                <p className="mt-2 text-sm text-[var(--color-text)]">{t.preview.items[0].status}</p>
               </div>
               <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-4">
-                <p className="text-xs font-medium text-[var(--color-muted)]">{previewLabels[locale][1].title}</p>
-                <p className="mt-2 text-sm text-[var(--color-text)]">{previewLabels[locale][1].status}</p>
+                <p className="text-xs font-medium text-[var(--color-muted)]">{t.preview.items[1].title}</p>
+                <p className="mt-2 text-sm text-[var(--color-text)]">{t.preview.items[1].status}</p>
               </div>
               <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-4">
-                <p className="text-xs font-medium text-[var(--color-muted)]">{previewLabels[locale][2].title}</p>
-                <p className="mt-2 text-sm text-[var(--color-text)]">{previewLabels[locale][2].status}</p>
+                <p className="text-xs font-medium text-[var(--color-muted)]">{t.preview.items[2].title}</p>
+                <p className="mt-2 text-sm text-[var(--color-text)]">{t.preview.items[2].status}</p>
               </div>
               <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-4">
-                <p className="text-xs font-medium text-[var(--color-muted)]">{previewLabels[locale][3].title}</p>
-                <p className="mt-2 text-sm text-[var(--color-text)]">{previewLabels[locale][3].status}</p>
+                <p className="text-xs font-medium text-[var(--color-muted)]">{t.preview.items[3].title}</p>
+                <p className="mt-2 text-sm text-[var(--color-text)]">{t.preview.items[3].status}</p>
               </div>
               <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-4 lg:col-span-2">
-                <p className="text-xs font-medium text-[var(--color-muted)]">{previewLabels[locale][4].title}</p>
-                <p className="mt-2 text-sm text-[var(--color-text)]">{previewLabels[locale][4].status}</p>
+                <p className="text-xs font-medium text-[var(--color-muted)]">{t.preview.items[4].title}</p>
+                <p className="mt-2 text-sm text-[var(--color-text)]">{t.preview.items[4].status}</p>
               </div>
             </div>
           </div>

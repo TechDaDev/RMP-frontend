@@ -1,7 +1,9 @@
+import type { ReactNode } from "react";
+
 interface FeatureCardProps {
   title: string;
   desc: string;
-  icon?: string;
+  icon?: ReactNode;
 }
 
 export function FeatureCard({ title, desc, icon = "●" }: FeatureCardProps) {

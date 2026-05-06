@@ -14,12 +14,12 @@ const flowItems: Record<Locale, string[]> = {
 
 export function Hero({ t, locale }: HeroProps) {
   return (
-    <section id="home" className="relative overflow-hidden py-12 md:py-20">
+    <section id="home" className="relative overflow-hidden py-10 md:py-20">
       <div className="hero-aura pointer-events-none" aria-hidden="true" />
-      <div className="container-grid items-center gap-10 lg:grid-cols-[1.1fr,0.9fr]">
+      <div className="container-grid grid items-center gap-10 lg:grid-cols-[1.08fr,0.92fr]">
         <div>
           <p className="mb-4 inline-flex rounded-full border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-1 text-xs font-semibold tracking-wide text-[var(--color-primary)]">
-            Phase 0 - Landing Page
+            {t.ui.phaseBadge}
           </p>
           <h1 className="text-balance text-3xl font-bold leading-tight text-[var(--color-text)] md:text-5xl">
             {t.hero.title}
@@ -27,11 +27,11 @@ export function Hero({ t, locale }: HeroProps) {
           <p className="mt-5 max-w-2xl text-base leading-7 text-[var(--color-muted)] md:text-lg">
             {t.hero.subtitle}
           </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <a className="btn-primary" href="#features">
+          <div className="mt-8 flex flex-wrap gap-3 sm:flex-nowrap">
+            <a className="btn-primary w-full sm:w-auto" href="#features">
               {t.hero.exploreBtn}
             </a>
-            <a className="btn-secondary" href="#how-it-works">
+            <a className="btn-secondary w-full sm:w-auto" href="#how-it-works">
               {t.hero.howBtn}
             </a>
           </div>
@@ -60,7 +60,7 @@ export function Hero({ t, locale }: HeroProps) {
           </div>
 
           <svg
-            aria-label="Connected healthcare flow"
+            aria-label={t.ui.heroFlowLabel}
             className="relative z-10 mt-4 h-24 w-full"
             viewBox="0 0 280 90"
           >

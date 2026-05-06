@@ -44,6 +44,7 @@ export interface Translations {
   preview: {
     title: string;
     subtitle: string;
+    items: { title: string; status: string }[];
   };
   faq: {
     title: string;
@@ -66,5 +67,15 @@ export interface Translations {
   theme: {
     light: string;
     dark: string;
+  };
+  ui: {
+    phaseBadge: string;
+    languageSwitcherLabel: string;
+    themeToggleLabel: string;
+    openMenu: string;
+    closeMenu: string;
+    primaryNavigation: string;
+    mobileMenu: string;
+    heroFlowLabel: string;
   };
 }

@@ -23,6 +23,7 @@ export function Header({
   onLocaleChange,
 }: HeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const mobileMenuId = "mobile-primary-nav";
 
   const links = [
     { id: "home", label: t.nav.home },
@@ -40,7 +41,7 @@ export function Header({
           <Logo locale={locale} />
         </a>
 
-        <nav className="hidden items-center gap-6 lg:flex" aria-label="Primary navigation">
+        <nav className="hidden items-center gap-6 lg:flex" aria-label={t.ui.primaryNavigation}>
           {links.map((item) => (
             <a
               key={item.id}
@@ -53,8 +54,8 @@ export function Header({
         </nav>
 
         <div className="hidden items-center gap-2 lg:flex">
-          <LanguageSwitcher locale={locale} onChange={onLocaleChange} t={t} />
-          <ThemeToggle theme={theme} onToggle={onThemeToggle} t={t} />
+          <LanguageSwitcher locale={locale} onChange={onLocaleChange} t={t} ariaLabel={t.ui.languageSwitcherLabel} />
+          <ThemeToggle theme={theme} onToggle={onThemeToggle} t={t} ariaLabel={t.ui.themeToggleLabel} />
           <a href="#cta" className="btn-primary">
             {t.nav.cta}
           </a>
@@ -62,31 +63,48 @@ export function Header({
 
         <button
           type="button"
-          className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--color-border)] text-[var(--color-text)] lg:hidden"
+          className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg border border-[var(--color-border)] text-[var(--color-text)] lg:hidden"
           onClick={() => setMenuOpen((prev) => !prev)}
-          aria-label="Toggle mobile menu"
+          aria-label={menuOpen ? t.ui.closeMenu : t.ui.openMenu}
           aria-expanded={menuOpen}
+          aria-controls={mobileMenuId}
         >
           <span className="text-lg">☰</span>
         </button>
       </div>
 
       {menuOpen ? (
-        <div className="container-grid grid gap-3 border-t border-[var(--color-border)] bg-[var(--color-surface)] py-4 lg:hidden">
+        <div id={mobileMenuId} className="container-grid grid gap-3 border-t border-[var(--color-border)] bg-[var(--color-surface)] py-4 lg:hidden" aria-label={t.ui.mobileMenu}>
           {links.map((item) => (
             <a
               key={item.id}
               href={`#${item.id}`}
-              className="rounded-lg px-2 py-2 text-sm font-medium text-[var(--color-text)]"
+              className="rounded-lg px-2 py-2 text-sm font-medium text-[var(--color-text)] hover:bg-[var(--color-surface-alt)]"
               onClick={() => setMenuOpen(false)}
             >
               {item.label}
             </a>
           ))}
           <div className="flex flex-wrap items-center gap-2 pt-2">
-            <LanguageSwitcher locale={locale} onChange={onLocaleChange} t={t} />
-            <ThemeToggle theme={theme} onToggle={onThemeToggle} t={t} />
-            <a href="#cta" className="btn-primary" onClick={() => setMenuOpen(false)}>
+            <LanguageSwitcher
+              locale={locale}
+              onChange={(value) => {
+                onLocaleChange(value);
+                setMenuOpen(false);
+              }}
+              t={t}
+              ariaLabel={t.ui.languageSwitcherLabel}
+            />
+            <ThemeToggle
+              theme={theme}
+              onToggle={() => {
+                onThemeToggle();
+                setMenuOpen(false);
+              }}
+              t={t}
+              ariaLabel={t.ui.themeToggleLabel}
+            />
+            <a href="#cta" className="btn-primary w-full sm:w-auto" onClick={() => setMenuOpen(false)}>
               {t.nav.cta}
             </a>
           </div>
