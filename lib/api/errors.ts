@@ -54,5 +54,24 @@ export async function throwApiError(response: Response): Promise<never> {
     throw new ApiError(msg, response.status, b.errors);
   }
 
+  if (body && typeof body === "object") {
+    const fieldErrors: Record<string, string[]> = {};
+    for (const [key, value] of Object.entries(body)) {
+      if (Array.isArray(value)) {
+        fieldErrors[key] = value.map(String);
+      } else if (typeof value === "string") {
+        fieldErrors[key] = [value];
+      }
+    }
+    if (Object.keys(fieldErrors).length > 0) {
+      const nonFieldErrors = fieldErrors.non_field_errors?.join(" ");
+      throw new ApiError(
+        nonFieldErrors ?? fieldErrors.detail?.[0] ?? `HTTP ${response.status}`,
+        response.status,
+        fieldErrors,
+      );
+    }
+  }
+
   throw new ApiError(`HTTP ${response.status}: ${response.statusText}`, response.status);
 }

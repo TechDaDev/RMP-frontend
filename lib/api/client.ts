@@ -26,10 +26,12 @@ export async function apiRequest<T>(
   }: RequestOptions = {},
 ): Promise<T> {
   const resolvedMethod: HttpMethod = method ?? (body !== undefined ? "POST" : "GET");
+  const isFormData = body instanceof FormData;
+  const headers: Record<string, string> = {};
 
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-  };
+  if (!isFormData && body !== undefined) {
+    headers["Content-Type"] = "application/json";
+  }
 
   if (auth) {
     const token = getAccessToken();
@@ -43,7 +45,12 @@ export async function apiRequest<T>(
     response = await fetch(apiUrl(path), {
       method: resolvedMethod,
       headers,
-      body: body !== undefined ? JSON.stringify(body) : undefined,
+      body:
+        body !== undefined
+          ? isFormData
+            ? body
+            : JSON.stringify(body)
+          : undefined,
     });
   } catch {
     // Network failure, DNS error, backend offline, etc.

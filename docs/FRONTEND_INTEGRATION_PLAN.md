@@ -31,12 +31,15 @@ This plan defines implementation order after Phase 1 API contract mapping.
 - i18n: 4 new strings across ar/ku/en
 - See `docs/AUTH_QA_REPORT.md` for full test results and remaining risks
 
-## Phase 3 — Profile and Verification
+## Phase 3 — Profile and Verification ✅ COMPLETE
 
-1. Build `/app/profile` page and profile completion UX.
-2. Integrate `GET /api/profiles/me/` and role profile PATCH endpoints.
-3. Add verification pending banners and action locks for doctor/pharmacist/laboratorian.
-4. Gate role workflows by verification status.
+1. Build `/app/profile` page and profile completion UX. ✅
+2. Integrate `GET /api/profiles/me/` and role profile PATCH endpoints. ✅
+3. Add verification status UI and professional guidance. ✅
+4. Add non-blocking dashboard profile prompts for incomplete/pending states. ✅
+5. Support confirmed image upload fields with multipart PATCH. ✅
+
+See `docs/PROFILE_INTEGRATION_NOTES.md` for the implemented contract and security notes.
 
 ## Phase 4 — Patient Portal
 

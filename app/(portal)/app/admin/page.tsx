@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { ProfilePromptCard } from "@/components/profile/ProfilePromptCard";
 
 export default function AdminPortalPage() {
   const { t } = useAppPreferences();
@@ -21,6 +22,7 @@ export default function AdminPortalPage() {
   return (
     <div className="space-y-6">
       <PageHeader badge={<Badge tone="primary">{t.roles.admin}</Badge>} title={t.dashboards.adminTitle} description={t.dashboards.adminSubtitle} />
+      <ProfilePromptCard />
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {modules.map(({ title, Icon }) => (
           <Card key={title} hoverable className="rounded-[2rem]">

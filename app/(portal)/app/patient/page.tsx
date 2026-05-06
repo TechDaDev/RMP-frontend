@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { ProfilePromptCard } from "@/components/profile/ProfilePromptCard";
 
 export default function PatientPortalPage() {
   const { t } = useAppPreferences();
@@ -20,6 +21,7 @@ export default function PatientPortalPage() {
   return (
     <div className="space-y-6">
       <PageHeader badge={<Badge tone="primary">{t.roles.patient}</Badge>} title={t.dashboards.patientTitle} description={t.dashboards.patientSubtitle} />
+      <ProfilePromptCard />
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {modules.map(({ title, Icon }) => (
           <Card key={title} hoverable className="rounded-[2rem]">

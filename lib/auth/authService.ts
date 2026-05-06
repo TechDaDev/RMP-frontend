@@ -103,8 +103,14 @@ export async function getCurrentUserService(): Promise<BackendUser> {
  * Fetch the current user's full profile (includes verification info).
  */
 export async function getCurrentProfileService(): Promise<ProfilesMeResponse> {
-  const resp = await apiRequest<ProfilesMeApiResponse>(API_ENDPOINTS.profiles.me, { auth: true });
-  return resp.data;
+  const resp = await apiRequest<ProfilesMeApiResponse | ProfilesMeResponse>(
+    API_ENDPOINTS.profiles.me,
+    { auth: true },
+  );
+  if ("data" in resp) {
+    return resp.data;
+  }
+  return resp;
 }
 
 /**

@@ -15,12 +15,19 @@ import {
   getCurrentProfileService,
 } from "@/lib/auth/authService";
 import { getAccessToken, clearTokens } from "@/lib/auth/tokenStorage";
-import type { BackendUser, ProfileVerification } from "@/types/backend";
+import type {
+  BackendUser,
+  ProfileCompletion,
+  ProfileVerification,
+  ProfilesMeResponse,
+} from "@/types/backend";
 import type { LoginRequest } from "@/types/backend";
 import { ApiError } from "@/lib/api/errors";
 
 interface AuthState {
   user: BackendUser | null;
+  profile: ProfilesMeResponse | null;
+  completion: ProfileCompletion | null;
   verification: ProfileVerification | null;
   /** true while the initial token check is running */
   loading: boolean;
@@ -31,6 +38,8 @@ interface AuthContextValue extends AuthState {
   logout: () => void;
   /** Reload user + profile from the server */
   refresh: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
+  updateProfileStateAfterSave: (updatedProfile: ProfilesMeResponse) => void;
   isAuthenticated: boolean;
 }
 
@@ -39,6 +48,8 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AuthState>({
     user: null,
+    profile: null,
+    completion: null,
     verification: null,
     loading: true,
   });
@@ -48,6 +59,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const profile = await getCurrentProfileService();
       setState({
         user: profile.user,
+        profile,
+        completion: profile.completion,
         verification: profile.verification,
         loading: false,
       });
@@ -57,8 +70,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (err instanceof ApiError && err.status === 401) {
         clearTokens();
       }
-      setState({ user: null, verification: null, loading: false });
+      setState({
+        user: null,
+        profile: null,
+        completion: null,
+        verification: null,
+        loading: false,
+      });
     }
+  }, []);
+
+  const updateProfileStateAfterSave = useCallback((updatedProfile: ProfilesMeResponse) => {
+    setState((prev) => ({
+      ...prev,
+      user: updatedProfile.user,
+      profile: updatedProfile,
+      completion: updatedProfile.completion,
+      verification: updatedProfile.verification,
+    }));
   }, []);
 
   // On mount, check if we already have a stored token and load the user.
@@ -80,7 +109,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = useCallback(() => {
     logoutService();
-    setState({ user: null, verification: null, loading: false });
+    setState({
+      user: null,
+      profile: null,
+      completion: null,
+      verification: null,
+      loading: false,
+    });
   }, []);
 
   const value = useMemo<AuthContextValue>(
@@ -89,9 +124,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       login,
       logout,
       refresh: loadProfile,
+      refreshProfile: loadProfile,
+      updateProfileStateAfterSave,
       isAuthenticated: state.user !== null,
     }),
-    [state, login, logout, loadProfile],
+    [state, login, logout, loadProfile, updateProfileStateAfterSave],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

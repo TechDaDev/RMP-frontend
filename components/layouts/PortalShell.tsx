@@ -86,6 +86,17 @@ export function PortalShell({ children }: PortalShellProps) {
           <GridIcon size={18} />
           {t.portal.dashboard}
         </Link>
+        <Link
+          href="/app/profile"
+          className={buttonClassName({
+            variant: pathname === "/app/profile" ? "primary" : "ghost",
+            className: "w-full justify-start rounded-2xl",
+          })}
+          onClick={() => setMenuOpen(false)}
+        >
+          <UserIcon size={18} />
+          {t.portal.profile}
+        </Link>
         {portalRoles.map((role) => {
           const meta = roleMetadata[role];
           const isActive = meta.defaultRoute === pathname;
