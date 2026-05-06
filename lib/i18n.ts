@@ -208,7 +208,7 @@ export const translations: Record<Locale, Translations> = {
       dark: "الوضع الليلي",
     },
     ui: {
-      phaseBadge: "المرحلة 0 - صفحة هبوط",
+      phaseBadge: "منصة طبية رقمية آمنة",
       languageSwitcherLabel: "تبديل اللغة",
       themeToggleLabel: "تبديل المظهر",
       openMenu: "فتح القائمة",
@@ -418,7 +418,7 @@ export const translations: Record<Locale, Translations> = {
       dark: "دۆخی تاریک",
     },
     ui: {
-      phaseBadge: "قۆناغی 0 - لاپەڕەی پێشوازیکردن",
+      phaseBadge: "پلاتفۆرمی پزیشکی دیجیتاڵی پارێزراو",
       languageSwitcherLabel: "گۆڕینی زمان",
       themeToggleLabel: "گۆڕینی دیمەن",
       openMenu: "کردنەوەی لیست",
@@ -628,7 +628,7 @@ export const translations: Record<Locale, Translations> = {
       dark: "Dark Mode",
     },
     ui: {
-      phaseBadge: "Phase 0 - Landing Page",
+      phaseBadge: "Secure Digital Medical Platform",
       languageSwitcherLabel: "Switch language",
       themeToggleLabel: "Toggle theme",
       openMenu: "Open menu",

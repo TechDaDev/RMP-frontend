@@ -1,11 +1,24 @@
 import { FeatureCard } from "@/components/FeatureCard";
+import {
+  LockIcon,
+  MessageIcon,
+  PulseIcon,
+  ShieldIcon,
+} from "@/components/icons";
 import { SectionHeader } from "@/components/SectionHeader";
-import { sectionIcon } from "@/components/sections/sectionIcons";
+import type { ReactNode } from "react";
 import type { Translations } from "@/types/i18n";
 
 interface TrustSectionProps {
   t: Translations;
 }
+
+const trustIcons: ReactNode[] = [
+  <LockIcon key="lock" size={20} />,
+  <ShieldIcon key="shield" size={20} />,
+  <MessageIcon key="msg" size={20} />,
+  <PulseIcon key="pulse" size={20} />,
+];
 
 export function TrustSection({ t }: TrustSectionProps) {
   return (
@@ -13,12 +26,12 @@ export function TrustSection({ t }: TrustSectionProps) {
       <div className="container-grid">
         <SectionHeader title={t.trust.title} subtitle={t.security.tagline} />
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {t.trust.items.map((item) => (
+          {t.trust.items.map((item, idx) => (
             <FeatureCard
               key={item.label}
               title={item.label}
               desc={item.desc}
-              icon={sectionIcon("trust")}
+              icon={trustIcons[idx % trustIcons.length]}
             />
           ))}
         </div>

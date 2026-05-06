@@ -43,7 +43,7 @@ function LandingPage() {
         <WhoItServesSection t={t} />
         <SecuritySection t={t} />
         <HowItWorksSection t={t} />
-        <PlatformPreviewSection t={t} />
+        <PlatformPreviewSection t={t} locale={locale} />
         <FAQSection t={t} />
         <FinalCTASection t={t} />
       </main>

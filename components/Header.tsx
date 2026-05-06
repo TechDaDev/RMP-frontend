@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { CloseIcon, MenuIcon } from "@/components/icons";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Logo } from "@/components/Logo";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -35,18 +36,18 @@ export function Header({
   ];
 
   return (
-    <header className="sticky top-0 z-40 border-b border-[var(--color-border)] bg-[color:color-mix(in_srgb,var(--color-bg)_88%,transparent)] backdrop-blur">
-      <div className="container-grid flex min-h-20 items-center justify-between gap-4 py-3">
+    <header className="sticky top-0 z-40 border-b border-[var(--color-border)] bg-[color:color-mix(in_srgb,var(--color-bg)_92%,transparent)] backdrop-blur-md">
+      <div className="container-grid flex min-h-[4.5rem] items-center justify-between gap-4 py-3">
         <a href="#home" className="focus-ring rounded-lg">
           <Logo locale={locale} />
         </a>
 
-        <nav className="hidden items-center gap-6 lg:flex" aria-label={t.ui.primaryNavigation}>
+        <nav className="hidden items-center gap-5 lg:flex" aria-label={t.ui.primaryNavigation}>
           {links.map((item) => (
             <a
               key={item.id}
               href={`#${item.id}`}
-              className="text-sm font-medium text-[var(--color-muted)] transition hover:text-[var(--color-text)]"
+              className="text-sm font-medium text-[var(--color-muted)] transition-colors hover:text-[var(--color-text)]"
             >
               {item.label}
             </a>
@@ -56,36 +57,40 @@ export function Header({
         <div className="hidden items-center gap-2 lg:flex">
           <LanguageSwitcher locale={locale} onChange={onLocaleChange} t={t} ariaLabel={t.ui.languageSwitcherLabel} />
           <ThemeToggle theme={theme} onToggle={onThemeToggle} t={t} ariaLabel={t.ui.themeToggleLabel} />
-          <a href="#cta" className="btn-primary">
+          <a href="#cta" className="btn-primary px-5 py-2 text-sm">
             {t.nav.cta}
           </a>
         </div>
 
         <button
           type="button"
-          className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg border border-[var(--color-border)] text-[var(--color-text)] lg:hidden"
+          className="inline-flex min-h-10 min-w-10 items-center justify-center rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] text-[var(--color-text)] transition hover:bg-[var(--color-surface-alt)] lg:hidden"
           onClick={() => setMenuOpen((prev) => !prev)}
           aria-label={menuOpen ? t.ui.closeMenu : t.ui.openMenu}
           aria-expanded={menuOpen}
           aria-controls={mobileMenuId}
         >
-          <span className="text-lg">☰</span>
+          {menuOpen ? <CloseIcon size={18} /> : <MenuIcon size={18} />}
         </button>
       </div>
 
       {menuOpen ? (
-        <div id={mobileMenuId} className="container-grid grid gap-3 border-t border-[var(--color-border)] bg-[var(--color-surface)] py-4 lg:hidden" aria-label={t.ui.mobileMenu}>
+        <div
+          id={mobileMenuId}
+          className="container-grid grid gap-2 border-t border-[var(--color-border)] bg-[var(--color-surface)] py-4 lg:hidden"
+          aria-label={t.ui.mobileMenu}
+        >
           {links.map((item) => (
             <a
               key={item.id}
               href={`#${item.id}`}
-              className="rounded-lg px-2 py-2 text-sm font-medium text-[var(--color-text)] hover:bg-[var(--color-surface-alt)]"
+              className="rounded-lg px-3 py-2.5 text-sm font-medium text-[var(--color-text)] transition hover:bg-[var(--color-surface-alt)]"
               onClick={() => setMenuOpen(false)}
             >
               {item.label}
             </a>
           ))}
-          <div className="flex flex-wrap items-center gap-2 pt-2">
+          <div className="flex flex-wrap items-center gap-2 border-t border-[var(--color-border)] pt-3">
             <LanguageSwitcher
               locale={locale}
               onChange={(value) => {
@@ -113,3 +118,4 @@ export function Header({
     </header>
   );
 }
+

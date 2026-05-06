@@ -2,10 +2,10 @@
 
 import type { Locale } from "@/types/i18n";
 
-const brandNames: Record<Locale, string> = {
-  ar: "منصة الرافدين الطبية الرقمية",
-  ku: "پلاتفۆرمی پزیشکی دیجیتاڵی ڕافیدەین",
-  en: "Al-Rafidain Digital Medical Platform",
+const brandShort: Record<Locale, string> = {
+  ar: "الرافدين",
+  ku: "ڕافیدەین",
+  en: "Al-Rafidain",
 };
 
 interface LogoProps {
@@ -17,55 +17,55 @@ export function Logo({ locale }: LogoProps) {
     <div className="flex items-center gap-3">
       <svg
         aria-hidden="true"
-        viewBox="0 0 72 72"
+        viewBox="0 0 64 64"
         className="h-10 w-10 shrink-0"
         role="img"
       >
         <defs>
-          <linearGradient id="riverA" x1="0" y1="0" x2="1" y2="1">
+          <linearGradient id="lg-river-a" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="var(--color-primary)" />
             <stop offset="100%" stopColor="var(--color-secondary)" />
           </linearGradient>
-          <linearGradient id="riverB" x1="1" y1="0" x2="0" y2="1">
+          <linearGradient id="lg-river-b" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="var(--color-accent)" />
             <stop offset="100%" stopColor="var(--color-primary)" />
           </linearGradient>
+          <linearGradient id="lg-bg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="color-mix(in srgb, var(--color-primary) 14%, var(--color-surface))" />
+            <stop offset="100%" stopColor="var(--color-surface)" />
+          </linearGradient>
         </defs>
 
-        <rect
-          x="6"
-          y="6"
-          width="60"
-          height="60"
-          rx="18"
-          fill="var(--color-surface)"
-          stroke="var(--color-border)"
-          strokeWidth="1.5"
-        />
+        {/* Background tile */}
+        <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#lg-bg)" stroke="var(--color-border)" strokeWidth="1.2" />
+
+        {/* Left river arc (Tigris) */}
         <path
-          d="M18 19C28 25 28 47 18 53"
-          stroke="url(#riverA)"
-          strokeWidth="4"
+          d="M17 14 C10 22 10 42 17 50"
+          stroke="url(#lg-river-a)"
+          strokeWidth="3.6"
           strokeLinecap="round"
           fill="none"
         />
+
+        {/* Right river arc (Euphrates) */}
         <path
-          d="M54 19C44 25 44 47 54 53"
-          stroke="url(#riverB)"
-          strokeWidth="4"
+          d="M47 14 C54 22 54 42 47 50"
+          stroke="url(#lg-river-b)"
+          strokeWidth="3.6"
           strokeLinecap="round"
           fill="none"
         />
+
+        {/* Medical cross */}
+        <line x1="32" y1="22" x2="32" y2="42" stroke="var(--color-primary)" strokeWidth="3" strokeLinecap="round" />
+        <line x1="22" y1="32" x2="42" y2="32" stroke="var(--color-primary)" strokeWidth="3" strokeLinecap="round" />
+
+        {/* Pulse line */}
         <path
-          d="M36 24v24M24 36h24"
-          stroke="var(--color-primary)"
-          strokeWidth="3.4"
-          strokeLinecap="round"
-        />
-        <path
-          d="M20 42h8l3-4 3 8 3-6h5"
+          d="M18 38h5l2.5-4.5 3 9 3-6.5h5l2 2h6"
           stroke="var(--color-accent)"
-          strokeWidth="2"
+          strokeWidth="1.8"
           strokeLinecap="round"
           strokeLinejoin="round"
           fill="none"
@@ -73,16 +73,21 @@ export function Logo({ locale }: LogoProps) {
           <animate
             attributeName="stroke-dasharray"
             values="0,80;20,40;0,80"
-            dur="4s"
+            dur="3.5s"
             repeatCount="indefinite"
           />
         </path>
       </svg>
-      <div>
-        <p className="text-sm font-semibold tracking-wide text-[var(--color-text)]">
-          {brandNames[locale]}
+
+      <div className="leading-tight">
+        <p className="text-xs font-bold tracking-wider text-[var(--color-primary)] uppercase opacity-75">
+          {brandShort[locale]}
+        </p>
+        <p className="text-[0.7rem] font-medium text-[var(--color-muted)] leading-none">
+          {locale === "en" ? "Digital Medical Platform" : locale === "ku" ? "پلاتفۆرمی پزیشکی" : "المنصة الطبية الرقمية"}
         </p>
       </div>
     </div>
   );
 }
+
