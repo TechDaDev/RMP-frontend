@@ -12,10 +12,13 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   BellIcon,
   CloseIcon,
+  FileTextIcon,
   GridIcon,
+  LabIcon,
   LogOutIcon,
   MenuIcon,
   MessageIcon,
+  PrescriptionIcon,
   SettingsIcon,
   UserIcon,
 } from "@/components/icons";
@@ -47,6 +50,44 @@ export function PortalShell({ children }: PortalShellProps) {
   const activeRole = activeRoleFromPath(pathname);
   const currentRoleLabel = activeRole ? roleMetadata[activeRole].labels[locale] : t.portal.chooseRole;
 
+  const patientNavItems = [
+    {
+      href: "/app/patient",
+      label: t.patient.dashboardTitle,
+      icon: GridIcon,
+    },
+    {
+      href: "/app/profile",
+      label: t.portal.profile,
+      icon: UserIcon,
+    },
+    {
+      href: "/app/patient/consultations",
+      label: t.patient.consultationsTitle,
+      icon: MessageIcon,
+    },
+    {
+      href: "/app/patient/prescriptions",
+      label: t.patient.prescriptionsTitle,
+      icon: PrescriptionIcon,
+    },
+    {
+      href: "/app/patient/lab-orders",
+      label: t.patient.labOrdersTitle,
+      icon: FileTextIcon,
+    },
+    {
+      href: "/app/patient/lab-results",
+      label: t.patient.labResultsTitle,
+      icon: LabIcon,
+    },
+    {
+      href: "/app/patient/medical-record",
+      label: t.patient.medicalRecordTitle,
+      icon: FileTextIcon,
+    },
+  ];
+
   function handleLogout() {
     logout();
     router.push("/login");
@@ -75,46 +116,69 @@ export function PortalShell({ children }: PortalShellProps) {
       </Card>
 
       <nav className="space-y-2" aria-label={t.ui.portalNavigation}>
-        <Link
-          href="/app"
-          className={buttonClassName({
-            variant: pathname === "/app" ? "primary" : "ghost",
-            className: "w-full justify-start rounded-2xl",
-          })}
-          onClick={() => setMenuOpen(false)}
-        >
-          <GridIcon size={18} />
-          {t.portal.dashboard}
-        </Link>
-        <Link
-          href="/app/profile"
-          className={buttonClassName({
-            variant: pathname === "/app/profile" ? "primary" : "ghost",
-            className: "w-full justify-start rounded-2xl",
-          })}
-          onClick={() => setMenuOpen(false)}
-        >
-          <UserIcon size={18} />
-          {t.portal.profile}
-        </Link>
-        {portalRoles.map((role) => {
-          const meta = roleMetadata[role];
-          const isActive = meta.defaultRoute === pathname;
-          return (
+        {user?.user_type === "patient" ? (
+          patientNavItems.map((item) => {
+            const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={buttonClassName({
+                  variant: isActive ? "primary" : "ghost",
+                  className: "w-full justify-start rounded-2xl",
+                })}
+                onClick={() => setMenuOpen(false)}
+              >
+                <Icon size={18} />
+                {item.label}
+              </Link>
+            );
+          })
+        ) : (
+          <>
             <Link
-              key={role}
-              href={meta.defaultRoute}
+              href="/app"
               className={buttonClassName({
-                variant: isActive ? "secondary" : "ghost",
+                variant: pathname === "/app" ? "primary" : "ghost",
                 className: "w-full justify-start rounded-2xl",
               })}
               onClick={() => setMenuOpen(false)}
             >
-              <meta.Icon size={18} />
-              {meta.labels[locale]}
+              <GridIcon size={18} />
+              {t.portal.dashboard}
             </Link>
-          );
-        })}
+            <Link
+              href="/app/profile"
+              className={buttonClassName({
+                variant: pathname === "/app/profile" ? "primary" : "ghost",
+                className: "w-full justify-start rounded-2xl",
+              })}
+              onClick={() => setMenuOpen(false)}
+            >
+              <UserIcon size={18} />
+              {t.portal.profile}
+            </Link>
+            {portalRoles.map((role) => {
+              const meta = roleMetadata[role];
+              const isActive = meta.defaultRoute === pathname;
+              return (
+                <Link
+                  key={role}
+                  href={meta.defaultRoute}
+                  className={buttonClassName({
+                    variant: isActive ? "secondary" : "ghost",
+                    className: "w-full justify-start rounded-2xl",
+                  })}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <meta.Icon size={18} />
+                  {meta.labels[locale]}
+                </Link>
+              );
+            })}
+          </>
+        )}
       </nav>
 
         <div className="mt-auto space-y-3 rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-4">

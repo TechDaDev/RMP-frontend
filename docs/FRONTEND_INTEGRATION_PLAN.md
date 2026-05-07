@@ -41,14 +41,25 @@ This plan defines implementation order after Phase 1 API contract mapping.
 
 See `docs/PROFILE_INTEGRATION_NOTES.md` for the implemented contract and security notes.
 
-## Phase 4 — Patient Portal
+## Phase 4 — Patient Portal ✅ COMPLETE
 
-1. Consultation creation/list/detail.
-2. Consultation messaging and read-state updates.
-3. Prescriptions list/detail (without medication items).
-4. Lab orders and released-only lab results.
-5. Patient medical record view.
-6. Enforce privacy display constraints in UI.
+1. Consultation creation, list, detail, and empty-state handling. ✅
+2. Consultation messaging and read-state updates. ✅
+3. Prescriptions list/detail without medication items. ✅
+4. Lab orders and released-only lab results. ✅
+5. Patient medical record view. ✅
+6. Patient-only navigation and privacy-safe rendering constraints. ✅
+
+Implementation notes:
+
+- Patient route tree is live under `/app/patient/...`
+- Sidebar navigation in `PortalShell` switches to patient workflow links for patient users
+- Patient portal types/services/components live in `types/patient.ts`, `lib/patient/patientService.ts`, and `components/patient/*`
+- See `docs/PATIENT_PORTAL_INTEGRATION_NOTES.md` for runtime contract details and known blockers
+
+Known blocker after implementation:
+
+- Live consultation creation is currently blocked when the backend symptom catalog is empty. The frontend now surfaces this as an explicit unavailable state instead of failing silently.
 
 ## Phase 5 — Doctor Portal
 
