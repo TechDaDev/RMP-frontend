@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -90,10 +91,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }));
   }, []);
 
+  const bootstrapped = useRef(false);
+
   // On mount, check if we already have a stored token and load the user.
   // The eslint rule is suppressed here because this is an intentional
   // async initialization pattern, not a sync setState call.
+  // The bootstrapped ref guards against React StrictMode's double-invoke
+  // in development, which would otherwise fire two profile fetches.
   useEffect(() => {
+    if (bootstrapped.current) return;
+    bootstrapped.current = true;
     if (getAccessToken()) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       void loadProfile();

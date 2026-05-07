@@ -124,6 +124,7 @@ export interface Translations {
     settings: string;
     logout: string;
     previewNotice: string;
+    connectedNotice: string;
     demoUser: string;
     entryTitle: string;
     entrySubtitle: string;
@@ -342,9 +343,12 @@ export interface Translations {
     backToHome: string;
     previewBadge: string;
     uiOnlyBadge: string;
+    liveBadge: string;
     viewPreview: string;
     previewLogin: string;
     accountType: string;
+    yes: string;
+    no: string;
   };
   lang: {
     ar: string;

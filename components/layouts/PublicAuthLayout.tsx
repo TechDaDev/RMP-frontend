@@ -49,9 +49,9 @@ export function PublicAuthLayout({ title, subtitle, children }: PublicAuthLayout
             <div className="space-y-4 rounded-[2rem] border border-[var(--color-border)] bg-[color:color-mix(in_srgb,var(--color-surface)_74%,transparent)] p-6 shadow-[var(--card-shadow)]">
               <Badge tone="success">
                 <ShieldIcon size={14} />
-                {t.common.uiOnlyBadge}
+                {t.common.liveBadge}
               </Badge>
-              <p className="text-sm leading-7 text-[var(--color-muted)]">{t.portal.previewNotice}</p>
+              <p className="text-sm leading-7 text-[var(--color-muted)]">{t.portal.connectedNotice}</p>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
                   <p className="text-sm font-bold text-[var(--color-text)]">{t.roles.patient}</p>

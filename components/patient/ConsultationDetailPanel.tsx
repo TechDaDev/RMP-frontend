@@ -54,10 +54,10 @@ export function ConsultationDetailPanel({ consultation }: ConsultationDetailPane
 
       <div className="grid gap-4 md:grid-cols-3">
         <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 py-3 text-sm text-[var(--color-text)]">
-          {t.patient.fever}: {consultation.has_fever ? t.common.previewBadge : "-"}
+          {t.patient.fever}: {consultation.has_fever ? t.common.yes : t.common.no}
         </div>
         <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 py-3 text-sm text-[var(--color-text)]">
-          {t.patient.pain}: {consultation.has_pain ? t.common.previewBadge : "-"}
+          {t.patient.pain}: {consultation.has_pain ? t.common.yes : t.common.no}
         </div>
         <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 py-3 text-sm text-[var(--color-text)]">
           {t.patient.consultationRefresh}: {formatDate(consultation.updated_at)}

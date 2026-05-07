@@ -112,7 +112,7 @@ export function PortalShell({ children }: PortalShellProps) {
       <Card className="rounded-[2rem] bg-[color:color-mix(in_srgb,var(--color-primary)_8%,var(--color-surface))] p-4">
         <Badge tone="primary">{t.portal.currentRole}</Badge>
         <p className="mt-3 text-base font-bold text-[var(--color-text)]">{currentRoleLabel}</p>
-        <p className="mt-2 text-sm leading-7 text-[var(--color-muted)]">{t.portal.previewNotice}</p>
+        <p className="mt-2 text-sm leading-7 text-[var(--color-muted)]">{user ? t.portal.connectedNotice : t.portal.previewNotice}</p>
       </Card>
 
       <nav className="space-y-2" aria-label={t.ui.portalNavigation}>
