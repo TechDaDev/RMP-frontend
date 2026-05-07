@@ -83,7 +83,8 @@ export interface SymptomCategory {
 
 export interface Symptom {
   id: string;
-  category: SymptomCategory;
+  category?: SymptomCategory;
+  category_id?: string;
   name: string;
   description?: string;
   is_red_flag?: boolean;
@@ -136,17 +137,12 @@ export interface ConsultationDetail extends ConsultationListItem {
 }
 
 export interface ConsultationCreateRequest {
-  selected_specialty?: string | null;
-  selected_specialty_other?: string;
   duration: ConsultationDuration;
   severity: ConsultationSeverity;
-  has_fever?: boolean;
-  has_pain?: boolean;
-  has_breathing_difficulty?: boolean;
-  previous_visit_for_same_issue?: boolean;
-  current_medications_related?: string;
+  has_fever: boolean;
+  has_pain: boolean;
   additional_notes?: string;
-  symptom_ids?: string[];
+  symptom_ids: string[];
 }
 
 export interface ConsultationMessageAttachment {

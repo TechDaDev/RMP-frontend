@@ -55,6 +55,15 @@ Patient portal requests are centralized in `lib/patient/patientService.ts`.
 - Accepts either flat arrays or paginated payloads for future safety
 - Keeps all patient workflow API access behind authenticated requests
 
+### Consultation Intake (Symptom-First)
+
+- Patient consultation creation is symptom-first and does not ask the patient to pick a specialty
+- Frontend submits `symptom_ids` with duration/severity/fever/pain/notes
+- Frontend does not submit `selected_specialty` or `selected_specialty_other`
+- Backend assigns `selected_specialty` deterministically from symptom-specialty routing rules
+- This routing is system rule-based (deterministic), not AI triage
+- AI triage/recommendation is future work and not implemented in this phase
+
 ### Route Surface
 
 Implemented patient routes:
@@ -84,26 +93,16 @@ The UI intentionally mirrors backend privacy limits instead of trying to infer h
 - No patient medical data is stored in local storage
 - No doctor, pharmacist, laboratorian, WebSocket, or RAG workflows were added in this phase
 
-## Known Backend Blocker
+## Symptom Catalog Dependency
 
-Consultation creation is implemented, but live creation is currently blocked when the symptom catalog is empty.
+Consultation creation requires a non-empty symptom catalog because `symptom_ids` are required.
 
-Observed backend behavior:
+Local backend seed command:
 
-- `GET /api/consultations/symptom-categories/` returned an empty list
-- `GET /api/consultations/symptoms/` returned an empty list
-- `POST /api/consultations/` rejects missing `symptom_ids`
-- `POST /api/consultations/` also rejects an empty `symptom_ids` array
-
-Frontend handling:
-
-- The new consultation page detects the empty catalog state
-- The form stays non-submittable when no symptoms are available
-- A clear unavailable-state message explains that the backend catalog must be seeded first
-
-Backend action needed to fully enable this flow:
-
-- Seed symptom categories and symptoms in the local backend data
+```bash
+cd /home/zeus3000/PycharmProjects/RMP_backend/alrafidain_backend
+DB_PORT=5433 python3 manage.py seed_symptoms --settings=config.settings.local
+```
 
 ## Validation Performed
 

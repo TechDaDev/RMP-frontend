@@ -38,7 +38,8 @@ function normalizeList<T>(value: PatientListResponse<T>): T[] {
   }
 
   if (value && typeof value === "object" && "results" in value) {
-    return (value as PaginatedResponse<T>).results;
+    const results = (value as PaginatedResponse<T>).results;
+    return Array.isArray(results) ? results : [];
   }
 
   return [];
@@ -83,11 +84,20 @@ export function getMyConsultations(): Promise<ConsultationListItem[]> {
 export async function createConsultation(
   payload: ConsultationCreateRequest,
 ): Promise<ConsultationDetail> {
+  const body: ConsultationCreateRequest = {
+    duration: payload.duration,
+    severity: payload.severity,
+    has_fever: payload.has_fever,
+    has_pain: payload.has_pain,
+    additional_notes: payload.additional_notes,
+    symptom_ids: payload.symptom_ids,
+  };
+
   const response = await apiRequest<ConsultationDetail | ApiEnvelope<ConsultationDetail>>(
     API_ENDPOINTS.consultations.create,
     {
       auth: true,
-      body: payload,
+      body,
     },
   );
 

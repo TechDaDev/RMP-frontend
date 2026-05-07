@@ -37,7 +37,8 @@ export function ConsultationForm({
 }: ConsultationFormProps) {
   const { t } = useAppPreferences();
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedSpecialty, setSelectedSpecialty] = useState("general_medicine");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectionError, setSelectionError] = useState<string | null>(null);
   const [duration, setDuration] = useState<ConsultationDuration>("less_than_24_hours");
   const [severity, setSeverity] = useState<ConsultationSeverity>("mild");
   const [hasFever, setHasFever] = useState(false);
@@ -45,10 +46,6 @@ export function ConsultationForm({
   const [additionalNotes, setAdditionalNotes] = useState("");
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
 
-  const specialtyOptions = useMemo(
-    () => Object.entries(t.patient.specialtyLabels),
-    [t.patient.specialtyLabels],
-  );
   const durationOptions = useMemo(
     () => Object.entries(t.patient.durationLabels),
     [t.patient.durationLabels],
@@ -57,11 +54,30 @@ export function ConsultationForm({
     () => Object.entries(t.patient.severityLabels),
     [t.patient.severityLabels],
   );
+  const filteredSymptoms = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) {
+      return symptoms;
+    }
+
+    return symptoms.filter((symptom) => {
+      const name = symptom.name.toLowerCase();
+      const description = symptom.description?.toLowerCase() ?? "";
+      const categoryName = symptom.category?.name?.toLowerCase() ?? "";
+      return name.includes(query) || description.includes(query) || categoryName.includes(query);
+    });
+  }, [searchQuery, symptoms]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    if (selectedSymptoms.length === 0) {
+      setSelectionError(t.patient.atLeastOneSymptomRequired);
+      return;
+    }
+
+    setSelectionError(null);
     await onSubmit({
-      selected_specialty: selectedSpecialty,
       duration,
       severity,
       has_fever: hasFever,
@@ -78,22 +94,12 @@ export function ConsultationForm({
       </div>
 
       <form className="space-y-6" onSubmit={handleSubmit} noValidate>
-        <div className="grid gap-4 lg:grid-cols-3">
-          <label className="block space-y-2">
-            <span className="text-sm font-semibold text-[var(--color-text)]">{t.patient.specialty}</span>
-            <select
-              className={fieldClassName}
-              value={selectedSpecialty}
-              onChange={(event) => setSelectedSpecialty(event.target.value)}
-            >
-              {specialtyOptions.map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
-          </label>
+        <div className="space-y-2 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 py-3">
+          <p className="text-sm font-semibold text-[var(--color-text)]">{t.patient.automaticSpecialtyRouting}</p>
+          <p className="text-sm text-[var(--color-muted)]">{t.patient.symptomsWillGuideSpecialty}</p>
+        </div>
 
+        <div className="grid gap-4 lg:grid-cols-2">
           <label className="block space-y-2">
             <span className="text-sm font-semibold text-[var(--color-text)]">{t.patient.duration}</span>
             <select
@@ -147,9 +153,10 @@ export function ConsultationForm({
         </label>
 
         <div className="space-y-4 rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-4">
-          <div className="grid gap-4 md:grid-cols-[minmax(0,260px)_1fr] md:items-end">
+          <p className="text-sm font-semibold text-[var(--color-text)]">{t.patient.selectSymptoms}</p>
+          <div className="grid gap-4 md:grid-cols-2">
             <label className="block space-y-2">
-              <span className="text-sm font-semibold text-[var(--color-text)]">{t.patient.symptomCategories}</span>
+              <span className="text-sm font-semibold text-[var(--color-text)]">{t.patient.symptomCategory}</span>
               <select
                 className={fieldClassName}
                 value={selectedCategory}
@@ -158,9 +165,10 @@ export function ConsultationForm({
                   setSelectedCategory(value);
                   onCategoryChange(value || undefined);
                   setSelectedSymptoms([]);
+                  setSelectionError(null);
                 }}
               >
-                <option value="">{t.patient.symptoms}</option>
+                <option value="">{t.patient.allCategories}</option>
                 {categories.map((category) => (
                   <option key={category.id} value={category.id}>
                     {category.name}
@@ -168,52 +176,93 @@ export function ConsultationForm({
                 ))}
               </select>
             </label>
+
+            <label className="block space-y-2">
+              <span className="text-sm font-semibold text-[var(--color-text)]">{t.patient.searchSymptoms}</span>
+              <input
+                type="search"
+                className={fieldClassName}
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder={t.patient.searchSymptoms}
+              />
+            </label>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <p className="text-sm text-[var(--color-muted)]">
-              {t.patient.selectedSymptomsCount}: {selectedSymptoms.length}
+              {t.patient.selectedSymptoms}: {selectedSymptoms.length}
             </p>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => {
+                setSelectedSymptoms([]);
+                setSelectionError(null);
+              }}
+              disabled={selectedSymptoms.length === 0}
+            >
+              {t.patient.clearSelection}
+            </Button>
           </div>
 
           {loadingSymptoms ? (
             <p className="text-sm text-[var(--color-muted)]">{t.patient.loading}</p>
           ) : symptoms.length === 0 ? (
             <EmptyState
-              title={t.patient.consultationCreateUnavailableTitle}
+              title={t.patient.noSymptomsAvailable}
               description={t.patient.consultationCreateUnavailableDescription}
+            />
+          ) : filteredSymptoms.length === 0 ? (
+            <EmptyState
+              title={t.patient.noSymptomsMatch}
+              description={t.patient.searchSymptoms}
             />
           ) : (
             <div className="grid gap-3 md:grid-cols-2">
-              {symptoms.map((symptom) => {
+              {filteredSymptoms.map((symptom) => {
                 const checked = selectedSymptoms.includes(symptom.id);
                 return (
-                  <label
+                  <button
                     key={symptom.id}
-                    className="flex items-start gap-3 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-text)]"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={checked}
-                      onChange={(event) => {
-                        setSelectedSymptoms((current) => {
-                          if (event.target.checked) {
-                            return [...current, symptom.id];
-                          }
+                    type="button"
+                    className={`text-start rounded-2xl border px-4 py-3 transition ${checked
+                      ? "border-[var(--color-primary)] bg-[color:color-mix(in_srgb,var(--color-primary)_10%,var(--color-surface))]"
+                      : "border-[var(--color-border)] bg-[var(--color-surface)]"
+                      }`}
+                    onClick={() => {
+                      setSelectedSymptoms((current) => {
+                        const exists = current.includes(symptom.id);
+                        if (exists) {
                           return current.filter((item) => item !== symptom.id);
-                        });
-                      }}
-                    />
-                    <span>
+                        }
+                        return [...current, symptom.id];
+                      });
+                      setSelectionError(null);
+                    }}
+                  >
+                    <span className="block text-sm text-[var(--color-text)]">
                       <span className="block font-semibold">{symptom.name}</span>
+                      <span className="mt-1 block text-xs text-[var(--color-muted)]">
+                        {symptom.category?.name ?? t.patient.systemAssignedSpecialty}
+                      </span>
                       {symptom.description ? (
                         <span className="mt-1 block text-xs text-[var(--color-muted)]">{symptom.description}</span>
                       ) : null}
+                      {symptom.is_red_flag ? (
+                        <span className="mt-2 inline-flex rounded-full border border-red-300 bg-red-50 px-2 py-0.5 text-xs font-semibold text-red-700 dark:border-red-700 dark:bg-red-950 dark:text-red-200">
+                          {t.patient.redFlagSymptom}
+                        </span>
+                      ) : null}
                     </span>
-                  </label>
+                  </button>
                 );
               })}
             </div>
           )}
         </div>
 
+        {selectionError ? <p className="text-sm font-medium text-red-600 dark:text-red-300">{selectionError}</p> : null}
         {error ? <p className="text-sm font-medium text-red-600 dark:text-red-300">{error}</p> : null}
 
         <Button type="submit" disabled={submitting || loadingSymptoms || symptoms.length === 0 || selectedSymptoms.length === 0}>

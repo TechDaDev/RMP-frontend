@@ -61,6 +61,15 @@ Known blocker after implementation:
 
 - Live consultation creation is currently blocked when the backend symptom catalog is empty. The frontend now surfaces this as an explicit unavailable state instead of failing silently.
 
+## Phase 4.1B — Symptom-First Consultation Intake ✅ COMPLETE
+
+1. Removed patient-facing specialty selection from consultation create flow. ✅
+2. Consultation form now uses symptom-first intake with multi-select symptoms. ✅
+3. Frontend create payload now sends `symptom_ids` and does not send `selected_specialty`. ✅
+4. Backend-assigned specialty remains display-only in consultation list/detail screens. ✅
+5. Current specialty assignment is deterministic backend routing (rule-based), not AI triage. ✅
+6. Local seed command for symptoms documented for development environments. ✅
+
 ## Phase 5 — Doctor Portal
 
 1. Pending/assigned consultation queues.

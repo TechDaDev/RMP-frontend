@@ -7,6 +7,7 @@ import { ConsultationForm } from "@/components/patient/ConsultationForm";
 import { Badge } from "@/components/ui/Badge";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { ApiError } from "@/lib/api/errors";
 import {
   createConsultation,
   getSymptomCategories,
@@ -72,11 +73,16 @@ export default function NewConsultationPage() {
 
   async function handleCategoryChange(categoryId?: string) {
     setLoadingSymptoms(true);
+    setError(null);
     try {
       const loadedSymptoms = await getSymptoms({ categoryId });
       setSymptoms(loadedSymptoms);
-    } catch {
-      setError(t.patient.consultationCreateError);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setError(err.message || t.patient.consultationCreateError);
+      } else {
+        setError(t.patient.consultationCreateError);
+      }
     } finally {
       setLoadingSymptoms(false);
     }
@@ -93,8 +99,12 @@ export default function NewConsultationPage() {
         return;
       }
       router.replace("/app/patient/consultations");
-    } catch {
-      setError(t.patient.consultationCreateError);
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setError(err.message || t.patient.consultationCreateError);
+      } else {
+        setError(t.patient.consultationCreateError);
+      }
     } finally {
       setSubmitting(false);
     }
