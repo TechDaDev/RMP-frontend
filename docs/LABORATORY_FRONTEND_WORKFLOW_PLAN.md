@@ -46,8 +46,9 @@ Canonical route family:
 
 Current implementation note:
 
-- `/app/lab` already exists as the laboratorian shell and role-gated entry point.
-- No new laboratory UI files are created in this phase.
+- `/app/lab` exists as the laboratorian shell and role-gated entry point.
+- `/app/lab/scan` is implemented with manual QR token entry.
+- Live QA for scan flow was completed in Phase 6.2B.
 
 ## Screen-to-Endpoint Map
 
@@ -173,11 +174,22 @@ Form rules:
 - Integrate `scanLabOrder` service call.
 - Render scanned order detail and remaining items.
 
+Status: Completed and live-QA validated (Phase 6.2B).
+
+Validated behaviors:
+
+- Empty token is blocked client-side.
+- Invalid token returns backend `400` and safe UI error message.
+- Valid token renders order status, summary, and item sections.
+- Scan reset action returns to manual entry state.
+
 ### Phase 6.3 - Complete Lab Order Items
 
 - Build `/app/lab/orders/[id]` and `/complete` flow.
 - Integrate `completeLabOrderItems`.
 - Enforce locked-order and verification guards.
+
+Status: Next recommended phase.
 
 ### Phase 6.4 - Create Lab Results
 

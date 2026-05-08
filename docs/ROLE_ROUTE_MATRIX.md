@@ -64,6 +64,14 @@ Role: laboratorian only.
 Canonical laboratorian shell and route family is `/app/lab`.
 Optional future alias: `/app/laboratory/*`.
 
+## Phase 6.2B Guard QA Results
+
+Explicit runtime checks were executed on `/app/lab/scan`:
+
+- patient -> redirected to `/app/patient`
+- doctor -> redirected to `/app/doctor`
+- laboratorian -> allowed
+
 ## Current Preview Mode Note
 
 - Current Phase 1 preview keeps /app as role selector for UI preview only.

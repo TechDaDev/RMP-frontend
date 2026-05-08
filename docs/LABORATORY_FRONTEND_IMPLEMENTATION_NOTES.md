@@ -77,3 +77,39 @@ Optional future alias (not canonical): `/app/laboratory/*`
 
 - Patient profile-completion gating for consultation creation is deferred.
 - It must be enforced in the backend first and only then mirrored in the frontend.
+
+## Phase 6.2B Live QA (2026-05-09)
+
+### Implemented and verified
+
+- `/app/lab/scan` is implemented and reachable from the laboratory dashboard workflow card.
+- Manual QR token entry is implemented (no camera scanner).
+- `POST /api/lab-orders/scan/` is integrated through `scanLabOrder` in the frontend service layer.
+- Scanned order panel renders status badge, summary fields, and item lists.
+- Pending and completed item sections render from backend response data.
+
+### Validation and error handling results
+
+- Empty token submission is blocked client-side (submit button disabled while input is empty).
+- Invalid token returns backend `400` and UI shows safe, user-facing error text.
+- Valid token scan succeeds and displays scanned order details and pending items.
+- "Scan another order" clears scanned state and returns to manual input.
+
+### Role and access QA
+
+- Laboratorian can access `/app/lab/scan`.
+- Patient and doctor are redirected away from `/app/lab/scan` to role-appropriate routes.
+
+### Locale and theme QA
+
+- Arabic remains default and renders RTL labels on scan page.
+- Kurdish renders RTL labels without missing keys.
+- English renders LTR labels without missing keys.
+- Theme toggle works and persisted preference was observed in browser storage.
+
+### Deferred by design
+
+- Camera scanner remains deferred.
+- Item completion UI is deferred to Phase 6.3.
+- Result creation and correction UI are deferred to Phase 6.4+.
+- No fake pending-order list is introduced.

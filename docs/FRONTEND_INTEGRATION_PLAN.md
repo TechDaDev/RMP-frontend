@@ -182,6 +182,16 @@ Notes:
 5. Lab result correction.
 6. Final QA and privacy checks.
 
+### Phase 6.2B — Laboratory QR Scan Live QA + Docs Finalization ✅ COMPLETE
+
+- Manual QR scan on `/app/lab/scan` validated against live backend.
+- Empty token blocked client-side.
+- Invalid token path validated (`400`) with safe UI error messaging.
+- Valid token path validated with order summary and pending/completed item rendering.
+- Role guards confirmed for patient/doctor/laboratorian access.
+- i18n (ar/ku/en) and theme behavior validated on scan page.
+- Documentation updated for scan implementation and QA status.
+
 ## Phase 7 — Pharmacist Portal
 
 1. Prescription scan workflow.
