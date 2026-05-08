@@ -120,3 +120,36 @@ Result at completion:
 
 - Seed the backend symptom catalog so consultation creation can be exercised end-to-end from the UI
 - Add patient workflow UI QA screenshots or scripted browser checks if a stricter release checklist is needed
+
+## Phase 4.2B - Consultation Detail 403 Diagnosis
+
+### Diagnosis Result
+
+- The consultation detail endpoint itself (`GET /api/consultations/<id>/`) returns `200` for the same patient and consultation ID.
+- The consultation messages endpoints return `403` for submitted consultations:
+	- `GET /api/consultations/<id>/messages/`
+	- `POST /api/consultations/<id>/messages/mark-read/`
+- Frontend detail page previously loaded detail and messages with `Promise.all`, so a messages `403` caused the whole detail view to fail with a generic empty state.
+
+### Root Cause
+
+- The frontend treated a non-critical messages permission error as a fatal consultation detail error.
+- In development, React StrictMode can double-run effects, which made the same `403` appear twice and amplified confusion during QA.
+
+### Fix Applied
+
+- Decoupled consultation detail loading from consultation messages loading in the patient detail page.
+- Kept detail rendering successful even if messages endpoints return `403`.
+- Added clearer consultation detail error UX for real detail-level failures with:
+	- a retry action
+	- a back-to-consultations action
+	- localized `403` copy in Arabic, Kurdish, and English
+
+### Verification Outcome
+
+- Consultation detail now renders when backend returns `200` for detail, even if messages are unavailable due to backend permissions for current consultation status.
+- Consultation creation behavior remains symptom-first and unchanged.
+
+### Deferred Work (Not Implemented in Phase 4.2B)
+
+- Profile-completion gating before consultation creation remains deferred and must be enforced in backend plus reflected in frontend in a future phase.

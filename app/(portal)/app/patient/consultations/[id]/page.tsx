@@ -1,14 +1,17 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
+import { Button, buttonClassName } from "@/components/ui/Button";
 import { ConsultationDetailPanel } from "@/components/patient/ConsultationDetailPanel";
 import { ConsultationMessagesPanel } from "@/components/patient/ConsultationMessagesPanel";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { ApiError } from "@/lib/api/errors";
 import {
   getConsultationDetail,
   getConsultationMessages,
@@ -36,21 +39,44 @@ export default function ConsultationDetailPage() {
     let active = true;
 
     async function loadInitialDetail() {
+      setLoading(true);
+      setError(null);
+      setMessageError(null);
+
       try {
-        const [consultationData, messageData] = await Promise.all([
-          getConsultationDetail(consultationId),
-          getConsultationMessages(consultationId),
-        ]);
+        const consultationData = await getConsultationDetail(consultationId);
         if (!active) {
           return;
         }
         setConsultation(consultationData);
-        setMessages(messageData);
-        setError(null);
-        await markConsultationMessagesRead(consultationId);
-      } catch {
+      } catch (err) {
         if (active) {
-          setError(t.patient.noDataDescription);
+          if (err instanceof ApiError && err.status === 403) {
+            setError(t.patient.consultationDetailForbidden);
+          } else {
+            setError(t.patient.noDataDescription);
+          }
+          setConsultation(null);
+          setMessages([]);
+          setLoading(false);
+        }
+
+        return;
+      }
+
+      try {
+        const messageData = await getConsultationMessages(consultationId);
+        if (!active) {
+          return;
+        }
+        setMessages(messageData);
+        await markConsultationMessagesRead(consultationId);
+      } catch (err) {
+        if (active) {
+          setMessages([]);
+          if (!(err instanceof ApiError && err.status === 403)) {
+            setMessageError(t.patient.consultationCreateError);
+          }
         }
       } finally {
         if (active) {
@@ -64,22 +90,40 @@ export default function ConsultationDetailPage() {
     return () => {
       active = false;
     };
-  }, [consultationId, t.patient.noDataDescription]);
+  }, [
+    consultationId,
+    t.patient.consultationCreateError,
+    t.patient.consultationDetailForbidden,
+    t.patient.noDataDescription,
+  ]);
 
   async function handleRefresh() {
     setLoading(true);
     setError(null);
+    setMessageError(null);
 
     try {
-      const [consultationData, messageData] = await Promise.all([
-        getConsultationDetail(consultationId),
-        getConsultationMessages(consultationId),
-      ]);
+      const consultationData = await getConsultationDetail(consultationId);
       setConsultation(consultationData);
-      setMessages(messageData);
-      await markConsultationMessagesRead(consultationId);
-    } catch {
-      setError(t.patient.noDataDescription);
+
+      try {
+        const messageData = await getConsultationMessages(consultationId);
+        setMessages(messageData);
+        await markConsultationMessagesRead(consultationId);
+      } catch (err) {
+        setMessages([]);
+        if (!(err instanceof ApiError && err.status === 403)) {
+          setMessageError(t.patient.consultationCreateError);
+        }
+      }
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 403) {
+        setError(t.patient.consultationDetailForbidden);
+      } else {
+        setError(t.patient.noDataDescription);
+      }
+      setConsultation(null);
+      setMessages([]);
     } finally {
       setLoading(false);
     }
@@ -114,7 +158,17 @@ export default function ConsultationDetailPage() {
   }
 
   if (error || !consultation) {
-    return <EmptyState title={t.patient.noDataTitle} description={error ?? t.patient.noDataDescription} />;
+    return (
+      <Card className="space-y-5 rounded-[2rem]">
+        <EmptyState title={t.patient.noDataTitle} description={error ?? t.patient.noDataDescription} />
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <Link href="/app/patient/consultations" className={buttonClassName({ variant: "secondary" })}>
+            {t.patient.backToConsultations}
+          </Link>
+          <Button onClick={() => void handleRefresh()}>{t.patient.retry}</Button>
+        </div>
+      </Card>
+    );
   }
 
   return (

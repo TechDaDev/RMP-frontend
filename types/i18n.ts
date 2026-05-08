@@ -202,6 +202,7 @@ export interface Translations {
     consultationCreateUnavailableTitle: string;
     consultationCreateUnavailableDescription: string;
     consultationCreateError: string;
+    consultationDetailForbidden: string;
     consultationRefresh: string;
     specialty: string;
     severity: string;
@@ -269,6 +270,7 @@ export interface Translations {
     noDataDescription: string;
     loading: string;
     retry: string;
+    backToConsultations: string;
     qrToken: string;
     qrUrl: string;
     doctor: string;
