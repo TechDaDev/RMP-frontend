@@ -9,6 +9,7 @@ import type {
   DoctorConsultationListItem,
   DoctorLabOrderDetail,
   DoctorLabResultDetail,
+  DoctorPatientRecord,
   LinkLabResultToMedicalRecordRequest,
   DoctorMessage,
   DoctorMessageRequest,
@@ -17,7 +18,6 @@ import type {
   ReviewDoctorLabResultRequest,
   DoctorResponseRequest,
 } from "@/types/doctor";
-import type { PatientMedicalRecord } from "@/types/patient";
 
 type ListResponse<T> = T[] | PaginatedResponse<T>;
 
@@ -227,6 +227,6 @@ export async function linkLabResultToMedicalRecord(
   return unwrapData(response);
 }
 
-export function getAuthorizedPatientRecord(patientId: string): Promise<PatientMedicalRecord> {
-  return getResource<PatientMedicalRecord>(API_ENDPOINTS.doctorPatientRecords.detail(patientId));
+export function getAuthorizedPatientRecord(patientId: string): Promise<DoctorPatientRecord> {
+  return getResource<DoctorPatientRecord>(API_ENDPOINTS.doctorPatientRecords.detail(patientId));
 }

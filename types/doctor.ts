@@ -293,3 +293,69 @@ export interface ReleaseDoctorLabResultRequest {
 export interface LinkLabResultToMedicalRecordRequest {
   notes?: string;
 }
+
+// ─── Doctor patient record (Phase 5.6) ───────────────────────────────────────
+
+export interface DoctorPatientRecordUserSummary {
+  id?: string;
+  email?: string;
+  first_name?: string;
+  last_name?: string;
+}
+
+export type DoctorPatientRecordEntryCategory =
+  | "blood_group"
+  | "allergy"
+  | "chronic_condition"
+  | "current_medication"
+  | "past_surgery"
+  | "family_history"
+  | "smoking_status"
+  | "pregnancy_status"
+  | "general_note"
+  | string;
+
+export type DoctorPatientRecordVerificationStatus =
+  | "self_reported"
+  | "doctor_confirmed"
+  | "laboratory_confirmed"
+  | "rejected"
+  | "unknown"
+  | string;
+
+export interface DoctorPatientRecordBloodGroup {
+  id?: string;
+  blood_group?: string;
+  verification_status?: DoctorPatientRecordVerificationStatus;
+  source_user?: DoctorPatientRecordUserSummary | null;
+  verified_by?: DoctorPatientRecordUserSummary | null;
+  verified_at?: string | null;
+  notes?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface DoctorPatientRecordEntry {
+  id: string;
+  category?: DoctorPatientRecordEntryCategory;
+  title?: string;
+  value?: string;
+  verification_status?: DoctorPatientRecordVerificationStatus;
+  source_user?: DoctorPatientRecordUserSummary | null;
+  source_role?: string;
+  verified_by?: DoctorPatientRecordUserSummary | null;
+  verified_at?: string | null;
+  is_active?: boolean;
+  notes?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface DoctorPatientRecord {
+  id: string;
+  patient?: DoctorPatientRecordUserSummary | null;
+  blood_group?: DoctorPatientRecordBloodGroup | null;
+  entries?: DoctorPatientRecordEntry[];
+  created_at?: string;
+  updated_at?: string;
+}

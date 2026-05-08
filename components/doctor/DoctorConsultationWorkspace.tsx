@@ -68,6 +68,7 @@ export function DoctorConsultationWorkspace({
         consultationId={consultation.id}
         status={consultation.status}
         isApproved={isApproved}
+        patientId={consultation.patient?.id}
       />
     </div>
   );

@@ -30,6 +30,12 @@ export function canDoctorCreateLabOrder(status: string): boolean {
   return ACTIVE_DOCTOR_STATUS.has(status);
 }
 
+const PATIENT_RECORD_ACCESS_STATUS = new Set(["accepted", "doctor_responded", "closed"]);
+
+export function canDoctorAccessPatientRecord(status: string): boolean {
+  return PATIENT_RECORD_ACCESS_STATUS.has(status);
+}
+
 export function getDoctorConsultationStatusLabelKey(status: string):
   | "statusSubmitted"
   | "statusAccepted"
