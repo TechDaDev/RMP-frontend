@@ -183,6 +183,61 @@ export interface CancelDoctorPrescriptionRequest {
   [key: string]: never;
 }
 
-export interface CreateLabOrderRequest {
-  [key: string]: unknown;
+export type DoctorLabOrderStatus =
+  | "issued"
+  | "partially_completed"
+  | "fully_completed"
+  | "expired"
+  | "cancelled"
+  | string;
+
+export type DoctorLabOrderItemStatus = "pending" | "completed" | "cancelled" | string;
+
+export interface CreateDoctorLabOrderItemRequest {
+  test?: string;
+  test_name?: string;
+  category?: string;
+  sample_type?: string;
+  instructions?: string;
+}
+
+export interface CreateDoctorLabOrderRequest {
+  items: CreateDoctorLabOrderItemRequest[];
+}
+
+export interface DoctorLabOrderItem {
+  id?: string;
+  test?: string | null;
+  test_name?: string;
+  category?: string;
+  sample_type?: string;
+  instructions?: string;
+  status?: DoctorLabOrderItemStatus;
+  completed_at?: string | null;
+  cancelled_at?: string | null;
+  created_at?: string;
+}
+
+export interface DoctorLabOrderCompletionRecord {
+  id?: string;
+  lab_order_item_id?: string;
+  laboratorian?: DoctorPatientUser;
+  status?: string;
+  note?: string;
+  created_at?: string;
+}
+
+export interface DoctorLabOrderDetail {
+  id: string;
+  consultation_id?: string;
+  patient?: DoctorPatientUser;
+  doctor?: DoctorPatientUser;
+  status?: DoctorLabOrderStatus;
+  qr_token?: string;
+  created_at?: string;
+  expires_at?: string | null;
+  cancelled_at?: string | null;
+  fully_completed_at?: string | null;
+  items?: DoctorLabOrderItem[];
+  completion_records?: DoctorLabOrderCompletionRecord[];
 }

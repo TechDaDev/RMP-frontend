@@ -123,3 +123,21 @@ Manual QA summary (browser):
 ## Deferred Task Reminder
 
 - Patient incomplete-profile consultation gate is deferred and must be backend-first before frontend enforcement
+
+## Phase 5.4 Implementation Notes (Completed)
+
+Implemented doctor lab-order workflow:
+- Create lab-order screen from consultation context at `/app/doctor/consultations/[id]/lab-orders/new`
+- Doctor lab-order detail route at `/app/doctor/lab-orders/[id]`
+- Doctor lab-order cancel action integrated with backend cancel endpoint
+- Consultation workspace action now links to create-lab-order when consultation status is `accepted` or `doctor_responded`
+- Verification-aware guard preserved: only approved doctors can perform lab-order actions
+
+Contract alignment and privacy notes:
+- Lab-order create is consultation-scoped and uses `POST /api/consultations/{consultation_id}/lab-orders/`
+- Doctor detail uses `GET /api/lab-orders/doctor/{lab_order_id}/` with full item list and completion records
+- Cancel uses `POST /api/lab-orders/doctor/{lab_order_id}/cancel/` and surfaces blocked states safely
+- Patient lab-order privacy remains intact; patient endpoints continue to hide test item details
+
+Deferred from this phase:
+- Doctor lab-result review/release/link flows are intentionally deferred to the next phase

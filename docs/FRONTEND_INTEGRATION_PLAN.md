@@ -131,6 +131,17 @@ Implementation notes:
 2. Implement doctor lab-order detail/cancel flows.
 3. Implement doctor lab-result detail, review, release, and link-medical-record flows.
 
+## Phase 5.4A — Doctor Lab Orders From Consultation ✅ COMPLETE
+
+1. Implemented create-lab-order screen from consultation context using `POST /api/consultations/{id}/lab-orders/`. ✅
+2. Implemented doctor lab-order detail screen using `GET /api/lab-orders/doctor/{id}/`. ✅
+3. Implemented doctor lab-order cancel action using `POST /api/lab-orders/doctor/{id}/cancel/`. ✅
+4. Wired consultation workspace action with status/verification guard (`accepted` or `doctor_responded`, approved doctor). ✅
+5. Preserved patient privacy contract for lab-order list/detail (no test item details in patient views). ✅
+
+Deferred:
+- Doctor lab-result review/release/link-medical-record flows move to next phase (Phase 5.5).
+
 ## Phase 5.5 — Patient Record Access
 
 1. Implement authorized patient-record view via `GET /api/patient-records/patients/{patient_id}/`.

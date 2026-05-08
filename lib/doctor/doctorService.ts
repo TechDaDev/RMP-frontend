@@ -3,10 +3,11 @@ import { API_ENDPOINTS } from "@/lib/api/endpoints";
 import type { ApiEnvelope, PaginatedResponse } from "@/types/api";
 import type {
   CancelDoctorPrescriptionRequest,
+  CreateDoctorLabOrderRequest,
   CreateDoctorPrescriptionRequest,
-  CreateLabOrderRequest,
   DoctorConsultationDetail,
   DoctorConsultationListItem,
+  DoctorLabOrderDetail,
   DoctorMessage,
   DoctorMessageRequest,
   DoctorPrescriptionDetail,
@@ -144,23 +145,33 @@ export async function cancelDoctorPrescription(
 
 export async function createLabOrderFromConsultation(
   id: string,
-  payload: CreateLabOrderRequest,
-): Promise<void> {
-  await apiRequest<void | ApiEnvelope<void>>(API_ENDPOINTS.doctorLabOrders.createFromConsultation(id), {
-    auth: true,
-    body: payload,
-  });
+  payload: CreateDoctorLabOrderRequest,
+): Promise<DoctorLabOrderDetail> {
+  const response = await apiRequest<DoctorLabOrderDetail | ApiEnvelope<DoctorLabOrderDetail>>(
+    API_ENDPOINTS.doctorLabOrders.createFromConsultation(id),
+    {
+      auth: true,
+      body: payload,
+    },
+  );
+
+  return unwrapData(response);
 }
 
-export function getDoctorLabOrderDetail(id: string): Promise<unknown> {
-  return getResource<unknown>(API_ENDPOINTS.doctorLabOrders.detail(id));
+export function getDoctorLabOrderDetail(id: string): Promise<DoctorLabOrderDetail> {
+  return getResource<DoctorLabOrderDetail>(API_ENDPOINTS.doctorLabOrders.detail(id));
 }
 
-export async function cancelDoctorLabOrder(id: string): Promise<void> {
-  await apiRequest<void | ApiEnvelope<void>>(API_ENDPOINTS.doctorLabOrders.cancel(id), {
-    auth: true,
-    body: {},
-  });
+export async function cancelDoctorLabOrder(id: string): Promise<DoctorLabOrderDetail> {
+  const response = await apiRequest<DoctorLabOrderDetail | ApiEnvelope<DoctorLabOrderDetail>>(
+    API_ENDPOINTS.doctorLabOrders.cancel(id),
+    {
+      auth: true,
+      body: {},
+    },
+  );
+
+  return unwrapData(response);
 }
 
 export function getDoctorLabResultDetail(id: string): Promise<unknown> {

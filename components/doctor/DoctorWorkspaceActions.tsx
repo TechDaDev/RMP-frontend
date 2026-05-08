@@ -4,7 +4,10 @@ import Link from "next/link";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { Button, buttonClassName } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { canDoctorCreatePrescription } from "@/lib/doctor/doctorConsultationStatus";
+import {
+  canDoctorCreateLabOrder,
+  canDoctorCreatePrescription,
+} from "@/lib/doctor/doctorConsultationStatus";
 
 interface DoctorWorkspaceActionsProps {
   consultationId: string;
@@ -15,6 +18,7 @@ interface DoctorWorkspaceActionsProps {
 export function DoctorWorkspaceActions({ consultationId, status, isApproved }: DoctorWorkspaceActionsProps) {
   const { t } = useAppPreferences();
   const canCreatePrescription = isApproved && canDoctorCreatePrescription(status);
+  const canCreateLabOrder = isApproved && canDoctorCreateLabOrder(status);
 
   return (
     <Card className="space-y-3">
@@ -32,9 +36,18 @@ export function DoctorWorkspaceActions({ consultationId, status, isApproved }: D
             {!isApproved ? t.doctor.verifiedDoctorRequired : t.doctor.prescriptionRequiresAcceptedConsultation}
           </Button>
         )}
-        <Button variant="secondary" disabled>
-          {t.doctor.labOrderPhaseComing}
-        </Button>
+        {canCreateLabOrder ? (
+          <Link
+            href={`/app/doctor/consultations/${consultationId}/lab-orders/new`}
+            className={buttonClassName({ variant: "secondary" })}
+          >
+            {t.doctor.createLabOrder}
+          </Link>
+        ) : (
+          <Button variant="secondary" disabled>
+            {!isApproved ? t.doctor.verifiedDoctorRequired : t.doctor.labOrderRequiresAcceptedConsultation}
+          </Button>
+        )}
       </div>
     </Card>
   );
