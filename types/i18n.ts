@@ -319,6 +319,32 @@ export interface Translations {
     medicalRecordCategoryLabels: Record<string, string>;
     valueTypeLabels: Record<string, string>;
   };
+  doctor: {
+    dashboardTitle: string;
+    dashboardSubtitle: string;
+    pendingConsultations: string;
+    assignedConsultations: string;
+    consultationWorkspace: string;
+    acceptConsultation: string;
+    sendResponse: string;
+    closeConsultation: string;
+    createPrescription: string;
+    createLabOrder: string;
+    patientRecord: string;
+    labResults: string;
+    messaging: string;
+    waitingForDoctorAction: string;
+    noPendingConsultations: string;
+    noAssignedConsultations: string;
+    verifiedDoctorRequired: string;
+    rejectUnavailable: string;
+    statusSubmitted: string;
+    statusAccepted: string;
+    statusDoctorResponded: string;
+    statusClosed: string;
+    statusCancelled: string;
+    statusRejected: string;
+  };
   profile: {
     profilePageSubtitle: string;
     personalInformation: string;

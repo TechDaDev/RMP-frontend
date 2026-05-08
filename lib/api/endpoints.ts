@@ -42,6 +42,16 @@ export const API_ENDPOINTS = {
     symptomCategories: "/api/consultations/symptom-categories/",
     symptoms: "/api/consultations/symptoms/",
   },
+  doctorConsultations: {
+    pending: "/api/consultations/doctor/pending/",
+    assigned: "/api/consultations/doctor/assigned/",
+    detail: (id: string) => `/api/consultations/${id}/`,
+    accept: (id: string) => `/api/consultations/${id}/accept/`,
+    response: (id: string) => `/api/consultations/${id}/responses/`,
+    close: (id: string) => `/api/consultations/${id}/close/`,
+    messages: (id: string) => `/api/consultations/${id}/messages/`,
+    markMessagesRead: (id: string) => `/api/consultations/${id}/messages/mark-read/`,
+  },
   prescriptions: {
     my: "/api/prescriptions/my/",
     myDetail: (id: string) => `/api/prescriptions/my/${id}/`,
@@ -50,6 +60,11 @@ export const API_ENDPOINTS = {
     createForConsultation: (consultationId: string) => `/api/consultations/${consultationId}/prescriptions/`,
     scan: "/api/prescriptions/scan/",
     dispense: (id: string) => `/api/prescriptions/${id}/dispense/`,
+  },
+  doctorPrescriptions: {
+    createFromConsultation: (consultationId: string) => `/api/consultations/${consultationId}/prescriptions/`,
+    detail: (prescriptionId: string) => `/api/prescriptions/doctor/${prescriptionId}/`,
+    cancel: (prescriptionId: string) => `/api/prescriptions/doctor/${prescriptionId}/cancel/`,
   },
   labOrders: {
     tests: "/api/lab-orders/tests/",
@@ -68,6 +83,17 @@ export const API_ENDPOINTS = {
     createItemResult: (itemId: string) => `/api/lab-orders/items/${itemId}/results/`,
     correctResult: (id: string) => `/api/lab-orders/results/${id}/correct/`,
   },
+  doctorLabOrders: {
+    createFromConsultation: (consultationId: string) => `/api/consultations/${consultationId}/lab-orders/`,
+    detail: (labOrderId: string) => `/api/lab-orders/doctor/${labOrderId}/`,
+    cancel: (labOrderId: string) => `/api/lab-orders/doctor/${labOrderId}/cancel/`,
+  },
+  doctorLabResults: {
+    detail: (labResultId: string) => `/api/lab-orders/doctor/results/${labResultId}/`,
+    review: (labResultId: string) => `/api/lab-orders/doctor/results/${labResultId}/review/`,
+    release: (labResultId: string) => `/api/lab-orders/doctor/results/${labResultId}/release/`,
+    linkMedicalRecord: (labResultId: string) => `/api/lab-orders/doctor/results/${labResultId}/link-medical-record/`,
+  },
   labResults: {
     my: "/api/lab-results/my/",
     myDetail: (id: string) => `/api/lab-results/my/${id}/`,
@@ -82,6 +108,9 @@ export const API_ENDPOINTS = {
     deactivateEntry: (entryId: string) => `/api/patient-records/entries/${entryId}/deactivate/`,
     setBloodGroup: (recordId: string) => `/api/patient-records/${recordId}/blood-group/`,
     verifyBloodGroup: (patientId: string) => `/api/patient-records/patients/${patientId}/blood-group/verify/`,
+  },
+  doctorPatientRecords: {
+    detail: (patientId: string) => `/api/patient-records/patients/${patientId}/`,
   },
   notifications: {
     list: "/api/notifications/",

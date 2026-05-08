@@ -83,15 +83,55 @@ Known blocker after implementation:
 
 See `docs/PATIENT_PORTAL_INTEGRATION_NOTES.md` Phase 4.5 section for full details and known limitations.
 
-## Phase 5 — Doctor Portal
+## Phase 5.0B — Doctor Portal Contract Preparation ✅ COMPLETE
 
-1. Pending/assigned consultation queues.
-2. Accept/respond/close consultation flow.
-3. Assigned patient medical record view.
-4. Prescription create/detail/cancel workflows.
-5. Lab order create/detail/cancel workflows.
-6. Lab result review/release workflows.
-7. Doctor RAG support tools.
+1. Audited backend doctor workflow contract and endpoint inventory. ✅
+2. Added doctor workflow route/screen planning docs. ✅
+3. Added doctor-specific endpoint constant groups for implementation ergonomics. ✅
+4. Added doctor workflow TypeScript models and lifecycle helper. ✅
+5. Added doctor service skeleton (not wired to UI yet). ✅
+
+Reference docs:
+- `docs/DOCTOR_FRONTEND_WORKFLOW_PLAN.md`
+- `docs/DOCTOR_FRONTEND_IMPLEMENTATION_NOTES.md`
+
+## Phase 5.1 — Doctor Dashboard + Pending/Assigned Consultations
+
+1. Implement doctor dashboard summary cards and quick links.
+2. Implement pending queue from `GET /api/consultations/doctor/pending/`.
+3. Implement assigned queue from `GET /api/consultations/doctor/assigned/`.
+4. Implement accept action from pending queue via `POST /api/consultations/{id}/accept/`.
+5. No reject action (no backend reject endpoint).
+
+## Phase 5.2 — Doctor Consultation Workspace
+
+1. Implement consultation detail workspace from `GET /api/consultations/{id}/`.
+2. Implement status-gated messaging (`GET/POST /messages`, `POST /messages/mark-read/`).
+3. Implement doctor response via `POST /api/consultations/{id}/responses/`.
+4. Implement close action via `POST /api/consultations/{id}/close/`.
+
+## Phase 5.3 — Prescriptions From Consultation
+
+1. Implement create-prescription screen from consultation context.
+2. Use `POST /api/consultations/{id}/prescriptions/`.
+3. Implement doctor prescription detail and cancel flows.
+
+## Phase 5.4 — Lab Orders and Lab Results
+
+1. Implement create-lab-order screen from consultation context.
+2. Implement doctor lab-order detail/cancel flows.
+3. Implement doctor lab-result detail, review, release, and link-medical-record flows.
+
+## Phase 5.5 — Patient Record Access
+
+1. Implement authorized patient-record view via `GET /api/patient-records/patients/{patient_id}/`.
+2. Enforce relationship-based access error handling in UI states.
+
+## Phase 5.6 — Doctor Portal QA
+
+1. Full doctor route QA pass.
+2. Verification-gate QA (pending/rejected/suspended vs approved).
+3. Privacy and authorization QA for unassigned doctor access.
 
 ## Phase 6 — Pharmacist Portal
 

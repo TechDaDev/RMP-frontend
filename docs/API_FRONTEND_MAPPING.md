@@ -68,6 +68,8 @@ Sources used (priority order):
 
 ## 4. Doctor Portal Mapping
 
+Consultation reject is intentionally excluded in frontend mapping because backend has no reject endpoint.
+
 | Screen | Endpoint | Method | Role | Auth Required | Request Type | Response Type | Frontend Status | Notes |
 |---|---|---|---|---|---|---|---|---|
 | /app/doctor (pending queue) | /api/consultations/doctor/pending/ | GET | doctor-approved | Yes | none | envelope | Phase 5 | Specialty-filtered |
@@ -76,6 +78,7 @@ Sources used (priority order):
 | /app/doctor consultation responses | /api/consultations/<id>/responses/ | POST | doctor-approved | Yes | JSON | envelope | Phase 5 | Assigned consultation |
 | /app/doctor consultation close | /api/consultations/<id>/close/ | POST | doctor-approved | Yes | none | envelope | Phase 5 | Assigned consultation |
 | /app/doctor consultation chat | /api/consultations/<id>/messages/ | GET/POST | doctor-approved | Yes | JSON | envelope | Phase 5 | Participant only |
+| /app/doctor consultation chat read-state | /api/consultations/<id>/messages/mark-read/ | POST | doctor-approved | Yes | none | envelope | Phase 5 | Read marker for allowed statuses |
 | /app/doctor patient record | /api/patient-records/patients/<patient_id>/ | GET | doctor-approved | Yes | none | envelope | Phase 5 | Active consultation required |
 | /app/doctor prescription create | /api/consultations/<id>/prescriptions/ | POST | doctor-approved | Yes | JSON | envelope | Phase 5 | Assigned consultation |
 | /app/doctor prescription detail | /api/prescriptions/doctor/<id>/ | GET | doctor-approved | Yes | none | envelope | Phase 5 | Full prescription detail |
@@ -86,9 +89,9 @@ Sources used (priority order):
 | /app/doctor lab result detail | /api/lab-orders/doctor/results/<id>/ | GET | doctor-approved | Yes | none | envelope | Phase 5 | Assigned result access |
 | /app/doctor lab result review | /api/lab-orders/doctor/results/<id>/review/ | POST | doctor-approved | Yes | JSON | envelope | Phase 5 | Review + optional release flag |
 | /app/doctor lab result release | /api/lab-orders/doctor/results/<id>/release/ | POST | doctor-approved | Yes | none | envelope | Phase 5 | Patient visibility gate |
-| /app/doctor RAG general query | /api/rag/doctor/query/ | POST | doctor-approved | Yes | JSON | raw | Phase 5 | RAG response is non-envelope |
-| /app/doctor RAG consult support | /api/rag/consultations/<id>/support/ | POST | doctor-approved | Yes | JSON | raw | Phase 5 | Assigned consultation required |
-| /app/doctor RAG lab support | /api/rag/lab-results/<id>/support/ | POST | doctor-approved | Yes | JSON | raw | Phase 5 | Assigned result required |
+| /app/doctor RAG general query | /api/rag/doctor/query/ | POST | doctor-approved | Yes | JSON | raw | Phase 12 | Out of scope for initial doctor workflow phases |
+| /app/doctor RAG consult support | /api/rag/consultations/<id>/support/ | POST | doctor-approved | Yes | JSON | raw | Phase 12 | Out of scope for initial doctor workflow phases |
+| /app/doctor RAG lab support | /api/rag/lab-results/<id>/support/ | POST | doctor-approved | Yes | JSON | raw | Phase 12 | Out of scope for initial doctor workflow phases |
 
 ## 5. Pharmacist Portal Mapping
 
