@@ -66,7 +66,7 @@ export default function PatientPortalPage() {
   const workflows = [
     {
       title: t.patient.requestConsultation,
-      description: t.patient.consultationsSubtitle,
+      description: t.patient.consultationNewSubtitle,
       href: "/app/patient/consultations/new",
       ctaLabel: t.patient.requestConsultation,
       icon: <MessageIcon size={20} />,
@@ -84,6 +84,13 @@ export default function PatientPortalPage() {
       href: "/app/patient/prescriptions",
       ctaLabel: t.patient.viewPrescriptions,
       icon: <PrescriptionIcon size={20} />,
+    },
+    {
+      title: t.patient.viewLabOrders,
+      description: t.patient.labOrdersSubtitle,
+      href: "/app/patient/lab-orders",
+      ctaLabel: t.patient.viewLabOrders,
+      icon: <LabIcon size={20} />,
     },
     {
       title: t.patient.viewLabResults,

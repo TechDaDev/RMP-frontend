@@ -106,16 +106,16 @@ export default function NewConsultationPage() {
           title={t.patient.consultationCreateUnavailableTitle}
           description={t.patient.consultationCreateUnavailableDescription}
         />
-      ) : null}
-
-      <ConsultationForm
-        categories={categories}
-        symptoms={symptoms}
-        loadingSymptoms={loadingSymptoms}
-        submitting={submitting}
-        error={error}
-        onSubmit={handleSubmit}
-      />
+      ) : (
+        <ConsultationForm
+          categories={categories}
+          symptoms={symptoms}
+          loadingSymptoms={loadingSymptoms}
+          submitting={submitting}
+          error={error}
+          onSubmit={handleSubmit}
+        />
+      )}
     </div>
   );
 }

@@ -288,6 +288,9 @@ export interface Translations {
     loading: string;
     retry: string;
     backToConsultations: string;
+    backToPrescriptions: string;
+    backToLabOrders: string;
+    backToLabResults: string;
     qrToken: string;
     qrUrl: string;
     doctor: string;

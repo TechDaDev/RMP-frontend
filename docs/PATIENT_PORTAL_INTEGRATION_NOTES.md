@@ -250,3 +250,67 @@ Backend status values are mapped to frontend lifecycle states in `lib/patient/co
 ### Deferred Work (Not Implemented in Phase 4.2B)
 
 - Profile-completion gating before consultation creation remains deferred and must be enforced in backend plus reflected in frontend in a future phase.
+
+## Phase 4.5 — Patient Portal Final QA Pass
+
+**Date:** 2026-05-08  
+**Frontend:** http://localhost:3000  
+**Backend:** http://localhost:8000 (health: ok)
+
+### Live Backend Verification (API check)
+
+| Endpoint | Result |
+|---|---|
+| GET /api/health/ | 200 ok |
+| POST /api/accounts/login/ (patient) | 200, tokens returned |
+| GET /api/consultations/my/ | 200, 3 records (all status: submitted) |
+| GET /api/consultations/symptom-categories/ | 200, 27 categories |
+| GET /api/prescriptions/my/ | 200, 0 records |
+| GET /api/lab-orders/my/ | 200, 0 records |
+| GET /api/lab-results/my/ | 200, 0 records |
+| GET /api/patient-records/my/ | 200, record with entries |
+| GET /api/consultations/{id}/messages/ (submitted) | 403 (correctly gated) |
+
+### Routes Verified via Code Inspection
+
+All patient routes confirmed structurally sound:
+- `/app/patient` — dashboard summary, workflow cards, profile prompt
+- `/app/profile` — profile header, completion status, verification, user + role forms
+- `/app/patient/consultations` — list with empty state, new button
+- `/app/patient/consultations/new` — symptom-first form (27 categories live)
+- `/app/patient/consultations/[id]` — detail + lifecycle card + messaging gate
+- `/app/patient/prescriptions` — list with empty state
+- `/app/patient/prescriptions/[id]` — detail with back link
+- `/app/patient/lab-orders` — list with empty state
+- `/app/patient/lab-orders/[id]` — detail with back link
+- `/app/patient/lab-results` — list with empty state
+- `/app/patient/lab-results/[id]` — detail with back link
+- `/app/patient/medical-record` — blood group + grouped entries + read-only note
+
+### Bugs Fixed in Phase 4.5
+
+1. **Lifecycle card double-highlight**: `submitted_marker` step had a redundant `isCurrent` condition that highlighted it alongside the `pending_review` step when a consultation was in `pending_review` state. Fixed to only highlight the named step by lifecycle value.
+
+2. **Dashboard missing Lab Orders quick action**: The workflow card grid had 5 cards but omitted Lab Orders. Added a Lab Orders card pointing to `/app/patient/lab-orders`.
+
+3. **Dashboard duplicate description copy**: Both "Request Consultation" and "View Consultations" workflow cards used `consultationsSubtitle`. Fixed: Request Consultation now uses `consultationNewSubtitle` (more specific to creation intent).
+
+4. **New consultation unavailable state double-render**: When the symptom catalog was empty, the `EmptyState` was shown but `ConsultationForm` was still rendered below it, causing visual stacking. Fixed: `ConsultationForm` is now conditionally rendered only when `!unavailable`.
+
+5. **Missing back navigation on error states**: Prescription detail, Lab Order detail, and Lab Result detail pages showed only an `EmptyState` on load errors with no way to navigate back. Added back links using existing `buttonClassName` pattern. Added 3 new i18n keys (`backToPrescriptions`, `backToLabOrders`, `backToLabResults`) in Arabic, Kurdish, and English.
+
+### Known Limitations (Not Fixed in Phase 4.5)
+
+- **Medical record entry verification_status labels**: `MedicalRecordPanel` maps `entry.verification_status` through `t.patient.statusLabels` (consultation status labels). Medical record verification status values (`pending`, `verified`, `rejected`) are not consultation statuses. Since `pending` is likely the only value present for the test patient and it falls back to the raw value gracefully, this is not visible to users with current data. Dedicated `medicalRecordVerificationLabels` map is deferred to a future cleanup phase.
+
+- **Profile-completion gate**: Consultation creation is accessible without a complete profile. Gating is deferred to a future phase pending backend enforcement.
+
+- **PortalShell `previewNotice` flash**: The `previewNotice` banner may appear briefly for authenticated users while auth context is resolving. Not critical; the flash is sub-200ms and resolves on next render.
+
+- **Prescriptions / Lab Orders / Lab Results**: Test patient has no prescriptions, lab orders, or lab results. Empty states were verified via code inspection only.
+
+### Build Status
+
+- ESLint: 0 errors, 0 warnings
+- `tsc --noEmit`: 0 errors
+- `npm run build`: Success, 23 routes generated

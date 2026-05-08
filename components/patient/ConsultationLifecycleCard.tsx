@@ -64,7 +64,6 @@ export function ConsultationLifecycleCard({ status }: ConsultationLifecycleCardP
             ? STEPS.findIndex((s) => s.key === lifecycle) > index
             : false;
           const isCurrent =
-            (step.key === "submitted_marker" && lifecycle === "pending_review") ||
             (step.key === "pending_review" && lifecycle === "pending_review") ||
             (step.key === "in_progress" && (lifecycle === "accepted" || lifecycle === "in_progress")) ||
             (step.key === "closed" && lifecycle === "closed");

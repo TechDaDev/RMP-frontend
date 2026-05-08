@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
+import { buttonClassName } from "@/components/ui/Button";
 import { PrescriptionDetailPanel } from "@/components/patient/PrescriptionDetailPanel";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
@@ -55,7 +57,16 @@ export default function PrescriptionDetailPage() {
   }
 
   if (error || !detail) {
-    return <EmptyState title={t.patient.noDataTitle} description={error ?? t.patient.noDataDescription} />;
+    return (
+      <div className="space-y-4">
+        <EmptyState title={t.patient.noDataTitle} description={error ?? t.patient.noDataDescription} />
+        <div className="flex justify-center">
+          <Link href="/app/patient/prescriptions" className={buttonClassName({ variant: "secondary" })}>
+            {t.patient.backToPrescriptions}
+          </Link>
+        </div>
+      </div>
+    );
   }
 
   return (

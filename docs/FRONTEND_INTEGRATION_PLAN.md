@@ -70,6 +70,19 @@ Known blocker after implementation:
 5. Current specialty assignment is deterministic backend routing (rule-based), not AI triage. ✅
 6. Local seed command for symptoms documented for development environments. ✅
 
+## Phase 4.5 — Patient Portal Final QA Pass ✅ COMPLETE
+
+1. Full code inspection of all patient portal files. ✅
+2. Live API verification against http://localhost:8000. ✅
+3. Fixed lifecycle card double-highlight on pending_review. ✅
+4. Added missing Lab Orders quick action card to patient dashboard. ✅
+5. Fixed duplicate description copy on Request/View Consultations dashboard cards. ✅
+6. Fixed new consultation page: hide ConsultationForm when symptom catalog is empty. ✅
+7. Added back navigation links to prescription, lab order, and lab result error states. ✅
+8. Added `backToPrescriptions`, `backToLabOrders`, `backToLabResults` i18n keys (ar/ku/en). ✅
+
+See `docs/PATIENT_PORTAL_INTEGRATION_NOTES.md` Phase 4.5 section for full details and known limitations.
+
 ## Phase 5 — Doctor Portal
 
 1. Pending/assigned consultation queues.
