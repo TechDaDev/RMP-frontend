@@ -100,8 +100,87 @@ export interface DoctorMessageRequest {
   body: string;
 }
 
-export interface CreatePrescriptionRequest {
-  [key: string]: unknown;
+export type DoctorPrescriptionStatus =
+  | "issued"
+  | "partially_dispensed"
+  | "fully_dispensed"
+  | "expired"
+  | "cancelled"
+  | string;
+
+export type DoctorPrescriptionItemStatus = "pending" | "dispensed" | "cancelled" | string;
+
+export type MedicationRoute =
+  | "oral"
+  | "topical"
+  | "inhalation"
+  | "injection"
+  | "eye"
+  | "ear"
+  | "nasal"
+  | "rectal"
+  | "other";
+
+export interface DoctorPrescriptionItemCreateRequest {
+  medication_name: string;
+  dosage: string;
+  frequency: string;
+  duration: string;
+  route: MedicationRoute;
+  strength?: string;
+  quantity?: string;
+  instructions?: string;
+}
+
+export interface CreateDoctorPrescriptionRequest {
+  items: DoctorPrescriptionItemCreateRequest[];
+}
+
+export interface DoctorPrescriptionItem {
+  id: string;
+  medication_name: string;
+  strength?: string;
+  dosage: string;
+  frequency: string;
+  duration: string;
+  route: MedicationRoute | string;
+  quantity?: string;
+  instructions?: string;
+  status?: DoctorPrescriptionItemStatus;
+  dispensed_at?: string | null;
+  cancelled_at?: string | null;
+  created_at?: string;
+}
+
+export interface DoctorDispensingRecord {
+  id: string;
+  prescription_item_id?: string;
+  pharmacist?: DoctorPatientUser;
+  status?: string;
+  dispensed_quantity?: string;
+  note?: string;
+  created_at?: string;
+}
+
+export interface DoctorPrescriptionDetail {
+  id: string;
+  consultation_id?: string;
+  patient?: DoctorPatientUser;
+  doctor?: DoctorPatientUser;
+  status?: DoctorPrescriptionStatus;
+  qr_token?: string;
+  issued_at?: string;
+  expires_at?: string | null;
+  cancelled_at?: string | null;
+  fully_dispensed_at?: string | null;
+  items?: DoctorPrescriptionItem[];
+  dispensing_records?: DoctorDispensingRecord[];
+}
+
+export type CreatePrescriptionRequest = CreateDoctorPrescriptionRequest;
+
+export interface CancelDoctorPrescriptionRequest {
+  [key: string]: never;
 }
 
 export interface CreateLabOrderRequest {

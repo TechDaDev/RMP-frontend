@@ -64,7 +64,11 @@ export function DoctorConsultationWorkspace({
         />
       </div>
 
-      <DoctorWorkspaceActions />
+      <DoctorWorkspaceActions
+        consultationId={consultation.id}
+        status={consultation.status}
+        isApproved={isApproved}
+      />
     </div>
   );
 }

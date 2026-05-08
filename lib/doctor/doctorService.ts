@@ -2,12 +2,14 @@ import { apiRequest } from "@/lib/api/client";
 import { API_ENDPOINTS } from "@/lib/api/endpoints";
 import type { ApiEnvelope, PaginatedResponse } from "@/types/api";
 import type {
+  CancelDoctorPrescriptionRequest,
+  CreateDoctorPrescriptionRequest,
   CreateLabOrderRequest,
-  CreatePrescriptionRequest,
   DoctorConsultationDetail,
   DoctorConsultationListItem,
   DoctorMessage,
   DoctorMessageRequest,
+  DoctorPrescriptionDetail,
   DoctorResponseRequest,
 } from "@/types/doctor";
 import type { PatientMedicalRecord } from "@/types/patient";
@@ -108,23 +110,36 @@ export async function markConsultationMessagesRead(id: string): Promise<void> {
 
 export async function createPrescriptionFromConsultation(
   id: string,
-  payload: CreatePrescriptionRequest,
-): Promise<void> {
-  await apiRequest<void | ApiEnvelope<void>>(API_ENDPOINTS.doctorPrescriptions.createFromConsultation(id), {
-    auth: true,
-    body: payload,
-  });
+  payload: CreateDoctorPrescriptionRequest,
+): Promise<DoctorPrescriptionDetail> {
+  const response = await apiRequest<DoctorPrescriptionDetail | ApiEnvelope<DoctorPrescriptionDetail>>(
+    API_ENDPOINTS.doctorPrescriptions.createFromConsultation(id),
+    {
+      auth: true,
+      body: payload,
+    },
+  );
+
+  return unwrapData(response);
 }
 
-export function getDoctorPrescriptionDetail(id: string): Promise<unknown> {
-  return getResource<unknown>(API_ENDPOINTS.doctorPrescriptions.detail(id));
+export function getDoctorPrescriptionDetail(id: string): Promise<DoctorPrescriptionDetail> {
+  return getResource<DoctorPrescriptionDetail>(API_ENDPOINTS.doctorPrescriptions.detail(id));
 }
 
-export async function cancelDoctorPrescription(id: string): Promise<void> {
-  await apiRequest<void | ApiEnvelope<void>>(API_ENDPOINTS.doctorPrescriptions.cancel(id), {
-    auth: true,
-    body: {},
-  });
+export async function cancelDoctorPrescription(
+  id: string,
+  payload: CancelDoctorPrescriptionRequest = {},
+): Promise<DoctorPrescriptionDetail> {
+  const response = await apiRequest<DoctorPrescriptionDetail | ApiEnvelope<DoctorPrescriptionDetail>>(
+    API_ENDPOINTS.doctorPrescriptions.cancel(id),
+    {
+      auth: true,
+      body: payload,
+    },
+  );
+
+  return unwrapData(response);
 }
 
 export async function createLabOrderFromConsultation(
