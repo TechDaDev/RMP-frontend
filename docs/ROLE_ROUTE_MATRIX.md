@@ -47,6 +47,21 @@ This matrix defines current preview behavior and planned guard/redirect behavior
 4. Patients must not see laboratorian_notes or doctor_notes in results.
 5. Non-approved medical staff should see profile completion/verification pending states and action-disabled workflows.
 
+## Planned Laboratory Route Map
+
+Role: laboratorian only.
+
+- `/app/laboratory`
+- `/app/laboratory/scan`
+- `/app/laboratory/orders/[id]`
+- `/app/laboratory/orders/[id]/complete`
+- `/app/laboratory/items/[itemId]/results/new`
+- `/app/laboratory/results/[id]`
+- `/app/laboratory/results/[id]/correct`
+- `/app/laboratory/tests`
+
+Current canonical laboratorian shell remains `/app/lab` until the new route family is implemented.
+
 ## Current Preview Mode Note
 
 - Current Phase 1 preview keeps /app as role selector for UI preview only.

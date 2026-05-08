@@ -111,6 +111,17 @@ Consultation reject is intentionally excluded in frontend mapping because backen
 | /app/lab (future result detail) | /api/lab-orders/results/<id>/ | GET | laboratorian/doctor | Yes | none | envelope | Phase 7 | Role constrained |
 | /app/lab (future correction) | /api/lab-orders/results/<id>/correct/ | POST | laboratorian-approved | Yes | JSON | envelope | Phase 7 | Creator/assignment constraints |
 
+### 6.1 Laboratory Service Skeleton Mapping (Phase 6.0B)
+
+| Frontend function | Endpoint | Method | Auth Required | Notes |
+|---|---|---|---|---|
+| `getLabTestCatalog` | `/api/lab-orders/tests/` | GET | Yes | Optional `category` and `search` query params |
+| `scanLabOrder` | `/api/lab-orders/scan/` | POST | Yes | QR token entry point for lab processing |
+| `completeLabOrderItems` | `/api/lab-orders/{lab_order_id}/complete/` | POST | Yes | Batch completion with `completed` or `unavailable` statuses |
+| `createLabResultForItem` | `/api/lab-orders/items/{lab_order_item_id}/results/` | POST | Yes | Multipart when `result_file` exists |
+| `getLaboratoryResultDetail` | `/api/lab-orders/results/{lab_result_id}/` | GET | Yes | Lab-side result detail |
+| `correctLaboratoryResult` | `/api/lab-orders/results/{lab_result_id}/correct/` | POST | Yes | Original laboratorian only, before release |
+
 ## 7. Admin/Staff Portal Mapping
 
 | Screen | Endpoint | Method | Role | Auth Required | Request Type | Response Type | Frontend Status | Notes |

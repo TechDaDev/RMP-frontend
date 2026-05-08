@@ -83,6 +83,18 @@ export const API_ENDPOINTS = {
     createItemResult: (itemId: string) => `/api/lab-orders/items/${itemId}/results/`,
     correctResult: (id: string) => `/api/lab-orders/results/${id}/correct/`,
   },
+  laboratoryTests: {
+    list: "/api/lab-orders/tests/",
+  },
+  laboratoryOrders: {
+    scan: "/api/lab-orders/scan/",
+    complete: (orderId: string) => `/api/lab-orders/${orderId}/complete/`,
+  },
+  laboratoryResults: {
+    createForItem: (itemId: string) => `/api/lab-orders/items/${itemId}/results/`,
+    detail: (resultId: string) => `/api/lab-orders/results/${resultId}/`,
+    correct: (resultId: string) => `/api/lab-orders/results/${resultId}/correct/`,
+  },
   doctorLabOrders: {
     createFromConsultation: (consultationId: string) => `/api/consultations/${consultationId}/lab-orders/`,
     detail: (labOrderId: string) => `/api/lab-orders/doctor/${labOrderId}/`,

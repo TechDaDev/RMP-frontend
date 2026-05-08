@@ -173,20 +173,29 @@ Notes:
 4. TypeScript clean: 0 errors. Lint clean: 0 warnings. Build: ✅ pass.
 5. See `docs/DOCTOR_PORTAL_FINAL_QA.md` for full report.
 
-## Phase 6 — Pharmacist Portal
+## Phase 6 — Laboratory Portal
+
+1. Laboratory dashboard with verification gating.
+2. QR scan and lab order processing.
+3. Batch item completion.
+4. Lab result creation.
+5. Lab result correction.
+6. Final QA and privacy checks.
+
+## Phase 7 — Pharmacist Portal
 
 1. Prescription scan workflow.
 2. Pending item display and dispensing workflow.
 3. Verification-gated action enforcement.
 
-## Phase 7 — Laboratory Portal
+## Phase 8 — Laboratory Portal
 
 1. Lab order scan workflow.
 2. Complete lab order items.
 3. Create/correct lab results.
 4. Verification-gated action enforcement.
 
-## Phase 8 — Admin/Staff Portal
+## Phase 9 — Admin/Staff Portal
 
 1. Knowledge base document operations.
 2. Chunk browsing and search tools.
@@ -194,7 +203,7 @@ Notes:
 4. RAG analytics and dataset export.
 5. Staff-only access control and audit-safe UI.
 
-## Phase 9 — Realtime
+## Phase 10 — Realtime
 
 1. User notification WebSocket integration.
 2. Consultation chat WebSocket integration.
