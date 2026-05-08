@@ -106,12 +106,18 @@ Reference docs:
 7. Enforced verification-aware clinical action lock in doctor queue actions. ✅
 8. Reject action remains unavailable (no backend reject endpoint). ✅
 
-## Phase 5.2 — Doctor Consultation Workspace
+## Phase 5.2 — Doctor Consultation Workspace ✅ COMPLETE
 
-1. Implement consultation detail workspace from `GET /api/consultations/{id}/`.
-2. Implement status-gated messaging (`GET/POST /messages`, `POST /messages/mark-read/`).
-3. Implement doctor response via `POST /api/consultations/{id}/responses/`.
-4. Implement close action via `POST /api/consultations/{id}/close/`.
+1. Implemented consultation detail workspace from `GET /api/consultations/{id}/`. ✅
+2. Implemented status-gated messaging (`GET/POST /messages`, `POST /messages/mark-read/`). ✅
+3. Implemented doctor response via `POST /api/consultations/{id}/responses/`. ✅
+4. Implemented close action via `POST /api/consultations/{id}/close/`. ✅
+
+Implementation notes:
+- Added dedicated doctor workspace components for patient summary, symptoms/routing, clinical flags, messages, response form, and close action.
+- Enforced verification-aware clinical action lock for messaging/response/close.
+- Added disabled placeholders for prescription and lab-order actions for later phases.
+- No reject action, no WebSocket, and no RAG integration in this phase.
 
 ## Phase 5.3 — Prescriptions From Consultation
 

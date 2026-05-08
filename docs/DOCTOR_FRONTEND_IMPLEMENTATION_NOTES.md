@@ -101,6 +101,25 @@ Deferred to Phase 5.2:
 - Full consultation workspace actions (messaging, response, close)
 - Prescription and lab-order creation flows from workspace
 
+## Phase 5.2 Implementation Notes (Completed)
+
+Implemented frontend consultation workspace at `/app/doctor/consultations/[id]`:
+- Replaced placeholder detail screen with a full doctor consultation workspace
+- Added patient summary, symptoms/routing, and clinical flags panels
+- Implemented status-gated doctor messaging (list/read/send) with mark-read behavior
+- Implemented doctor response form (`response_text`, optional `recommendation_type`)
+- Implemented close consultation action with confirmation prompt
+- Added verification-aware action lock across message/response/close actions
+- Added disabled placeholders for prescriptions/lab orders (Phase 5.3/5.4)
+- Preserved status/action matrix behavior (no reject action, no websocket/rag)
+
+Manual QA summary (browser):
+- Login as approved doctor succeeded
+- Consultation workspace rendered live detail/messaging data
+- Message send succeeded and refreshed list
+- Close consultation succeeded and transitioned UI to read-only/disabled action state
+- Response submit flow rendered correctly; endpoint returned 400 for the closed/previously-responded seed state (error UI verified)
+
 ## Deferred Task Reminder
 
 - Patient incomplete-profile consultation gate is deferred and must be backend-first before frontend enforcement
