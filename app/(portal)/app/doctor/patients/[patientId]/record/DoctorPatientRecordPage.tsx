@@ -18,6 +18,7 @@ interface Props {
 
 function DoctorPatientRecordContent({ patientId }: Props) {
   const { t } = useAppPreferences();
+  const p = t.patient;
   const { verification } = useAuth();
   const searchParams = useSearchParams();
   const consultationId = searchParams.get("consultationId");
@@ -68,9 +69,7 @@ function DoctorPatientRecordContent({ patientId }: Props) {
     }
 
     void load();
-    return () => {
-      active = false;
-    };
+    return () => { active = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [patientId]);
 
@@ -97,7 +96,7 @@ function DoctorPatientRecordContent({ patientId }: Props) {
 
       {loading && (
         <div role="status">
-          <p className="text-sm text-[var(--color-text-secondary)]">{d.noPendingConsultations}</p>
+          <p className="text-sm text-[var(--color-text-secondary)]">{p.loading}</p>
         </div>
       )}
 
@@ -143,3 +142,4 @@ export function DoctorPatientRecordPage({ patientId }: Props) {
     </RequireRole>
   );
 }
+
