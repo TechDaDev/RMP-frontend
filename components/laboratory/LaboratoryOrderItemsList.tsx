@@ -56,19 +56,21 @@ export function LaboratoryOrderItemsList({ remainingItems = [], completedItems =
         </div>
       )}
 
-      {completedItems.length > 0 && (
-        <div>
-          <div className="mb-4 flex items-center justify-between">
-            <h3 className="text-base font-semibold text-[var(--color-text)]">{t.laboratory.completedItems}</h3>
-            <Badge tone="success">{completedItems.length}</Badge>
-          </div>
+      <div>
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="text-base font-semibold text-[var(--color-text)]">{t.laboratory.completedItems}</h3>
+          <Badge tone="success">{completedItems.length}</Badge>
+        </div>
+        {completedItems.length > 0 ? (
           <div className="space-y-3">
             {completedItems.map((item) => (
               <ItemRow key={item.id} item={item} />
             ))}
           </div>
-        </div>
-      )}
+        ) : (
+          <p className="text-sm text-[var(--color-muted)]">{t.laboratory.noCompletedItems}</p>
+        )}
+      </div>
 
       {remainingItems.length === 0 && completedItems.length === 0 && (
         <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-6 text-center">

@@ -614,6 +614,7 @@ export interface Translations {
     orderExpiresAt: string;
     ordersCannotBeModified: string;
     noRemainingItems: string;
+    noCompletedItems: string;
     itemCompletionPhaseComing: string;
     scanFailed: string;
   };
