@@ -95,13 +95,16 @@ Reference docs:
 - `docs/DOCTOR_FRONTEND_WORKFLOW_PLAN.md`
 - `docs/DOCTOR_FRONTEND_IMPLEMENTATION_NOTES.md`
 
-## Phase 5.1 — Doctor Dashboard + Pending/Assigned Consultations
+## Phase 5.1 — Doctor Dashboard + Pending/Assigned Consultations ✅ COMPLETE
 
-1. Implement doctor dashboard summary cards and quick links.
-2. Implement pending queue from `GET /api/consultations/doctor/pending/`.
-3. Implement assigned queue from `GET /api/consultations/doctor/assigned/`.
-4. Implement accept action from pending queue via `POST /api/consultations/{id}/accept/`.
-5. No reject action (no backend reject endpoint).
+1. Implemented doctor dashboard summary cards and queue quick links. ✅
+2. Implemented pending queue from `GET /api/consultations/doctor/pending/`. ✅
+3. Implemented assigned queue from `GET /api/consultations/doctor/assigned/`. ✅
+4. Implemented accept action from pending queue via `POST /api/consultations/{id}/accept/`. ✅
+5. Added lightweight doctor consultation detail placeholder route (`/app/doctor/consultations/[id]`). ✅
+6. Added doctor-specific portal navigation (Dashboard, Pending, Assigned, Profile). ✅
+7. Enforced verification-aware clinical action lock in doctor queue actions. ✅
+8. Reject action remains unavailable (no backend reject endpoint). ✅
 
 ## Phase 5.2 — Doctor Consultation Workspace
 

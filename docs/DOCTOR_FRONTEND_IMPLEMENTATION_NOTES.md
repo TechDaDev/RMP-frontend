@@ -85,6 +85,22 @@ Patient records:
 - No RAG integration
 - No WebSocket integration
 
+## Phase 5.1 Implementation Notes (Completed)
+
+Implemented frontend screens and behavior:
+- Doctor dashboard implemented at `/app/doctor`
+- Pending queue implemented at `/app/doctor/consultations/pending`
+- Assigned queue implemented at `/app/doctor/consultations/assigned`
+- Accept action implemented (`POST /api/consultations/{id}/accept/`)
+- Consultation detail placeholder implemented at `/app/doctor/consultations/[id]`
+- Doctor-only navigation in portal shell now includes Dashboard, Pending, Assigned, Profile
+- Verification-aware action lock implemented (accept disabled when doctor is not approved)
+- Reject action remains unavailable (no backend endpoint)
+
+Deferred to Phase 5.2:
+- Full consultation workspace actions (messaging, response, close)
+- Prescription and lab-order creation flows from workspace
+
 ## Deferred Task Reminder
 
 - Patient incomplete-profile consultation gate is deferred and must be backend-first before frontend enforcement

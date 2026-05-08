@@ -12,6 +12,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   BellIcon,
   CloseIcon,
+  DoctorIcon,
   FileTextIcon,
   GridIcon,
   LabIcon,
@@ -88,6 +89,29 @@ export function PortalShell({ children }: PortalShellProps) {
     },
   ];
 
+  const doctorNavItems = [
+    {
+      href: "/app/doctor",
+      label: t.doctor.doctorDashboard,
+      icon: GridIcon,
+    },
+    {
+      href: "/app/doctor/consultations/pending",
+      label: t.doctor.pendingConsultations,
+      icon: MessageIcon,
+    },
+    {
+      href: "/app/doctor/consultations/assigned",
+      label: t.doctor.assignedConsultations,
+      icon: DoctorIcon,
+    },
+    {
+      href: "/app/profile",
+      label: t.portal.profile,
+      icon: UserIcon,
+    },
+  ];
+
   function handleLogout() {
     logout();
     router.push("/login");
@@ -120,6 +144,26 @@ export function PortalShell({ children }: PortalShellProps) {
           patientNavItems.map((item) => {
             const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
             const Icon = item.icon;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={buttonClassName({
+                  variant: isActive ? "primary" : "ghost",
+                  className: "w-full justify-start rounded-2xl",
+                })}
+                onClick={() => setMenuOpen(false)}
+              >
+                <Icon size={18} />
+                {item.label}
+              </Link>
+            );
+          })
+        ) : user?.user_type === "doctor" ? (
+          doctorNavItems.map((item) => {
+            const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+            const Icon = item.icon;
+
             return (
               <Link
                 key={item.href}

@@ -320,12 +320,22 @@ export interface Translations {
     valueTypeLabels: Record<string, string>;
   };
   doctor: {
+    doctorDashboard: string;
+    doctorDashboardSubtitle: string;
     dashboardTitle: string;
     dashboardSubtitle: string;
     pendingConsultations: string;
     assignedConsultations: string;
+    pendingConsultationsSubtitle: string;
+    assignedConsultationsSubtitle: string;
     consultationWorkspace: string;
     acceptConsultation: string;
+    acceptingConsultation: string;
+    consultationAccepted: string;
+    acceptFailed: string;
+    viewDetails: string;
+    doctorSpecialty: string;
+    matchingSpecialtyQueue: string;
     sendResponse: string;
     closeConsultation: string;
     createPrescription: string;
@@ -337,6 +347,14 @@ export interface Translations {
     noPendingConsultations: string;
     noAssignedConsultations: string;
     verifiedDoctorRequired: string;
+    verifiedDoctorRequiredDescription: string;
+    doctorNotApprovedActionDisabled: string;
+    latestPending: string;
+    latestAssigned: string;
+    fullWorkspaceComingNext: string;
+    backToDoctorDashboard: string;
+    backToPendingConsultations: string;
+    backToAssignedConsultations: string;
     rejectUnavailable: string;
     statusSubmitted: string;
     statusAccepted: string;
