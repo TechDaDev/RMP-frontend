@@ -71,23 +71,6 @@ export default function NewConsultationPage() {
     };
   }, [t.patient.consultationCreateError]);
 
-  async function handleCategoryChange(categoryId?: string) {
-    setLoadingSymptoms(true);
-    setError(null);
-    try {
-      const loadedSymptoms = await getSymptoms({ categoryId });
-      setSymptoms(loadedSymptoms);
-    } catch (err) {
-      if (err instanceof ApiError) {
-        setError(err.message || t.patient.consultationCreateError);
-      } else {
-        setError(t.patient.consultationCreateError);
-      }
-    } finally {
-      setLoadingSymptoms(false);
-    }
-  }
-
   async function handleSubmit(payload: ConsultationCreateRequest) {
     setSubmitting(true);
     setError(null);
@@ -131,7 +114,6 @@ export default function NewConsultationPage() {
         loadingSymptoms={loadingSymptoms}
         submitting={submitting}
         error={error}
-        onCategoryChange={handleCategoryChange}
         onSubmit={handleSubmit}
       />
     </div>

@@ -229,6 +229,9 @@ export interface Translations {
     symptomsWillGuideSpecialty: string;
     systemAssignedSpecialty: string;
     selectedSymptomsCount: string;
+    safetyEmergencyNotice: string;
+    removeSymptom: string;
+    showingSymptomsCount: string;
     submitRequest: string;
     submittingRequest: string;
     emergencyWarning: string;

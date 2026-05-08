@@ -148,6 +148,66 @@ Result at completion:
 ### Verification Outcome
 
 - Consultation detail now renders when backend returns `200` for detail, even if messages are unavailable due to backend permissions for current consultation status.
+
+## Phase 4.3B - Symptom Catalog UX Verification
+
+### Backend Catalog State (Verified Live)
+
+- `GET /api/consultations/symptom-categories/` → 27 categories (expanded from 13)
+- `GET /api/consultations/symptoms/` → 141 symptoms (expanded from 22)
+- 23 red-flag symptoms observed in catalog
+- Symptom response is non-paginated: all symptoms returned as flat array inside `data` envelope
+- Each symptom has: `id`, `category` (nested object with `id`/`name`/`description`/`display_order`), `name`, `description`, `is_red_flag`, `display_order`
+- Normalization in `patientService.ts` handles envelope unwrap + flat array correctly — no change required
+
+### Symptom Picker UX Changes Applied
+
+**Client-side filtering** (was server-side category API call):
+- Category filter now filters `symptoms` prop client-side inside `filteredSymptoms` useMemo
+- `handleCategoryChange` API call removed from `new/page.tsx`; all 141 symptoms loaded once on mount
+- Filtering is instant and does not require a network round-trip per category switch
+- Clearing a category no longer resets selected symptoms (previous behavior discarded selections on category change)
+
+**Category count in dropdown**:
+- Each `<option>` now shows symptom count, e.g. `Respiratory (12)`
+- "All categories" option shows total count `(141)`
+- Counts computed from the loaded `symptoms` array via `categoryCounts` useMemo
+
+**Selected symptoms chip panel**:
+- When one or more symptoms are selected, a chip row appears above the symptom grid
+- Each chip shows the symptom name and an × button to individually deselect
+- Chips truncate long names to prevent layout overflow
+- Chips use the primary accent color for visual continuity
+
+**Sorting**:
+- Symptom grid sorts: selected first → red-flag second → display_order ascending
+- This keeps selected symptoms visible at the top of the (potentially long) grid
+
+**Scrollable symptom grid**:
+- Grid container capped at `max-h-96` with `overflow-y-auto`
+- Prevents the page from becoming excessively tall with 141 symptoms
+
+**Red-flag safety notice**:
+- When any selected symptom is a red flag (`is_red_flag: true`), a distinct red-bordered notice appears
+- Notice copy (all 3 locales):
+  - Arabic: إذا كانت الأعراض شديدة أو طارئة، يرجى التوجه إلى أقرب طوارئ فورًا.
+  - English: If symptoms are severe or urgent, please seek emergency care immediately.
+  - Kurdish: ئەگەر نیشانەکان توند یان فریاکەوتن بوون، تکایە دەستبەجێ سەردانی نزیکترین فریاکەوتن بکە.
+- Notice is contextual — only shown when a red-flag symptom is actually selected
+- Does not claim diagnosis or AI triage
+
+**Filtered symptom count indicator**:
+- When category or search filters are active, the header shows `X / total` symptom count so the patient knows they are seeing a subset
+
+### No Specialty Selector
+- No specialty dropdown was re-introduced
+- Backend continues to assign `selected_specialty` from symptom routing rules
+- Frontend submits `symptom_ids` only
+
+### New Translation Keys Added (ar / ku / en)
+- `safetyEmergencyNotice`: shown when a red-flag symptom is selected
+- `removeSymptom`: aria-label for the chip × button
+- `showingSymptomsCount`: "Showing {count} of {total} symptoms" (available for future use)
 - Consultation creation behavior remains symptom-first and unchanged.
 
 ### Deferred Work (Not Implemented in Phase 4.2B)
