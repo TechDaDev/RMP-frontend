@@ -35,17 +35,17 @@ export function canViewResult(status: string): boolean {
   );
 }
 
-export function getLabOrderStatusTone(status: string): "neutral" | "info" | "success" | "warning" | "danger" {
+export function getLabOrderStatusTone(status: string): "neutral" | "primary" | "success" {
   switch (status) {
     case "issued":
-      return "info";
+      return "primary";
     case "partially_completed":
-      return "warning";
+      return "primary";
     case "fully_completed":
       return "success";
     case "expired":
     case "cancelled":
-      return "danger";
+      return "neutral";
     default:
       return "neutral";
   }

@@ -602,6 +602,20 @@ export interface Translations {
     resultStatusCorrected: string;
     resultStatusReviewed: string;
     resultStatusReleased: string;
+    scanOrder: string;
+    scanningOrder: string;
+    backToLabDashboard: string;
+    scanAnotherOrder: string;
+    manualQrOnly: string;
+    qrTokenRequired: string;
+    qrTokenPlaceholder: string;
+    scannedOrder: string;
+    orderStatus: string;
+    orderExpiresAt: string;
+    ordersCannotBeModified: string;
+    noRemainingItems: string;
+    itemCompletionPhaseComing: string;
+    scanFailed: string;
   };
   profile: {
     profilePageSubtitle: string;
