@@ -107,7 +107,7 @@ Rules:
 ## Item Completion Workflow
 
 1. Laboratorian reviews the scanned order detail.
-2. For each eligible item, the frontend sends `completed` or `unavailable`.
+2. For each eligible item, the frontend sends `completed`.
 3. Frontend calls `POST /api/lab-orders/{lab_order_id}/complete/`.
 4. Backend updates item status and order lifecycle state.
 
@@ -185,11 +185,18 @@ Validated behaviors:
 
 ### Phase 6.3 - Complete Lab Order Items
 
-- Build `/app/lab/orders/[id]` and `/complete` flow.
-- Integrate `completeLabOrderItems`.
-- Enforce locked-order and verification guards.
+- Implement per-item completion inside `/app/lab/scan` scanned-order panel.
+- Integrate `completeLabOrderItems` with phase-scoped payload (`status: completed`).
+- Enforce locked-order constraints and completion-state refresh after successful completion.
 
-Status: Next recommended phase.
+Status: Completed (Phase 6.3 implementation on scan workflow).
+
+Validated behaviors:
+
+- Remaining items render completion controls when order is not locked.
+- Completing an item updates order status and list state.
+- UI rescans using runtime QR token state when completion response does not include populated completed item list.
+- Result creation remains deferred and non-interactive in this phase.
 
 ### Phase 6.4 - Create Lab Results
 

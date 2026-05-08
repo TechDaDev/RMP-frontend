@@ -4,6 +4,7 @@ import type { ApiEnvelope, PaginatedResponse } from "@/types/api";
 import type {
   CompleteLabOrderRequest,
   CorrectLaboratoryResultRequest,
+  LaboratoryCompletionResult,
   LaboratoryOrderScanResponse,
   LaboratoryResultCreateRequest,
   LaboratoryResultDetail,
@@ -110,8 +111,8 @@ export async function scanLabOrder(payload: ScanLabOrderRequest): Promise<Labora
   return unwrapData(response);
 }
 
-export async function completeLabOrderItems(orderId: string, payload: CompleteLabOrderRequest): Promise<LaboratoryOrderScanResponse> {
-  const response = await apiRequest<LaboratoryOrderScanResponse | ApiEnvelope<LaboratoryOrderScanResponse>>(
+export async function completeLabOrderItems(orderId: string, payload: CompleteLabOrderRequest): Promise<LaboratoryCompletionResult> {
+  const response = await apiRequest<LaboratoryCompletionResult | ApiEnvelope<LaboratoryCompletionResult>>(
     API_ENDPOINTS.laboratoryOrders.complete(orderId),
     {
       auth: true,
@@ -119,7 +120,14 @@ export async function completeLabOrderItems(orderId: string, payload: CompleteLa
     },
   );
 
-  return unwrapData(response);
+  const result = unwrapData(response) as LaboratoryCompletionResult & {
+    pending_items?: LaboratoryCompletionResult["remaining_items"];
+  };
+
+  return {
+    ...result,
+    remaining_items: result.remaining_items ?? result.pending_items,
+  };
 }
 
 export async function createLabResultForItem(

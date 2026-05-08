@@ -113,3 +113,33 @@ Optional future alias (not canonical): `/app/laboratory/*`
 - Item completion UI is deferred to Phase 6.3.
 - Result creation and correction UI are deferred to Phase 6.4+.
 - No fake pending-order list is introduced.
+
+## Phase 6.3 Laboratory Item Completion (2026-05-09)
+
+### Implemented and verified
+
+- Item completion action is now available per remaining item inside `/app/lab/scan` after a successful scan.
+- Completion calls `POST /api/lab-orders/{lab_order_id}/complete/` via `completeLabOrderItems` with phase-scoped payload status `completed`.
+- Optional laboratorian completion note is supported in the UI payload.
+- Scan state is refreshed after completion; when completion response omits full completed-items detail, the page rescans using in-memory token state.
+
+### Behavioral constraints
+
+- Completion controls are hidden/disabled for locked orders.
+- Result creation remains explicitly deferred in this phase.
+- No result creation or correction UI was introduced as part of item completion.
+
+### Live API QA snapshot
+
+- Completion endpoint returned `200` for real pending item completion.
+- Completion response returned `lab_order`, `locked`, `message`, and `remaining_items`; completed item detail is recovered by the in-memory QR rescan fallback.
+- Order lifecycle moved from `issued` to `partially_completed` after one item and to locked `fully_completed` after the final item.
+- Invalid item completion payload returned `400` with safe frontend error handling path.
+
+### Live browser QA snapshot
+
+- `/app/lab/scan` completed a real scanned remaining item from the browser.
+- Completed/locked order state hid completion controls and kept result creation deferred messaging visible.
+- Arabic default rendered RTL; English rendered LTR; Kurdish rendered RTL.
+- Dark and light theme preferences applied.
+- Patient and doctor users remained redirected away from `/app/lab/scan`.

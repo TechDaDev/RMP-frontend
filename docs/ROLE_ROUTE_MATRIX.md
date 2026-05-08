@@ -72,6 +72,15 @@ Explicit runtime checks were executed on `/app/lab/scan`:
 - doctor -> redirected to `/app/doctor`
 - laboratorian -> allowed
 
+## Phase 6.3 Completion Guard QA Results
+
+Runtime checks for completion action on `/app/lab/scan` confirmed:
+
+- Completion action is available only for laboratorian scanned-order workflow.
+- Locked orders render read-only messaging and do not expose completion controls.
+- Patient and doctor remain blocked from `/app/lab/scan` by existing role redirects.
+- Browser QA confirmed patient redirects to `/app/patient` and doctor redirects to `/app/doctor`.
+
 ## Current Preview Mode Note
 
 - Current Phase 1 preview keeps /app as role selector for UI preview only.

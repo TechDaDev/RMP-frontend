@@ -3,10 +3,12 @@ import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { LaboratoryOrderStatusBadge } from "./LaboratoryOrderStatusBadge";
 import { LaboratoryOrderItemsList } from "./LaboratoryOrderItemsList";
-import type { LaboratoryOrderScanResponse } from "@/types/laboratory";
+import type { LaboratoryCompletionResult, LaboratoryOrderScanResponse } from "@/types/laboratory";
 
 export interface LaboratoryScannedOrderPanelProps {
   scanResponse: LaboratoryOrderScanResponse;
+  onItemCompleted: (result: LaboratoryCompletionResult) => Promise<void> | void;
+  completionDisabled?: boolean;
 }
 
 function formatDate(dateString?: string): string {
@@ -24,7 +26,11 @@ function formatDate(dateString?: string): string {
   }
 }
 
-export function LaboratoryScannedOrderPanel({ scanResponse }: LaboratoryScannedOrderPanelProps) {
+export function LaboratoryScannedOrderPanel({
+  scanResponse,
+  onItemCompleted,
+  completionDisabled = false,
+}: LaboratoryScannedOrderPanelProps) {
   const { t } = useAppPreferences();
   const { lab_order, remaining_items, locked, message } = scanResponse;
 
@@ -80,17 +86,21 @@ export function LaboratoryScannedOrderPanel({ scanResponse }: LaboratoryScannedO
       </Card>
 
       {/* Items List */}
-      {!locked && (
-        <Card className="rounded-2xl">
-          <div className="space-y-4">
-            <h2 className="text-lg font-bold text-[var(--color-text)]">{t.laboratory.labOrderItems}</h2>
-            <LaboratoryOrderItemsList
-              remainingItems={remaining_items}
-              completedItems={lab_order.completed_items}
-            />
-          </div>
-        </Card>
-      )}
+      <Card className="rounded-2xl">
+        <div className="space-y-4">
+          <h2 className="text-lg font-bold text-[var(--color-text)]">{t.laboratory.labOrderItems}</h2>
+          <LaboratoryOrderItemsList
+            orderId={lab_order.id}
+            orderStatus={lab_order.status}
+            locked={locked}
+            remainingItems={remaining_items}
+            completedItems={lab_order.completed_items}
+            onItemCompleted={onItemCompleted}
+            completionDisabled={completionDisabled}
+          />
+          <p className="text-sm text-[var(--color-muted)]">{t.laboratory.resultCreationStillDeferred}</p>
+        </div>
+      </Card>
 
       {/* Locked Message */}
       {locked && (

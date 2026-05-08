@@ -192,6 +192,15 @@ Notes:
 - i18n (ar/ku/en) and theme behavior validated on scan page.
 - Documentation updated for scan implementation and QA status.
 
+### Phase 6.3 — Laboratory Item Completion ✅ COMPLETE
+
+- Implemented per-item completion controls inside scanned-order workflow on `/app/lab/scan`.
+- Integrated `POST /api/lab-orders/{id}/complete/` using frontend service contract.
+- Added optional completion note support.
+- Added completion-state refresh path with in-memory token rescan fallback.
+- Kept result creation deferred and non-interactive for this phase boundary.
+- Updated i18n keys and laboratory workflow docs to reflect completion behavior.
+
 ## Phase 7 — Pharmacist Portal
 
 1. Prescription scan workflow.

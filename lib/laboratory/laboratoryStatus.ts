@@ -7,10 +7,17 @@ export function isLabOrderLocked(status: string): boolean {
 }
 
 export function canCompleteLabOrder(status: string): boolean {
-  return status === "issued" || status === "partially_completed";
+  return !isLabOrderLocked(status);
 }
 
 export function canCreateResultForItem(itemStatus: string, orderStatus?: string): boolean {
+  void itemStatus;
+  void orderStatus;
+
+  // Phase 6.4 owns result creation UI; keep disabled in Phase 6.3.
+  return false;
+
+  /*
   if (itemStatus !== "completed") {
     return false;
   }
@@ -20,6 +27,7 @@ export function canCreateResultForItem(itemStatus: string, orderStatus?: string)
   }
 
   return !isLabOrderLocked(orderStatus);
+  */
 }
 
 export function canCorrectResult(status: string): boolean {

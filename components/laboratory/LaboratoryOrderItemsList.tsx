@@ -1,13 +1,39 @@
+import type { ReactNode } from "react";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { Badge } from "@/components/ui/Badge";
-import type { LaboratoryOrderItem } from "@/types/laboratory";
+import { canCompleteLabOrder } from "@/lib/laboratory/laboratoryStatus";
+import type { LaboratoryCompletionResult, LaboratoryOrderItem } from "@/types/laboratory";
+import { LaboratoryCompleteItemButton } from "./LaboratoryCompleteItemButton";
 
 export interface LaboratoryOrderItemsListProps {
+  orderId: string;
+  orderStatus?: string;
+  locked?: boolean;
   remainingItems?: LaboratoryOrderItem[];
   completedItems?: LaboratoryOrderItem[];
+  onItemCompleted: (result: LaboratoryCompletionResult) => Promise<void> | void;
+  completionDisabled?: boolean;
 }
 
-function ItemRow({ item }: { item: LaboratoryOrderItem }) {
+function formatItemDate(dateString?: string | null): string {
+  if (!dateString) {
+    return "—";
+  }
+
+  try {
+    return new Intl.DateTimeFormat("en-US", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(new Date(dateString));
+  } catch {
+    return dateString;
+  }
+}
+
+function ItemRow({ item, action }: { item: LaboratoryOrderItem; action?: ReactNode }) {
   const { t } = useAppPreferences();
 
   return (
@@ -30,31 +56,64 @@ function ItemRow({ item }: { item: LaboratoryOrderItem }) {
               <span className="font-medium">{t.laboratory.instructions}:</span> {item.instructions}
             </div>
           )}
+          {item.completed_at && (
+            <div>
+              <span className="font-medium">{t.laboratory.completedAt}:</span> {formatItemDate(item.completed_at)}
+            </div>
+          )}
         </div>
       </div>
+      {action ? <div className="min-w-[10rem]">{action}</div> : null}
     </div>
   );
 }
 
-export function LaboratoryOrderItemsList({ remainingItems = [], completedItems = [] }: LaboratoryOrderItemsListProps) {
+export function LaboratoryOrderItemsList({
+  orderId,
+  orderStatus,
+  locked = false,
+  remainingItems = [],
+  completedItems = [],
+  onItemCompleted,
+  completionDisabled = false,
+}: LaboratoryOrderItemsListProps) {
   const { t } = useAppPreferences();
+  const canComplete = !locked && canCompleteLabOrder(orderStatus ?? "issued");
 
   return (
     <div className="space-y-6">
-      {remainingItems.length > 0 && (
-        <div>
-          <div className="mb-4 flex items-center justify-between">
-            <h3 className="text-base font-semibold text-[var(--color-text)]">{t.laboratory.pendingItems}</h3>
-            <Badge tone="primary">{remainingItems.length}</Badge>
-          </div>
+      {locked ? (
+        <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-3 text-sm text-[var(--color-muted)]">
+          {t.laboratory.cannotCompleteLockedOrder}
+        </div>
+      ) : null}
+
+      <div>
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="text-base font-semibold text-[var(--color-text)]">{t.laboratory.pendingItems}</h3>
+          <Badge tone="primary">{remainingItems.length}</Badge>
+        </div>
+        {remainingItems.length > 0 ? (
           <div className="space-y-3">
             {remainingItems.map((item) => (
-              <ItemRow key={item.id} item={item} />
+              <ItemRow
+                key={item.id}
+                item={item}
+                action={canComplete ? (
+                  <LaboratoryCompleteItemButton
+                    orderId={orderId}
+                    item={item}
+                    disabled={completionDisabled}
+                    onCompleted={onItemCompleted}
+                  />
+                ) : undefined}
+              />
             ))}
           </div>
-          <p className="mt-4 text-sm text-[var(--color-muted)]">{t.laboratory.itemCompletionPhaseComing}</p>
-        </div>
-      )}
+        ) : (
+          <p className="text-sm text-[var(--color-muted)]">{t.laboratory.noRemainingItems}</p>
+        )}
+      </div>
 
       <div>
         <div className="mb-4 flex items-center justify-between">

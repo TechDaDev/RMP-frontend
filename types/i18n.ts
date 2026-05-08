@@ -616,6 +616,25 @@ export interface Translations {
     noRemainingItems: string;
     noCompletedItems: string;
     itemCompletionPhaseComing: string;
+    completeLabItem: string;
+    completeSelectedItem: string;
+    completeAllItems: string;
+    markItemCompleted: string;
+    itemCompletionNote: string;
+    itemCompletionNotePlaceholder: string;
+    confirmCompleteItem: string;
+    completingItem: string;
+    itemCompleted: string;
+    itemCompletionFailed: string;
+    orderUpdated: string;
+    cannotCompleteLockedOrder: string;
+    cannotCompleteCompletedItem: string;
+    completionRecords: string;
+    completedByLaboratorian: string;
+    completedAt: string;
+    resultCreationStillDeferred: string;
+    allItemsCompleted: string;
+    partialCompletionSaved: string;
     scanFailed: string;
   };
   profile: {
@@ -683,6 +702,7 @@ export interface Translations {
     accountType: string;
     yes: string;
     no: string;
+    cancel: string;
   };
   lang: {
     ar: string;

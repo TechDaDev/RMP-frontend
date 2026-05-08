@@ -88,16 +88,22 @@ export interface ScanLabOrderRequest {
   qr_token: string;
 }
 
-export type LaboratoryCompleteLabOrderItemStatus = "completed" | "unavailable";
-
 export interface CompleteLabOrderItemRequest {
   lab_order_item_id: string;
-  status: LaboratoryCompleteLabOrderItemStatus;
+  status: "completed";
   note?: string;
 }
 
 export interface CompleteLabOrderRequest {
   items: CompleteLabOrderItemRequest[];
+}
+
+export interface LaboratoryCompletionResult {
+  lab_order?: LaboratoryOrderDetail;
+  completed_items?: LaboratoryOrderItem[];
+  remaining_items?: LaboratoryOrderItem[];
+  locked?: boolean;
+  message?: string | null;
 }
 
 export interface LaboratoryResultCreateRequest {

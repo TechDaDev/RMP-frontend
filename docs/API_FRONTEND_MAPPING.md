@@ -106,7 +106,7 @@ Consultation reject is intentionally excluded in frontend mapping because backen
 |---|---|---|---|---|---|---|---|---|
 | /app/lab (catalog support) | /api/lab-orders/tests/ | GET | doctor/laboratorian | Yes | none | envelope | Phase 7 | Lab test catalog |
 | /app/lab/scan | /api/lab-orders/scan/ | POST | laboratorian-approved | Yes | JSON | envelope | Phase 6.2B complete | Manual QR token entry, safe error handling, and scanned order panel are live |
-| /app/lab (future complete items) | /api/lab-orders/<id>/complete/ | POST | laboratorian-approved | Yes | JSON | envelope | Phase 7 | Complete selected order items |
+| /app/lab/scan (item completion) | /api/lab-orders/<id>/complete/ | POST | laboratorian-approved | Yes | JSON | envelope | Phase 6.3 complete | Complete selected remaining item with optional note; UI refreshes scanned state after success |
 | /app/lab (future submit result) | /api/lab-orders/items/<item_id>/results/ | POST | laboratorian-approved | Yes | JSON/multipart | envelope | Phase 7 | Result file optional |
 | /app/lab (future result detail) | /api/lab-orders/results/<id>/ | GET | laboratorian/doctor | Yes | none | envelope | Phase 7 | Role constrained |
 | /app/lab (future correction) | /api/lab-orders/results/<id>/correct/ | POST | laboratorian-approved | Yes | JSON | envelope | Phase 7 | Creator/assignment constraints |
@@ -117,7 +117,7 @@ Consultation reject is intentionally excluded in frontend mapping because backen
 |---|---|---|---|---|
 | `getLabTestCatalog` | `/api/lab-orders/tests/` | GET | Yes | Optional `category` and `search` query params |
 | `scanLabOrder` | `/api/lab-orders/scan/` | POST | Yes | QR token entry point for lab processing |
-| `completeLabOrderItems` | `/api/lab-orders/{lab_order_id}/complete/` | POST | Yes | Batch completion with `completed` or `unavailable` statuses |
+| `completeLabOrderItems` | `/api/lab-orders/{lab_order_id}/complete/` | POST | Yes | Item completion is currently phase-scoped to `completed` status |
 | `createLabResultForItem` | `/api/lab-orders/items/{lab_order_item_id}/results/` | POST | Yes | Multipart when `result_file` exists |
 | `getLaboratoryResultDetail` | `/api/lab-orders/results/{lab_result_id}/` | GET | Yes | Lab-side result detail |
 | `correctLaboratoryResult` | `/api/lab-orders/results/{lab_result_id}/correct/` | POST | Yes | Original laboratorian only, before release |
