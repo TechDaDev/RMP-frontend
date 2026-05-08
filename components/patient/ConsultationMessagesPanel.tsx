@@ -5,7 +5,7 @@ import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
-import type { ConsultationMessage, ConsultationStatus } from "@/types/patient";
+import type { ConsultationMessage } from "@/types/patient";
 
 const textAreaClassName = "w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-text)] outline-none transition focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[color:color-mix(in_srgb,var(--color-primary)_18%,transparent)]";
 
@@ -18,7 +18,8 @@ function formatDate(value?: string) {
 }
 
 interface ConsultationMessagesPanelProps {
-  status: ConsultationStatus;
+  canSend: boolean;
+  unavailableReason?: string | null;
   messages: ConsultationMessage[];
   sending: boolean;
   error?: string | null;
@@ -28,7 +29,8 @@ interface ConsultationMessagesPanelProps {
 }
 
 export function ConsultationMessagesPanel({
-  status,
+  canSend,
+  unavailableReason,
   messages,
   sending,
   error,
@@ -38,7 +40,6 @@ export function ConsultationMessagesPanel({
 }: ConsultationMessagesPanelProps) {
   const { t } = useAppPreferences();
   const [body, setBody] = useState("");
-  const canSend = status === "accepted" || status === "doctor_responded";
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -56,9 +57,7 @@ export function ConsultationMessagesPanel({
         <Button variant="secondary" onClick={onRefresh}>{t.patient.messagesRefresh}</Button>
       </div>
 
-      {messages.length === 0 ? (
-        <EmptyState title={t.patient.messagesEmptyTitle} description={t.patient.messagesEmptyDescription} />
-      ) : (
+      {messages.length > 0 ? (
         <div className="space-y-3">
           {messages.map((message) => (
             <div key={message.id} className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 py-3">
@@ -70,30 +69,34 @@ export function ConsultationMessagesPanel({
             </div>
           ))}
         </div>
-      )}
+      ) : canSend ? (
+        <EmptyState title={t.patient.messagesEmptyTitle} description={t.patient.messagesEmptyDescription} />
+      ) : null}
 
-      {!canSend ? (
+      {!canSend && unavailableReason ? (
         <p className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-100">
-          {t.patient.messagesUnavailable}
+          {unavailableReason}
         </p>
       ) : null}
 
       {success ? <p className="text-sm font-medium text-green-600 dark:text-green-300">{success}</p> : null}
       {error ? <p className="text-sm font-medium text-red-600 dark:text-red-300">{error}</p> : null}
 
-      <form className="space-y-4" onSubmit={handleSubmit} noValidate>
-        <textarea
-          className={textAreaClassName}
-          rows={4}
-          value={body}
-          onChange={(event) => setBody(event.target.value)}
-          placeholder={t.patient.messagePlaceholder}
-          disabled={!canSend || sending}
-        />
-        <Button type="submit" disabled={!canSend || sending || body.trim().length === 0}>
-          {sending ? t.patient.sendingMessage : t.patient.sendMessage}
-        </Button>
-      </form>
+      {canSend ? (
+        <form className="space-y-4" onSubmit={handleSubmit} noValidate>
+          <textarea
+            className={textAreaClassName}
+            rows={4}
+            value={body}
+            onChange={(event) => setBody(event.target.value)}
+            placeholder={t.patient.messagePlaceholder}
+            disabled={sending}
+          />
+          <Button type="submit" disabled={sending || body.trim().length === 0}>
+            {sending ? t.patient.sendingMessage : t.patient.sendMessage}
+          </Button>
+        </form>
+      ) : null}
     </Card>
   );
 }

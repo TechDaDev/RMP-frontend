@@ -183,6 +183,43 @@ Result at completion:
 - Symptom grid sorts: selected first → red-flag second → display_order ascending
 - This keeps selected symptoms visible at the top of the (potentially long) grid
 
+## Phase 4.4 - Consultation Lifecycle Clarity and Messaging Gate
+
+### Lifecycle Mapping
+
+Backend status values are mapped to frontend lifecycle states in `lib/patient/consultationStatus.ts`:
+
+| Backend status    | Lifecycle        | Messaging allowed |
+|-------------------|------------------|-------------------|
+| `submitted`       | `pending_review` | No                |
+| `accepted`        | `accepted`       | Yes               |
+| `doctor_responded`| `in_progress`    | Yes               |
+| `closed`          | `closed`         | No                |
+| `cancelled`       | `cancelled`      | No                |
+| `rejected`        | `cancelled`      | No                |
+
+### API Call Gating
+
+- `GET /api/consultations/<id>/messages/` is only called when `canPatientUseMessages(status)` returns `true`
+- `POST /api/consultations/<id>/messages/mark-read/` is likewise skipped for non-messaging statuses
+- This prevents unnecessary 403 responses and avoids surfacing confusing error states to the patient
+- 403 errors that occur when messaging is expected to be allowed are shown as `messagingPermissionDenied`
+
+### New Components
+
+**`ConsultationLifecycleCard`** (`components/patient/ConsultationLifecycleCard.tsx`):
+- Renders a 4-stage progress indicator: Submitted → Doctor Review → Follow-up → Closed
+- Current stage is highlighted with the primary accent color
+- Cancelled/rejected consultations show a simple cancellation notice instead of the steps
+- Includes a status-appropriate help paragraph for the patient
+- Shown between `ConsultationDetailPanel` and `ConsultationMessagesPanel` on the detail page
+
+**`ConsultationMessagesPanel` changes**:
+- `status: ConsultationStatus` prop replaced by `canSend: boolean` + `unavailableReason?: string | null`
+- Send form is hidden entirely (not just disabled) when `!canSend`
+- Reason card is shown when `!canSend && unavailableReason` is provided
+- Existing message list continues to render when messages are present regardless of `canSend`
+
 **Scrollable symptom grid**:
 - Grid container capped at `max-h-96` with `overflow-y-auto`
 - Prevents the page from becoming excessively tall with 141 symptoms

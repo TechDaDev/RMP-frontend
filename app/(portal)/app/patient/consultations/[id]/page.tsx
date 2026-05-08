@@ -6,12 +6,14 @@ import { useParams } from "next/navigation";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { Button, buttonClassName } from "@/components/ui/Button";
 import { ConsultationDetailPanel } from "@/components/patient/ConsultationDetailPanel";
+import { ConsultationLifecycleCard } from "@/components/patient/ConsultationLifecycleCard";
 import { ConsultationMessagesPanel } from "@/components/patient/ConsultationMessagesPanel";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { ApiError } from "@/lib/api/errors";
+import { canPatientUseMessages, getConsultationLifecycle } from "@/lib/patient/consultationStatus";
 import {
   getConsultationDetail,
   getConsultationMessages,
@@ -33,7 +35,19 @@ export default function ConsultationDetailPage() {
   const [messageError, setMessageError] = useState<string | null>(null);
   const [messageSuccess, setMessageSuccess] = useState<string | null>(null);
 
-  const status = useMemo(() => consultation?.status ?? "submitted", [consultation?.status]);
+  const status = consultation?.status ?? "submitted";
+  const lifecycle = getConsultationLifecycle(status);
+  const messagingAllowed = canPatientUseMessages(status);
+
+  const unavailableReason = useMemo(() => {
+    if (messagingAllowed) return null;
+    switch (lifecycle) {
+      case "pending_review": return t.patient.messagingPending;
+      case "closed": return t.patient.messagingClosed;
+      case "cancelled": return t.patient.messagingCancelled;
+      default: return t.patient.messagingPermissionDenied;
+    }
+  }, [messagingAllowed, lifecycle, t.patient.messagingPending, t.patient.messagingClosed, t.patient.messagingCancelled, t.patient.messagingPermissionDenied]);
 
   useEffect(() => {
     let active = true;
@@ -43,8 +57,10 @@ export default function ConsultationDetailPage() {
       setError(null);
       setMessageError(null);
 
+      let consultationData: ConsultationDetail | null = null;
+
       try {
-        const consultationData = await getConsultationDetail(consultationId);
+        consultationData = await getConsultationDetail(consultationId);
         if (!active) {
           return;
         }
@@ -64,24 +80,32 @@ export default function ConsultationDetailPage() {
         return;
       }
 
-      try {
-        const messageData = await getConsultationMessages(consultationId);
-        if (!active) {
-          return;
-        }
-        setMessages(messageData);
-        await markConsultationMessagesRead(consultationId);
-      } catch (err) {
-        if (active) {
-          setMessages([]);
-          if (!(err instanceof ApiError && err.status === 403)) {
-            setMessageError(t.patient.consultationCreateError);
+      if (canPatientUseMessages(consultationData.status)) {
+        try {
+          const messageData = await getConsultationMessages(consultationId);
+          if (!active) {
+            return;
+          }
+          setMessages(messageData);
+          void markConsultationMessagesRead(consultationId);
+        } catch (err) {
+          if (active) {
+            setMessages([]);
+            if (err instanceof ApiError && err.status === 403) {
+              setMessageError(t.patient.messagingPermissionDenied);
+            } else {
+              setMessageError(t.patient.consultationCreateError);
+            }
           }
         }
-      } finally {
+      } else {
         if (active) {
-          setLoading(false);
+          setMessages([]);
         }
+      }
+
+      if (active) {
+        setLoading(false);
       }
     }
 
@@ -95,6 +119,7 @@ export default function ConsultationDetailPage() {
     t.patient.consultationCreateError,
     t.patient.consultationDetailForbidden,
     t.patient.noDataDescription,
+    t.patient.messagingPermissionDenied,
   ]);
 
   async function handleRefresh() {
@@ -106,15 +131,21 @@ export default function ConsultationDetailPage() {
       const consultationData = await getConsultationDetail(consultationId);
       setConsultation(consultationData);
 
-      try {
-        const messageData = await getConsultationMessages(consultationId);
-        setMessages(messageData);
-        await markConsultationMessagesRead(consultationId);
-      } catch (err) {
-        setMessages([]);
-        if (!(err instanceof ApiError && err.status === 403)) {
-          setMessageError(t.patient.consultationCreateError);
+      if (canPatientUseMessages(consultationData.status)) {
+        try {
+          const messageData = await getConsultationMessages(consultationId);
+          setMessages(messageData);
+          void markConsultationMessagesRead(consultationId);
+        } catch (err) {
+          setMessages([]);
+          if (err instanceof ApiError && err.status === 403) {
+            setMessageError(t.patient.messagingPermissionDenied);
+          } else {
+            setMessageError(t.patient.consultationCreateError);
+          }
         }
+      } else {
+        setMessages([]);
       }
     } catch (err) {
       if (err instanceof ApiError && err.status === 403) {
@@ -141,7 +172,7 @@ export default function ConsultationDetailPage() {
       setMessageSuccess(t.patient.messageSent);
       const nextMessages = await getConsultationMessages(consultationId);
       setMessages(nextMessages);
-      await markConsultationMessagesRead(consultationId);
+      void markConsultationMessagesRead(consultationId);
     } catch {
       setMessageError(t.patient.consultationCreateError);
     } finally {
@@ -180,11 +211,13 @@ export default function ConsultationDetailPage() {
       />
 
       <ConsultationDetailPanel consultation={consultation} />
+      <ConsultationLifecycleCard status={status} />
       <ConsultationMessagesPanel
-        status={status}
+        canSend={messagingAllowed}
+        unavailableReason={!messagingAllowed ? (messageError ?? unavailableReason) : null}
         messages={messages}
         sending={sending}
-        error={messageError}
+        error={messagingAllowed ? messageError : null}
         success={messageSuccess}
         onRefresh={() => void handleRefresh()}
         onSend={handleSend}

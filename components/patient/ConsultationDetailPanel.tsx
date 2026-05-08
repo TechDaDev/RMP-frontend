@@ -3,6 +3,7 @@
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { ConsultationStatusBadge } from "@/components/patient/ConsultationStatusBadge";
 import { Card } from "@/components/ui/Card";
+import { getConsultationLifecycle } from "@/lib/patient/consultationStatus";
 import type { ConsultationDetail } from "@/types/patient";
 
 function formatDate(value?: string | null) {
@@ -19,6 +20,14 @@ interface ConsultationDetailPanelProps {
 
 export function ConsultationDetailPanel({ consultation }: ConsultationDetailPanelProps) {
   const { t } = useAppPreferences();
+  const lifecycle = getConsultationLifecycle(consultation.status);
+  const statusHelp = lifecycle === "pending_review"
+    ? t.patient.statusHelpPending
+    : lifecycle === "accepted" || lifecycle === "in_progress"
+      ? t.patient.statusHelpAccepted
+      : lifecycle === "closed"
+        ? t.patient.statusHelpClosed
+        : t.patient.statusHelpCancelled;
 
   return (
     <Card className="space-y-5 rounded-[2rem]">
@@ -27,6 +36,10 @@ export function ConsultationDetailPanel({ consultation }: ConsultationDetailPane
         <span className="text-sm text-[var(--color-muted)]">
           {t.patient.createdAt}: {formatDate(consultation.created_at)}
         </span>
+      </div>
+
+      <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 py-3 text-sm leading-7 text-[var(--color-muted)]">
+        {statusHelp}
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
