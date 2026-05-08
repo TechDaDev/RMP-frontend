@@ -201,6 +201,15 @@ Notes:
 - Kept result creation deferred and non-interactive for this phase boundary.
 - Updated i18n keys and laboratory workflow docs to reflect completion behavior.
 
+### Phase 6.4 — Laboratory Result Creation ✅ COMPLETE
+
+- Implemented route `/app/lab/items/[itemId]/results/new`.
+- Added dynamic value-type result form (`numeric`, `text`, `blood_group`, `positive_negative`, `file_only`).
+- Integrated `POST /api/lab-orders/items/{item_id}/results/` with envelope handling.
+- Added FormData upload handling for `file_only` with `result_file`.
+- Added completed-item create-result action from scanned-order completed section.
+- Preserved phase boundary: correction UI deferred to Phase 6.5.
+
 ## Phase 7 — Pharmacist Portal
 
 1. Prescription scan workflow.

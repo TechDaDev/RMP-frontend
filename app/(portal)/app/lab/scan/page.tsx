@@ -156,6 +156,7 @@ export default function LaboratoryScanPage() {
                 scanResponse={scanResponse}
                 onItemCompleted={handleItemCompleted}
                 completionDisabled={isRefreshingOrder}
+                resultActionDisabled={isRefreshingOrder}
               />
 
               <div className="flex flex-col gap-3 sm:flex-row">

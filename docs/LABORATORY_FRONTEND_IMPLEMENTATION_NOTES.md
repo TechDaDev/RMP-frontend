@@ -143,3 +143,33 @@ Optional future alias (not canonical): `/app/laboratory/*`
 - Arabic default rendered RTL; English rendered LTR; Kurdish rendered RTL.
 - Dark and light theme preferences applied.
 - Patient and doctor users remained redirected away from `/app/lab/scan`.
+
+## Phase 6.4 Laboratory Result Creation (2026-05-09)
+
+### Implemented and verified
+
+- Added result creation route: `/app/lab/items/[itemId]/results/new`.
+- Added dynamic result form for backend value types:
+	- `numeric`
+	- `text`
+	- `blood_group`
+	- `positive_negative`
+	- `file_only`
+- Integrated `POST /api/lab-orders/items/{item_id}/results/` via `createLabResultForItem`.
+- Added multipart upload support for `file_only` (FormData with `result_file`).
+- Added completed-item create-result action wiring in scanned order item list.
+
+### Contract QA highlights
+
+- Successful create responses return envelope keys `success`, `message`, `data`.
+- Duplicate result creation for same item returns `400`.
+- Invalid payloads return field-level validation errors under `errors`.
+- `blood_group_value` uses enum values such as `a_positive` (not `A+`).
+- Lab and doctor result-detail endpoints returned created result records.
+- Patient released-results list did not include newly submitted (unreleased) results.
+
+### Behavioral constraints
+
+- Result correction remains deferred to Phase 6.5.
+- Doctor review/release remains doctor-portal responsibility.
+- No camera scanning, WebSocket, or RAG additions in this phase.

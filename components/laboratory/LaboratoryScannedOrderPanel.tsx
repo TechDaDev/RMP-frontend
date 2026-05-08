@@ -9,6 +9,7 @@ export interface LaboratoryScannedOrderPanelProps {
   scanResponse: LaboratoryOrderScanResponse;
   onItemCompleted: (result: LaboratoryCompletionResult) => Promise<void> | void;
   completionDisabled?: boolean;
+  resultActionDisabled?: boolean;
 }
 
 function formatDate(dateString?: string): string {
@@ -30,6 +31,7 @@ export function LaboratoryScannedOrderPanel({
   scanResponse,
   onItemCompleted,
   completionDisabled = false,
+  resultActionDisabled = false,
 }: LaboratoryScannedOrderPanelProps) {
   const { t } = useAppPreferences();
   const { lab_order, remaining_items, locked, message } = scanResponse;
@@ -97,8 +99,8 @@ export function LaboratoryScannedOrderPanel({
             completedItems={lab_order.completed_items}
             onItemCompleted={onItemCompleted}
             completionDisabled={completionDisabled}
+            resultActionDisabled={resultActionDisabled}
           />
-          <p className="text-sm text-[var(--color-muted)]">{t.laboratory.resultCreationStillDeferred}</p>
         </div>
       </Card>
 

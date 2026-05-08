@@ -61,6 +61,9 @@ export interface LaboratoryOrderItem {
   completed_at?: string | null;
   cancelled_at?: string | null;
   created_at?: string;
+  result_id?: string | null;
+  lab_result_id?: string | null;
+  lab_result?: { id?: string } | null;
 }
 
 export interface LaboratoryOrderDetail {
@@ -106,7 +109,7 @@ export interface LaboratoryCompletionResult {
   message?: string | null;
 }
 
-export interface LaboratoryResultCreateRequest {
+export interface CreateLaboratoryResultRequest {
   value_type: LaboratoryResultValueType;
   numeric_value?: string | number;
   text_value?: string;
@@ -117,6 +120,8 @@ export interface LaboratoryResultCreateRequest {
   laboratorian_notes?: string;
   result_file?: File;
 }
+
+export type LaboratoryResultCreateRequest = CreateLaboratoryResultRequest;
 
 export interface CorrectLaboratoryResultRequest {
   reason: string;
@@ -133,7 +138,7 @@ export interface CorrectLaboratoryResultRequest {
 export interface LaboratoryResultDetail {
   id: string;
   lab_order?: string | { id?: string } | null;
-  lab_order_item?: string | { id?: string; test_name?: string; category?: string } | null;
+  lab_order_item?: LaboratoryOrderItem | string | unknown | null;
   test_label?: string;
   patient?: LaboratorySafeUser | null;
   doctor?: LaboratorySafeUser | null;

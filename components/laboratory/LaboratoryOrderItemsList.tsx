@@ -1,7 +1,9 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { Badge } from "@/components/ui/Badge";
-import { canCompleteLabOrder } from "@/lib/laboratory/laboratoryStatus";
+import { Button } from "@/components/ui/Button";
+import { canCompleteLabOrder, canCreateResultForItem } from "@/lib/laboratory/laboratoryStatus";
 import type { LaboratoryCompletionResult, LaboratoryOrderItem } from "@/types/laboratory";
 import { LaboratoryCompleteItemButton } from "./LaboratoryCompleteItemButton";
 
@@ -13,6 +15,27 @@ export interface LaboratoryOrderItemsListProps {
   completedItems?: LaboratoryOrderItem[];
   onItemCompleted: (result: LaboratoryCompletionResult) => Promise<void> | void;
   completionDisabled?: boolean;
+  resultActionDisabled?: boolean;
+}
+
+function getItemResultId(item: LaboratoryOrderItem): string | null {
+  if (item.result_id) {
+    return item.result_id;
+  }
+
+  if (item.lab_result_id) {
+    return item.lab_result_id;
+  }
+
+  if (item.lab_result?.id) {
+    return item.lab_result.id;
+  }
+
+  return null;
+}
+
+function hasResultMarker(item: LaboratoryOrderItem): boolean {
+  return "result_id" in item || "lab_result_id" in item || "lab_result" in item;
 }
 
 function formatItemDate(dateString?: string | null): string {
@@ -76,6 +99,7 @@ export function LaboratoryOrderItemsList({
   completedItems = [],
   onItemCompleted,
   completionDisabled = false,
+  resultActionDisabled = false,
 }: LaboratoryOrderItemsListProps) {
   const { t } = useAppPreferences();
   const canComplete = !locked && canCompleteLabOrder(orderStatus ?? "issued");
@@ -123,7 +147,52 @@ export function LaboratoryOrderItemsList({
         {completedItems.length > 0 ? (
           <div className="space-y-3">
             {completedItems.map((item) => (
-              <ItemRow key={item.id} item={item} />
+              <ItemRow
+                key={item.id}
+                item={item}
+                action={(() => {
+                  const existingResultId = getItemResultId(item);
+
+                  if (existingResultId) {
+                    return (
+                      <div className="space-y-2">
+                        <p className="text-xs text-[var(--color-muted)]">{t.laboratory.resultAlreadySubmitted}</p>
+                        <Link href={`/app/lab/results/${existingResultId}`}>
+                          <Button variant="secondary" className="w-full">{t.laboratory.createResult}</Button>
+                        </Link>
+                      </div>
+                    );
+                  }
+
+                  if (hasResultMarker(item)) {
+                    return (
+                      <p className="text-xs text-[var(--color-muted)]">{t.laboratory.resultAlreadySubmitted}</p>
+                    );
+                  }
+
+                  if (!canCreateResultForItem(item.status ?? "completed", orderStatus)) {
+                    return (
+                      <p className="text-xs text-[var(--color-muted)]">{t.laboratory.resultCreationUnavailable}</p>
+                    );
+                  }
+
+                  if (resultActionDisabled) {
+                    return (
+                      <Button className="w-full" disabled>
+                        {t.laboratory.createLabResult}
+                      </Button>
+                    );
+                  }
+
+                  return (
+                    <Link href={`/app/lab/items/${item.id}/results/new?orderId=${orderId}`}>
+                      <Button className="w-full">
+                        {t.laboratory.createLabResult}
+                      </Button>
+                    </Link>
+                  );
+                })()}
+              />
             ))}
           </div>
         ) : (

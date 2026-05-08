@@ -200,9 +200,19 @@ Validated behaviors:
 
 ### Phase 6.4 - Create Lab Results
 
-- Build `/app/lab/items/[itemId]/results/new`.
-- Support the five backend value types.
-- Support multipart upload for file-only results.
+- Build `/app/lab/items/[itemId]/results/new`. ✅
+- Support the five backend value types. ✅
+- Support multipart upload for file-only results. ✅
+
+Status: Completed (Phase 6.4).
+
+Validated behaviors:
+
+- Completed items can open result-creation route from scanned-order workflow.
+- Dynamic form validation follows backend value-type requirements.
+- `file_only` submissions use multipart/FormData.
+- Duplicate result creation is backend-blocked and surfaced as safe UI error.
+- Correction flow remains deferred to Phase 6.5.
 
 ### Phase 6.5 - Correct Lab Results
 
