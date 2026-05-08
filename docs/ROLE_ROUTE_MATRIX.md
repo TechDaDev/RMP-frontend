@@ -51,16 +51,18 @@ This matrix defines current preview behavior and planned guard/redirect behavior
 
 Role: laboratorian only.
 
-- `/app/laboratory`
-- `/app/laboratory/scan`
-- `/app/laboratory/orders/[id]`
-- `/app/laboratory/orders/[id]/complete`
-- `/app/laboratory/items/[itemId]/results/new`
-- `/app/laboratory/results/[id]`
-- `/app/laboratory/results/[id]/correct`
-- `/app/laboratory/tests`
 
-Current canonical laboratorian shell remains `/app/lab` until the new route family is implemented.
+- `/app/lab`
+- `/app/lab/scan`
+- `/app/lab/orders/[id]`
+- `/app/lab/orders/[id]/complete`
+- `/app/lab/items/[itemId]/results/new`
+- `/app/lab/results/[id]`
+- `/app/lab/results/[id]/correct`
+- `/app/lab/tests`
+
+Canonical laboratorian shell and route family is `/app/lab`.
+Optional future alias: `/app/laboratory/*`.
 
 ## Current Preview Mode Note
 

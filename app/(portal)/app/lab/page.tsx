@@ -1,39 +1,97 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
-import { CheckCircleIcon, FileTextIcon, LabIcon, MessageIcon } from "@/components/icons";
+import { useAuth } from "@/components/auth/AuthProvider";
+import { LaboratoryDashboardSummary } from "@/components/laboratory/LaboratoryDashboardSummary";
+import { LaboratoryPrivacyNotice } from "@/components/laboratory/LaboratoryPrivacyNotice";
+import { LaboratoryTestCatalogPreview } from "@/components/laboratory/LaboratoryTestCatalogPreview";
+import { LaboratoryVerificationNotice } from "@/components/laboratory/LaboratoryVerificationNotice";
+import { LaboratoryWorkflowCard } from "@/components/laboratory/LaboratoryWorkflowCard";
 import { Badge } from "@/components/ui/Badge";
-import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { ProfilePromptCard } from "@/components/profile/ProfilePromptCard";
+import { ShieldIcon } from "@/components/icons";
+import { getLabTestCatalog } from "@/lib/laboratory/laboratoryService";
+import type { LaboratorianProfileData } from "@/types/backend";
+import type { LaboratoryTestCatalogItem } from "@/types/laboratory";
 
 export default function LaboratoryPortalPage() {
   const { t } = useAppPreferences();
+  const { profile, verification } = useAuth();
+  const roleProfile = useMemo<LaboratorianProfileData | null>(
+    () => (profile?.role_profile && "laboratory_name" in profile.role_profile ? profile.role_profile : null),
+    [profile?.role_profile],
+  );
+  const isApproved = verification?.is_approved === true;
+  const [catalog, setCatalog] = useState<LaboratoryTestCatalogItem[]>([]);
+  const [catalogLoading, setCatalogLoading] = useState(false);
+  const [catalogError, setCatalogError] = useState<string | null>(null);
+  const visibleCatalog = isApproved ? catalog : [];
+  const visibleCatalogLoading = isApproved ? catalogLoading : false;
+  const visibleCatalogError = isApproved ? catalogError : null;
 
-  const modules = [
-    { title: t.dashboards.modules.testRequests, Icon: LabIcon },
-    { title: t.dashboards.modules.uploadResults, Icon: FileTextIcon },
-    { title: t.dashboards.modules.sentResults, Icon: CheckCircleIcon },
-    { title: t.dashboards.modules.messages, Icon: MessageIcon },
-  ];
+  useEffect(() => {
+    if (!isApproved) {
+      return;
+    }
+
+    let cancelled = false;
+
+    async function loadCatalog() {
+      setCatalogLoading(true);
+      setCatalogError(null);
+
+      try {
+        const items = await getLabTestCatalog();
+        if (!cancelled) {
+          setCatalog(items);
+        }
+      } catch {
+        if (!cancelled) {
+          setCatalogError(t.laboratory.noLabTestsAvailable);
+        }
+      } finally {
+        if (!cancelled) {
+          setCatalogLoading(false);
+        }
+      }
+    }
+
+    void loadCatalog();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isApproved, t.laboratory.noLabTestsAvailable]);
 
   return (
     <div className="space-y-6">
-      <PageHeader badge={<Badge tone="primary">{t.roles.laboratory}</Badge>} title={t.dashboards.laboratoryTitle} description={t.dashboards.laboratorySubtitle} />
-      <ProfilePromptCard />
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {modules.map(({ title, Icon }) => (
-          <Card key={title} hoverable className="rounded-[2rem]">
-            <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--color-surface-alt)] text-[var(--color-primary)]">
-              <Icon size={20} />
-            </span>
-            <h2 className="mt-4 text-base font-bold text-[var(--color-text)]">{title}</h2>
-            <p className="mt-2 text-sm leading-7 text-[var(--color-muted)]">{t.dashboards.previewNotice}</p>
-          </Card>
-        ))}
-      </div>
-      <EmptyState title={t.common.uiOnlyBadge} description={t.portal.previewNotice} />
+      <PageHeader
+        badge={<Badge tone={isApproved ? "success" : "primary"}>{t.roles.laboratory}</Badge>}
+        title={t.laboratory.dashboardTitle}
+        description={t.laboratory.dashboardSubtitle}
+        actions={<Badge tone={isApproved ? "success" : "primary"}>{isApproved ? t.profile.verificationApproved : t.laboratory.verificationRequired}</Badge>}
+      />
+
+      <LaboratoryVerificationNotice verification={verification} roleProfile={roleProfile} />
+      <LaboratoryDashboardSummary roleProfile={roleProfile} verification={verification} catalogCount={catalog.length} />
+
+      {isApproved ? (
+        <div className="space-y-6">
+          <div className="grid gap-6 xl:grid-cols-2">
+            <LaboratoryWorkflowCard />
+            <LaboratoryPrivacyNotice />
+          </div>
+          <LaboratoryTestCatalogPreview items={visibleCatalog} loading={visibleCatalogLoading} error={visibleCatalogError} />
+        </div>
+      ) : (
+        <EmptyState
+          icon={<ShieldIcon size={20} />}
+          title={t.laboratory.laboratoryVerificationPending}
+          description={t.laboratory.laboratoryActionsDisabled}
+        />
+      )}
     </div>
   );
 }

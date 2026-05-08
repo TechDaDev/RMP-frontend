@@ -19,14 +19,16 @@
 
 ## Route Plan
 
-- `/app/laboratory`
-- `/app/laboratory/scan`
-- `/app/laboratory/orders/[id]`
-- `/app/laboratory/orders/[id]/complete`
-- `/app/laboratory/items/[itemId]/results/new`
-- `/app/laboratory/results/[id]`
-- `/app/laboratory/results/[id]/correct`
-- `/app/laboratory/tests`
+- `/app/lab`
+- `/app/lab/scan`
+- `/app/lab/orders/[id]`
+- `/app/lab/orders/[id]/complete`
+- `/app/lab/items/[itemId]/results/new`
+- `/app/lab/results/[id]`
+- `/app/lab/results/[id]/correct`
+- `/app/lab/tests`
+
+Optional future alias (not canonical): `/app/laboratory/*`
 
 ## Status / Action Matrix
 

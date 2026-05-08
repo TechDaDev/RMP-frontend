@@ -28,20 +28,21 @@ keys needed for Phase 6.1. No laboratory UI screens are built in this phase.
 - Approved laboratorian verification is required for all clinical lab actions.
 - Unapproved laboratorians must see a verification-pending state and disabled actions.
 - Backend returns `403` for unapproved laboratorians on lab clinical endpoints.
-- The frontend should treat `/app/lab` as the current laboratory shell and prepare the `/app/laboratory` route family for Phase 6.1+.
+- The frontend should treat `/app/lab` as the canonical laboratory shell route.
+- `/app/laboratory` can be added later only as an alias if needed.
 
 ## Route Map
 
-Planned future route family:
+Canonical route family:
 
-- `/app/laboratory` - Laboratory dashboard
-- `/app/laboratory/scan` - QR token scan and manual entry
-- `/app/laboratory/orders/[id]` - Lab order processing detail
-- `/app/laboratory/orders/[id]/complete` - Batch item completion flow
-- `/app/laboratory/items/[itemId]/results/new` - Create a lab result for one item
-- `/app/laboratory/results/[id]` - Laboratory result detail
-- `/app/laboratory/results/[id]/correct` - Correct a submitted result
-- `/app/laboratory/tests` - Lab test catalog browser/search
+- `/app/lab` - Laboratory dashboard
+- `/app/lab/scan` - QR token scan and manual entry
+- `/app/lab/orders/[id]` - Lab order processing detail
+- `/app/lab/orders/[id]/complete` - Batch item completion flow
+- `/app/lab/items/[itemId]/results/new` - Create a lab result for one item
+- `/app/lab/results/[id]` - Laboratory result detail
+- `/app/lab/results/[id]/correct` - Correct a submitted result
+- `/app/lab/tests` - Lab test catalog browser/search
 
 Current implementation note:
 
@@ -52,14 +53,14 @@ Current implementation note:
 
 | Screen | Endpoint | Method | Purpose |
 |---|---|---|---|
-| `/app/laboratory` | `GET /api/lab-orders/tests/` | GET | Load catalog and dashboard helpers |
-| `/app/laboratory/scan` | `POST /api/lab-orders/scan/` | POST | Open an order by QR token |
-| `/app/laboratory/orders/[id]` | `POST /api/lab-orders/{lab_order_id}/complete/` | POST | Complete order items |
-| `/app/laboratory/orders/[id]` | `GET /api/lab-orders/tests/` | GET | Support test catalog lookup |
-| `/app/laboratory/items/[itemId]/results/new` | `POST /api/lab-orders/items/{lab_order_item_id}/results/` | POST | Create a new lab result |
-| `/app/laboratory/results/[id]` | `GET /api/lab-orders/results/{lab_result_id}/` | GET | Read result detail |
-| `/app/laboratory/results/[id]/correct` | `POST /api/lab-orders/results/{lab_result_id}/correct/` | POST | Correct an existing result |
-| `/app/laboratory/tests` | `GET /api/lab-orders/tests/` | GET | Search and filter catalog |
+| `/app/lab` | `GET /api/lab-orders/tests/` | GET | Load catalog and dashboard helpers |
+| `/app/lab/scan` | `POST /api/lab-orders/scan/` | POST | Open an order by QR token |
+| `/app/lab/orders/[id]` | `POST /api/lab-orders/{lab_order_id}/complete/` | POST | Complete order items |
+| `/app/lab/orders/[id]` | `GET /api/lab-orders/tests/` | GET | Support test catalog lookup |
+| `/app/lab/items/[itemId]/results/new` | `POST /api/lab-orders/items/{lab_order_item_id}/results/` | POST | Create a new lab result |
+| `/app/lab/results/[id]` | `GET /api/lab-orders/results/{lab_result_id}/` | GET | Read result detail |
+| `/app/lab/results/[id]/correct` | `POST /api/lab-orders/results/{lab_result_id}/correct/` | POST | Correct an existing result |
+| `/app/lab/tests` | `GET /api/lab-orders/tests/` | GET | Search and filter catalog |
 
 ## Lab Order Lifecycle
 
@@ -162,31 +163,31 @@ Form rules:
 
 ### Phase 6.1 - Laboratory Dashboard + Verification Gate
 
-- Build `/app/laboratory` dashboard shell.
+- Build `/app/lab` dashboard shell.
 - Show verification banner and disabled action states for unapproved laboratorians.
 - Surface quick links for scan, tests, and recent work.
 
 ### Phase 6.2 - QR Scan and Lab Order Processing
 
-- Build `/app/laboratory/scan`.
+- Build `/app/lab/scan`.
 - Integrate `scanLabOrder` service call.
 - Render scanned order detail and remaining items.
 
 ### Phase 6.3 - Complete Lab Order Items
 
-- Build `/app/laboratory/orders/[id]` and `/complete` flow.
+- Build `/app/lab/orders/[id]` and `/complete` flow.
 - Integrate `completeLabOrderItems`.
 - Enforce locked-order and verification guards.
 
 ### Phase 6.4 - Create Lab Results
 
-- Build `/app/laboratory/items/[itemId]/results/new`.
+- Build `/app/lab/items/[itemId]/results/new`.
 - Support the five backend value types.
 - Support multipart upload for file-only results.
 
 ### Phase 6.5 - Correct Lab Results
 
-- Build `/app/laboratory/results/[id]/correct`.
+- Build `/app/lab/results/[id]/correct`.
 - Allow original author correction only before release.
 - Preserve immutable file handling.
 
@@ -199,7 +200,8 @@ Form rules:
 - No separate pending-order list endpoint for laboratorians.
 - No WebSocket requirement for Phase 6 initial work.
 - No live result-correction stream or realtime lab dashboard contract.
-- The current `/app/lab` shell exists, but `/app/laboratory` is the planned public route family.
+- `/app/lab` is the current and planned canonical route family.
+- `/app/laboratory` may be introduced later as an alias only if required.
 
 ## Deferred Future Tasks
 
