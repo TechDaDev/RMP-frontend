@@ -22,23 +22,13 @@ const ROUTES: MedicationRoute[] = [
   "other",
 ];
 
-const routeLabels: Record<MedicationRoute, string> = {
-  oral: "Oral",
-  topical: "Topical",
-  inhalation: "Inhalation",
-  injection: "Injection",
-  eye: "Eye",
-  ear: "Ear",
-  nasal: "Nasal",
-  rectal: "Rectal",
-  other: "Other",
-};
+export type PrescriptionItemDraft = Omit<DoctorPrescriptionItemCreateRequest, "route"> & { route: MedicationRoute | "" };
 
 interface DoctorPrescriptionItemEditorProps {
   index: number;
-  item: DoctorPrescriptionItemCreateRequest;
+  item: PrescriptionItemDraft;
   canRemove: boolean;
-  onChange: (next: DoctorPrescriptionItemCreateRequest) => void;
+  onChange: (next: PrescriptionItemDraft) => void;
   onRemove: () => void;
   errors?: Partial<Record<keyof DoctorPrescriptionItemCreateRequest, string>>;
 }
@@ -53,7 +43,7 @@ export function DoctorPrescriptionItemEditor({
 }: DoctorPrescriptionItemEditorProps) {
   const { t } = useAppPreferences();
 
-  function updateField<K extends keyof DoctorPrescriptionItemCreateRequest>(field: K, value: DoctorPrescriptionItemCreateRequest[K]) {
+  function updateField<K extends keyof PrescriptionItemDraft>(field: K, value: PrescriptionItemDraft[K]) {
     onChange({ ...item, [field]: value });
   }
 
@@ -114,17 +104,23 @@ export function DoctorPrescriptionItemEditor({
         </label>
 
         <label className="block space-y-2">
-          <span className="text-sm font-semibold text-[var(--color-text)]">Route</span>
+          <span className="text-sm font-semibold text-[var(--color-text)]">{t.doctor.route}</span>
           <select
             className={fieldClassName}
             value={item.route}
             onChange={(event) => updateField("route", event.target.value as MedicationRoute)}
           >
-            {ROUTES.map((route) => (
-              <option key={route} value={route}>
-                {routeLabels[route]}
-              </option>
-            ))}
+            <option value="" disabled>
+              {t.doctor.selectRoute}
+            </option>
+            {ROUTES.map((route) => {
+              const labelKey = `route${route.charAt(0).toUpperCase()}${route.slice(1)}` as keyof typeof t.doctor;
+              return (
+                <option key={route} value={route}>
+                  {(t.doctor[labelKey] as string) ?? route}
+                </option>
+              );
+            })}
           </select>
           {errors?.route ? <p className="text-xs font-medium text-red-600 dark:text-red-300">{errors.route}</p> : null}
         </label>

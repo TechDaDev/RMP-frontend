@@ -2,21 +2,22 @@
 
 import { useState, type FormEvent } from "react";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
-import { DoctorPrescriptionItemEditor } from "@/components/doctor/DoctorPrescriptionItemEditor";
+import { DoctorPrescriptionItemEditor, type PrescriptionItemDraft } from "@/components/doctor/DoctorPrescriptionItemEditor";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import type { CreateDoctorPrescriptionRequest, DoctorPrescriptionItemCreateRequest } from "@/types/doctor";
+import { ApiError } from "@/lib/api/errors";
+import type { CreateDoctorPrescriptionRequest, DoctorPrescriptionItemCreateRequest, MedicationRoute } from "@/types/doctor";
 
 interface DoctorPrescriptionFormProps {
   onSubmit: (payload: CreateDoctorPrescriptionRequest) => Promise<void>;
 }
 
-const EMPTY_ITEM: DoctorPrescriptionItemCreateRequest = {
+const EMPTY_ITEM: PrescriptionItemDraft = {
   medication_name: "",
   dosage: "",
   frequency: "",
   duration: "",
-  route: "oral",
+  route: "",
   strength: "",
   quantity: "",
   instructions: "",
@@ -26,12 +27,12 @@ type ItemErrors = Partial<Record<keyof DoctorPrescriptionItemCreateRequest, stri
 
 export function DoctorPrescriptionForm({ onSubmit }: DoctorPrescriptionFormProps) {
   const { t } = useAppPreferences();
-  const [items, setItems] = useState<DoctorPrescriptionItemCreateRequest[]>([{ ...EMPTY_ITEM }]);
+  const [items, setItems] = useState<PrescriptionItemDraft[]>([{ ...EMPTY_ITEM }]);
   const [errors, setErrors] = useState<Record<number, ItemErrors>>({});
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  function updateItem(index: number, next: DoctorPrescriptionItemCreateRequest) {
+  function updateItem(index: number, next: PrescriptionItemDraft) {
     setItems((current) => current.map((item, itemIndex) => (itemIndex === index ? next : item)));
   }
 
@@ -72,7 +73,7 @@ export function DoctorPrescriptionForm({ onSubmit }: DoctorPrescriptionFormProps
         itemErrors.duration = t.doctor.duration;
       }
       if (!item.route) {
-        itemErrors.route = t.doctor.prescription;
+        itemErrors.route = t.doctor.routeRequired;
       }
       if (Object.keys(itemErrors).length > 0) {
         nextErrors[index] = itemErrors;
@@ -97,23 +98,49 @@ export function DoctorPrescriptionForm({ onSubmit }: DoctorPrescriptionFormProps
       return;
     }
 
-    const payloadItems = items.map((item) => ({
-      medication_name: item.medication_name.trim(),
-      dosage: item.dosage.trim(),
-      frequency: item.frequency.trim(),
-      duration: item.duration.trim(),
-      route: item.route,
-      strength: item.strength?.trim() ?? "",
-      quantity: item.quantity?.trim() ?? "",
-      instructions: item.instructions?.trim() ?? "",
-    }));
+    const payloadItems = items.map((item) => {
+      const base: DoctorPrescriptionItemCreateRequest = {
+        medication_name: item.medication_name.trim(),
+        dosage: item.dosage.trim(),
+        frequency: item.frequency.trim(),
+        duration: item.duration.trim(),
+        route: item.route as MedicationRoute,
+      };
+      const strength = item.strength?.trim();
+      const quantity = item.quantity?.trim();
+      const instructions = item.instructions?.trim();
+      if (strength) base.strength = strength;
+      if (quantity) base.quantity = quantity;
+      if (instructions) base.instructions = instructions;
+      return base;
+    });
 
     setSubmitting(true);
     try {
       await onSubmit({ items: payloadItems });
       setItems([{ ...EMPTY_ITEM }]);
       setErrors({});
-    } catch {
+    } catch (err) {
+      if (err instanceof ApiError && err.fieldErrors) {
+        const rawItems = (err.fieldErrors as Record<string, unknown>).items;
+        if (Array.isArray(rawItems) && rawItems.length > 0) {
+          const perItem: Record<number, ItemErrors> = {};
+          rawItems.forEach((itemErr, idx) => {
+            if (itemErr && typeof itemErr === "object") {
+              const errs: ItemErrors = {};
+              for (const [k, v] of Object.entries(itemErr as Record<string, unknown>)) {
+                errs[k as keyof DoctorPrescriptionItemCreateRequest] = Array.isArray(v) ? (v[0] as string) : String(v);
+              }
+              if (Object.keys(errs).length > 0) perItem[idx] = errs;
+            }
+          });
+          if (Object.keys(perItem).length > 0) {
+            setErrors(perItem);
+            setSubmitError(t.doctor.prescriptionValidationFailed);
+            return;
+          }
+        }
+      }
       setSubmitError(t.doctor.prescriptionCreateFailed);
     } finally {
       setSubmitting(false);

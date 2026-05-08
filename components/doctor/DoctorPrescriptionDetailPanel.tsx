@@ -97,8 +97,12 @@ export function DoctorPrescriptionDetailPanel({ prescription }: DoctorPrescripti
                     <p className="text-sm text-[var(--color-text)]">{item.instructions || "-"}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-[var(--color-muted)]">Route</p>
-                    <p className="text-sm text-[var(--color-text)]">{item.route || "-"}</p>
+                    <p className="text-xs text-[var(--color-muted)]">{t.doctor.route}</p>
+                    <p className="text-sm text-[var(--color-text)]">
+                      {item.route
+                        ? ((t.doctor[`route${item.route.charAt(0).toUpperCase()}${item.route.slice(1)}` as keyof typeof t.doctor] as string) ?? item.route)
+                        : "-"}
+                    </p>
                   </div>
                 </div>
               </div>
