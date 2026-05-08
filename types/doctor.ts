@@ -221,6 +221,8 @@ export interface DoctorLabOrderItem {
 export interface DoctorLabOrderCompletionRecord {
   id?: string;
   lab_order_item_id?: string;
+  lab_result_id?: string;
+  result_id?: string;
   laboratorian?: DoctorPatientUser;
   status?: string;
   note?: string;
@@ -240,4 +242,54 @@ export interface DoctorLabOrderDetail {
   fully_completed_at?: string | null;
   items?: DoctorLabOrderItem[];
   completion_records?: DoctorLabOrderCompletionRecord[];
+}
+
+export type DoctorLabResultStatus =
+  | "submitted"
+  | "corrected"
+  | "reviewed"
+  | "released"
+  | string;
+
+export interface DoctorLabResultDetail {
+  id: string;
+  lab_order?: string | { id?: string } | null;
+  lab_order_item?: string | { id?: string; test_name?: string; category?: string } | null;
+  patient?: DoctorPatientUser;
+  doctor?: DoctorPatientUser;
+  laboratorian?: DoctorPatientUser;
+  status?: DoctorLabResultStatus;
+  value_type?: string;
+  text_value?: string;
+  numeric_value?: string | number | null;
+  blood_group_value?: string;
+  unit?: string;
+  reference_range?: string;
+  flag?: string;
+  result_file?: string | null;
+  original_file_name?: string;
+  laboratorian_notes?: string;
+  doctor_notes?: string;
+  submitted_at?: string;
+  reviewed_at?: string | null;
+  released_at?: string | null;
+  corrected_at?: string | null;
+  is_linked_to_medical_record?: boolean;
+  linked_entry?: string | null;
+  linked_blood_group_record?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface ReviewDoctorLabResultRequest {
+  doctor_notes?: string;
+  release_to_patient?: boolean;
+}
+
+export interface ReleaseDoctorLabResultRequest {
+  [key: string]: never;
+}
+
+export interface LinkLabResultToMedicalRecordRequest {
+  notes?: string;
 }

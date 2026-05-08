@@ -141,3 +141,20 @@ Contract alignment and privacy notes:
 
 Deferred from this phase:
 - Doctor lab-result review/release/link flows are intentionally deferred to the next phase
+
+## Phase 5.5 Implementation Notes (Completed)
+
+Implemented doctor lab-result workflow:
+- Added doctor lab-result detail route at `/app/doctor/lab-results/[id]`
+- Added doctor review action using `POST /api/lab-orders/doctor/results/{id}/review/`
+- Added doctor release action using `POST /api/lab-orders/doctor/results/{id}/release/`
+- Added link-to-medical-record action using `POST /api/lab-orders/doctor/results/{id}/link-medical-record/`
+
+Contract alignment:
+- Doctor detail uses full `LabResultSerializer` payload (includes doctor/laboratorian notes)
+- Patient lab-result views remain release-gated and exclude `doctor_notes` and `laboratorian_notes`
+- Link-to-medical-record action supports optional `notes` in serializer; service currently links using backend-generated notes
+
+Lab order detail integration:
+- Lab-order detail now checks for result identifiers in completion records and links to doctor lab-result details when present
+- If result identifiers are not present in the payload, UI shows neutral fallback text (no fake IDs)

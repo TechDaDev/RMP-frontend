@@ -147,6 +147,18 @@ Deferred:
 1. Implement authorized patient-record view via `GET /api/patient-records/patients/{patient_id}/`.
 2. Enforce relationship-based access error handling in UI states.
 
+## Phase 5.5A — Doctor Lab Result Review and Release ✅ COMPLETE
+
+1. Implemented doctor lab-result detail route (`/app/doctor/lab-results/[id]`). ✅
+2. Implemented doctor review action (`POST /api/lab-orders/doctor/results/{id}/review/`). ✅
+3. Implemented doctor release action (`POST /api/lab-orders/doctor/results/{id}/release/`). ✅
+4. Implemented doctor link-to-medical-record action (`POST /api/lab-orders/doctor/results/{id}/link-medical-record/`). ✅
+5. Added lab-order detail integration for result links when IDs are present; otherwise fallback informational state. ✅
+
+Notes:
+- No dedicated doctor lab-result list endpoint exists; detail route is entry-pointed from known IDs.
+- Patient privacy remains backend-enforced and frontend-preserved (released-only visibility, no doctor/laboratorian notes).
+
 ## Phase 5.6 — Doctor Portal QA
 
 1. Full doctor route QA pass.

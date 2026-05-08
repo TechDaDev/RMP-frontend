@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { Card } from "@/components/ui/Card";
 import type { DoctorLabOrderDetail } from "@/types/doctor";
@@ -17,6 +18,10 @@ interface DoctorLabOrderDetailPanelProps {
 
 export function DoctorLabOrderDetailPanel({ labOrder }: DoctorLabOrderDetailPanelProps) {
   const { t } = useAppPreferences();
+  const resultLinks =
+    labOrder.completion_records
+      ?.map((record) => record.lab_result_id ?? record.result_id)
+      .filter((value): value is string => Boolean(value)) ?? [];
 
   return (
     <Card className="space-y-5 rounded-[2rem]">
@@ -106,6 +111,25 @@ export function DoctorLabOrderDetailPanel({ labOrder }: DoctorLabOrderDetailPane
           </div>
         ) : (
           <p className="text-sm text-[var(--color-muted)]">-</p>
+        )}
+      </div>
+
+      <div className="space-y-3">
+        <h4 className="text-sm font-semibold text-[var(--color-text)]">{t.doctor.labResults}</h4>
+        {resultLinks.length > 0 ? (
+          <div className="flex flex-wrap gap-2">
+            {resultLinks.map((resultId) => (
+              <Link
+                key={resultId}
+                href={`/app/doctor/lab-results/${resultId}`}
+                className="text-sm font-medium text-[var(--color-primary)] underline"
+              >
+                {t.doctor.labResult} {resultId}
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-[var(--color-muted)]">{t.doctor.resultsUnavailable}</p>
         )}
       </div>
     </Card>

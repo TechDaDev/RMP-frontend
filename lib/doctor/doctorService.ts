@@ -8,9 +8,13 @@ import type {
   DoctorConsultationDetail,
   DoctorConsultationListItem,
   DoctorLabOrderDetail,
+  DoctorLabResultDetail,
+  LinkLabResultToMedicalRecordRequest,
   DoctorMessage,
   DoctorMessageRequest,
   DoctorPrescriptionDetail,
+  ReleaseDoctorLabResultRequest,
+  ReviewDoctorLabResultRequest,
   DoctorResponseRequest,
 } from "@/types/doctor";
 import type { PatientMedicalRecord } from "@/types/patient";
@@ -174,32 +178,53 @@ export async function cancelDoctorLabOrder(id: string): Promise<DoctorLabOrderDe
   return unwrapData(response);
 }
 
-export function getDoctorLabResultDetail(id: string): Promise<unknown> {
-  return getResource<unknown>(API_ENDPOINTS.doctorLabResults.detail(id));
+export function getDoctorLabResultDetail(id: string): Promise<DoctorLabResultDetail> {
+  return getResource<DoctorLabResultDetail>(API_ENDPOINTS.doctorLabResults.detail(id));
 }
 
-export async function reviewDoctorLabResult(id: string, payload: Record<string, unknown>): Promise<void> {
-  await apiRequest<void | ApiEnvelope<void>>(API_ENDPOINTS.doctorLabResults.review(id), {
-    auth: true,
-    body: payload,
-  });
+export async function reviewDoctorLabResult(
+  id: string,
+  payload: ReviewDoctorLabResultRequest,
+): Promise<DoctorLabResultDetail> {
+  const response = await apiRequest<DoctorLabResultDetail | ApiEnvelope<DoctorLabResultDetail>>(
+    API_ENDPOINTS.doctorLabResults.review(id),
+    {
+      auth: true,
+      body: payload,
+    },
+  );
+
+  return unwrapData(response);
 }
 
-export async function releaseDoctorLabResult(id: string): Promise<void> {
-  await apiRequest<void | ApiEnvelope<void>>(API_ENDPOINTS.doctorLabResults.release(id), {
-    auth: true,
-    body: {},
-  });
+export async function releaseDoctorLabResult(
+  id: string,
+  payload: ReleaseDoctorLabResultRequest = {},
+): Promise<DoctorLabResultDetail> {
+  const response = await apiRequest<DoctorLabResultDetail | ApiEnvelope<DoctorLabResultDetail>>(
+    API_ENDPOINTS.doctorLabResults.release(id),
+    {
+      auth: true,
+      body: payload,
+    },
+  );
+
+  return unwrapData(response);
 }
 
 export async function linkLabResultToMedicalRecord(
   id: string,
-  payload?: Record<string, unknown>,
-): Promise<void> {
-  await apiRequest<void | ApiEnvelope<void>>(API_ENDPOINTS.doctorLabResults.linkMedicalRecord(id), {
-    auth: true,
-    body: payload ?? {},
-  });
+  payload: LinkLabResultToMedicalRecordRequest = {},
+): Promise<DoctorLabResultDetail> {
+  const response = await apiRequest<DoctorLabResultDetail | ApiEnvelope<DoctorLabResultDetail>>(
+    API_ENDPOINTS.doctorLabResults.linkMedicalRecord(id),
+    {
+      auth: true,
+      body: payload,
+    },
+  );
+
+  return unwrapData(response);
 }
 
 export function getAuthorizedPatientRecord(patientId: string): Promise<PatientMedicalRecord> {
