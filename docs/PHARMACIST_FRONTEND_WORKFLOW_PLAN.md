@@ -47,6 +47,22 @@ Phase 7.0B — Contract preparation and planning
 
 **Phase 7.1+** (future) will implement the actual UI screens and integrate the service layer with React components.
 
+### Phase 7.1 Status Update
+
+Implemented in frontend:
+
+- `/app/pharmacist` dashboard with verification-first rendering
+- pharmacy identity summary from authenticated profile payload
+- workflow quick-action cards with deferred-action states
+- privacy/safety notice for dispensing constraints
+
+Still deferred:
+
+- `/app/pharmacist/scan`
+- `/app/pharmacist/prescriptions/[id]`
+- `/app/pharmacist/prescriptions/[id]/dispense`
+- `/app/pharmacist/history`
+
 ---
 
 ## Non-Scope

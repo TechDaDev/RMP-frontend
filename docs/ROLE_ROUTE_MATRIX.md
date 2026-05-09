@@ -84,6 +84,17 @@ Guard conditions (Phase 7.1+):
 - Scan/dispense actions require: verification_status == "approved"
 - Unverified pharmacist sees verification-pending banner and action lock
 
+## Phase 7.1 Pharmacist Guard QA Results
+
+Runtime checks for `/app/pharmacist` confirmed:
+
+- pharmacist -> allowed
+- patient -> redirected to `/app/patient`
+- doctor -> redirected to `/app/doctor`
+- laboratorian -> redirected to `/app/lab`
+
+Phase 7.1 dashboard keeps scan/detail/dispense/history actions as deferred UI controls.
+
 ---
 
 ## Phase 6.2B Guard QA Results

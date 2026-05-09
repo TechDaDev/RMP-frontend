@@ -281,16 +281,31 @@ Reference docs:
 - `docs/PHARMACIST_FRONTEND_WORKFLOW_PLAN.md` — Complete workflow plan, privacy rules, UI states
 - `docs/PHARMACIST_FRONTEND_IMPLEMENTATION_NOTES.md` — Technical handoff for Phase 7.1
 
-## Phase 7.1 — Pharmacist Dashboard + Verification Gate
+## Phase 7.1 — Pharmacist Dashboard + Verification Gate ✅ COMPLETE
 
-1. Build `/app/pharmacist` dashboard page.
-2. Display verification status badge (pending/approved/rejected).
-3. Show profile completion prompt if unverified.
-4. Add quick links (Scan, History, Settings).
-5. Integrate profile service for verification_status check.
-6. Add sidebar navigation item if not already present.
+1. Implemented real `/app/pharmacist` dashboard page (replaced preview-only cards).
+2. Implemented verification-first UX with status badge and verification notice (approved/pending/rejected/suspended).
+3. Implemented pharmacy identity summary from real auth/profile payload (`user`, `user_profile`, `role_profile`).
+4. Implemented workflow quick-action cards for scan/detail/dispense/history with phase-safe disabled states.
+5. Implemented pharmacist privacy/safety notice (no patient-visible internal notes, locked status rules, audit reminder).
+6. Kept Phase 7.1 scope boundary: no scan/detail/dispense API calls wired to UI yet.
 
-Expected output: Dashboard screen with verification gate ready for Phase 7.2 scan workflow.
+QA highlights:
+
+- Pharmacist login redirects to `/app/pharmacist` and dashboard renders with live profile/verification data.
+- Role guard redirects non-pharmacist users away from `/app/pharmacist`:
+   - patient -> `/app/patient`
+   - doctor -> `/app/doctor`
+   - laboratorian -> `/app/lab`
+- i18n verified on dashboard in Arabic, English, and Kurdish.
+- Theme toggle verified on dashboard.
+
+Remaining limitations for next phases:
+
+- `/app/pharmacist/scan` deferred to Phase 7.2.
+- `/app/pharmacist/prescriptions/[id]` deferred to Phase 7.2.
+- `/app/pharmacist/prescriptions/[id]/dispense` deferred to Phase 7.3.
+- `/app/pharmacist/history` deferred until backend adds a history endpoint.
 
 ## Phase 7.2 — Prescription QR Scan and Detail
 

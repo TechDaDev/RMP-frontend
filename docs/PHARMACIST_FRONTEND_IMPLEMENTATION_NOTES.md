@@ -2,6 +2,56 @@
 
 Phase 7.0B — Technical handoff for Phase 7.1+ implementation
 
+Phase 7.1 addendum — Dashboard + verification gate implemented
+
+---
+
+## Phase 7.1 Status (Implemented)
+
+### Implemented route
+
+- `/app/pharmacist`
+
+### Implemented UI scope
+
+- Pharmacist dashboard header and status badge.
+- Verification gate notice (approved/pending/rejected/suspended messaging).
+- Pharmacy identity summary card (safe real profile fields only).
+- Workflow quick-action cards:
+  - Scan Prescription (Phase 7.2 message)
+  - Prescription Detail (Phase 7.2 message)
+  - Dispense Prescription (Phase 7.3 message)
+  - Dispensing History (deferred pending backend endpoint)
+- Privacy and safety notice with backend contract rules.
+
+### Explicitly deferred (still not implemented)
+
+- `/app/pharmacist/scan` route and scan form.
+- `/app/pharmacist/prescriptions/[id]` detail workflow.
+- `/app/pharmacist/prescriptions/[id]/dispense` submit workflow.
+- Camera QR scanner.
+- WebSocket notifications.
+
+### Role guard QA result
+
+- pharmacist -> allowed on `/app/pharmacist`
+- patient -> redirected to `/app/patient`
+- doctor -> redirected to `/app/doctor`
+- laboratorian -> redirected to `/app/lab`
+
+### Language/theme QA result
+
+- Arabic dashboard rendering: pass
+- English dashboard rendering: pass
+- Kurdish dashboard rendering: pass
+- Theme toggle (light/dark): pass
+
+### Current limitations
+
+- Workflow cards are intentionally disabled until corresponding routes are implemented in later phases.
+- History card remains deferred because backend contract does not expose pharmacist history endpoint.
+- Dashboard shows no fake counters or synthetic activity.
+
 ---
 
 ## Backend Contract Source
