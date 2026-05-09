@@ -66,6 +66,11 @@ export const API_ENDPOINTS = {
     detail: (prescriptionId: string) => `/api/prescriptions/doctor/${prescriptionId}/`,
     cancel: (prescriptionId: string) => `/api/prescriptions/doctor/${prescriptionId}/cancel/`,
   },
+  pharmacistPrescriptions: {
+    scan: "/api/prescriptions/scan/",
+    detail: (prescriptionId: string) => `/api/prescriptions/${prescriptionId}/`,
+    dispense: (prescriptionId: string) => `/api/prescriptions/${prescriptionId}/dispense/`,
+  },
   labOrders: {
     tests: "/api/lab-orders/tests/",
     my: "/api/lab-orders/my/",

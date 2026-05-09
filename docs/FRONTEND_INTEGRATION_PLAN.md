@@ -262,11 +262,81 @@ See `docs/LABORATORY_PORTAL_FINAL_QA.md` for full evidence and Phase 6.6.1 adden
 
 See `docs/LABORATORY_PORTAL_FINAL_QA.md` Phase 6.7B addendum for full details.
 
-## Phase 7 — Pharmacist Portal
+## Phase 7.0B — Pharmacist Portal Workflow Planning ✅ COMPLETE (Current)
 
-1. Prescription scan workflow.
-2. Pending item display and dispensing workflow.
-3. Verification-gated action enforcement.
+1. ✅ Backend pharmacist workflow contract audited (backend commit 6639d66).
+2. ✅ Pharmacist frontend workflow plan documented (see `docs/PHARMACIST_FRONTEND_WORKFLOW_PLAN.md`).
+3. ✅ Route map defined: `/app/pharmacist`, `/app/pharmacist/scan`, `/app/pharmacist/prescriptions/[id]`, `/app/pharmacist/prescriptions/[id]/dispense`, `/app/pharmacist/history` (deferred).
+4. ✅ Endpoint constants added: `pharmacistPrescriptions` group in `lib/api/endpoints.ts`.
+5. ✅ Pharmacist TypeScript types created: `types/pharmacist.ts` with request/response contracts, UI models, and dispensing records.
+6. ✅ Pharmacist status/action helpers created: `lib/pharmacist/pharmacistStatus.ts` with deterministic permission functions.
+7. ✅ Pharmacist service skeleton created: `lib/pharmacist/pharmacistService.ts` with scan, detail (placeholder), and dispense stubs.
+8. ✅ Pharmacist i18n keys added (ar/ku/en): ~80 keys covering dashboard, scan, detail, dispensing, and status messaging.
+9. ✅ Role route matrix and API mapping updated with Phase 7 routes and endpoint mappings.
+10. ✅ Pharmacist implementation notes created (see `docs/PHARMACIST_FRONTEND_IMPLEMENTATION_NOTES.md`).
+
+**No UI screens implemented yet.** All code (types, helpers, service, i18n, docs) is prepared for Phase 7.1+ to consume.
+
+Reference docs:
+- `docs/PHARMACIST_FRONTEND_WORKFLOW_PLAN.md` — Complete workflow plan, privacy rules, UI states
+- `docs/PHARMACIST_FRONTEND_IMPLEMENTATION_NOTES.md` — Technical handoff for Phase 7.1
+
+## Phase 7.1 — Pharmacist Dashboard + Verification Gate
+
+1. Build `/app/pharmacist` dashboard page.
+2. Display verification status badge (pending/approved/rejected).
+3. Show profile completion prompt if unverified.
+4. Add quick links (Scan, History, Settings).
+5. Integrate profile service for verification_status check.
+6. Add sidebar navigation item if not already present.
+
+Expected output: Dashboard screen with verification gate ready for Phase 7.2 scan workflow.
+
+## Phase 7.2 — Prescription QR Scan and Detail
+
+1. Build `/app/pharmacist/scan` page with manual QR token entry.
+2. Integrate `POST /api/prescriptions/scan/` service call.
+3. Build prescription detail display with remaining_items list.
+4. Show status badges and expiry warnings.
+5. Display doctor context (name, email, ID).
+6. Handle error states (invalid token, expired, locked, unapproved pharmacist).
+7. Add role/verification gating (pharmacist-approved only).
+
+Expected output: QR scan entry + prescription detail screen ready for Phase 7.3 dispensing.
+
+## Phase 7.3 — Prescription Dispensing Workflow
+
+1. Build dispense form/modal on prescription detail or separate route.
+2. Add item checkboxes with status selection (dispensed/unavailable).
+3. Add optional fields: quantity, note.
+4. Integrate `POST /api/prescriptions/{id}/dispense/` service call.
+5. Show result (updated prescription status, remaining items).
+6. Handle partial dispensing: offer "Continue Dispensing" or "Scan Another".
+7. Handle error states (locked, expired, validation errors).
+
+Expected output: Dispensing workflow screen with partial dispensing support.
+
+## Phase 7.4 — Dispensing History and Status Review (Optional)
+
+1. Build `/app/pharmacist/history` page if backend supports endpoint.
+2. Display past dispensing actions with pharmacist, timestamp, status, quantity, note.
+3. Add filter/search by date range or prescription ID.
+
+**Note**: Backend Phase 7.0A does not have a dedicated pharmacist history endpoint. Deferred to Phase 7.4 or future backend phase.
+
+## Phase 7.5 — Pharmacist Portal Final QA Pass
+
+1. End-to-end QA of all screens and workflows.
+2. Verification gate testing (pending vs approved pharmacist).
+3. Error state validation (all error cases from plan).
+4. i18n validation (ar/ku/en, RTL/LTR correctness).
+5. Theme validation (dark/light mode).
+6. Mobile/responsive design check.
+7. Privacy compliance (no patient data exposure).
+8. Doctor notification side effects verification.
+9. Performance and accessibility audit.
+
+Expected output: QA report + fixes + final commit for pharmacist portal.
 
 ## Phase 8 — Doctor Lab Result Review/Release
 

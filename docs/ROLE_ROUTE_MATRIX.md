@@ -64,6 +64,28 @@ Role: laboratorian only.
 Canonical laboratorian shell and route family is `/app/lab`.
 Optional future alias: `/app/laboratory/*`.
 
+## Planned Pharmacist Route Map (Phase 7.0B)
+
+Role: pharmacist only.
+
+Future routes:
+
+- `/app/pharmacist` — Dashboard
+- `/app/pharmacist/scan` — Prescription QR scan entry
+- `/app/pharmacist/prescriptions/[id]` — Prescription detail with items
+- `/app/pharmacist/prescriptions/[id]/dispense` — Dispensing workflow
+- `/app/pharmacist/history` — Dispensing history (deferred if backend endpoint not available)
+
+Canonical pharmacist shell and route family is `/app/pharmacist`.
+
+Guard conditions (Phase 7.1+):
+
+- Route `/app/pharmacist/*` requires: user_type == "pharmacist" 
+- Scan/dispense actions require: verification_status == "approved"
+- Unverified pharmacist sees verification-pending banner and action lock
+
+---
+
 ## Phase 6.2B Guard QA Results
 
 Explicit runtime checks were executed on `/app/lab/scan`:

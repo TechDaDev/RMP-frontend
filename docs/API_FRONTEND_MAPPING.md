@@ -93,12 +93,15 @@ Consultation reject is intentionally excluded in frontend mapping because backen
 | /app/doctor RAG consult support | /api/rag/consultations/<id>/support/ | POST | doctor-approved | Yes | JSON | raw | Phase 12 | Out of scope for initial doctor workflow phases |
 | /app/doctor RAG lab support | /api/rag/lab-results/<id>/support/ | POST | doctor-approved | Yes | JSON | raw | Phase 12 | Out of scope for initial doctor workflow phases |
 
-## 5. Pharmacist Portal Mapping
+## 5. Pharmacist Portal Mapping (Phase 7.0B)
 
 | Screen | Endpoint | Method | Role | Auth Required | Request Type | Response Type | Frontend Status | Notes |
 |---|---|---|---|---|---|---|---|---|
-| /app/pharmacist (future scan) | /api/prescriptions/scan/ | POST | pharmacist-approved | Yes | JSON | envelope | Phase 6 | Returns pending-only items |
-| /app/pharmacist (future dispense) | /api/prescriptions/<id>/dispense/ | POST | pharmacist-approved | Yes | JSON | envelope | Phase 6 | Dispense selected items |
+| /app/pharmacist | /api/profiles/me/pharmacist/ | GET | pharmacist | Yes | none | envelope | Phase 7.1 | Load verification status for dashboard badge |
+| /app/pharmacist/scan | /api/prescriptions/scan/ | POST | pharmacist-approved | Yes | JSON | envelope | Phase 7.2 | Manual QR token entry; returns remaining_items only |
+| /app/pharmacist/prescriptions/[id] (from scan) | (data from scan response) | — | pharmacist-approved | — | — | — | Phase 7.2 | No separate detail endpoint in Phase 7.0A; uses scan response data |
+| /app/pharmacist/prescriptions/[id]/dispense | /api/prescriptions/<id>/dispense/ | POST | pharmacist-approved | Yes | JSON | envelope | Phase 7.3 | Dispense selected items with status (dispensed/unavailable) and optional quantity/note |
+| /app/pharmacist/history (future) | /api/prescriptions/pharmacist/history/ | GET | pharmacist-approved | Yes | none | envelope | Phase 7.4 | Deferred: Backend does not have this endpoint in Phase 7.0A |
 
 ## 6. Laboratory Portal Mapping
 
