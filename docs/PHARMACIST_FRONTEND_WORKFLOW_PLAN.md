@@ -52,14 +52,15 @@ Phase 7.0B — Contract preparation and planning
 Implemented in frontend:
 
 - `/app/pharmacist` dashboard with verification-first rendering
+- `/app/pharmacist/scan` manual QR entry flow with verification gate
+- pharmacist-safe scanned prescription detail panel from scan response payload
 - pharmacy identity summary from authenticated profile payload
-- workflow quick-action cards with deferred-action states
+- workflow quick-action cards (scan live, dispense/history deferred)
 - privacy/safety notice for dispensing constraints
 
 Still deferred:
 
-- `/app/pharmacist/scan`
-- `/app/pharmacist/prescriptions/[id]`
+- `/app/pharmacist/prescriptions/[id]` dedicated detail route
 - `/app/pharmacist/prescriptions/[id]/dispense`
 - `/app/pharmacist/history`
 

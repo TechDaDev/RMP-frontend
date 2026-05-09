@@ -732,6 +732,7 @@ export interface Translations {
     scanPrescription: string;
     scanPrescriptionSubtitle: string;
     qrToken: string;
+    qrTokenRequired: string;
     manualQrEntry: string;
     submitQrToken: string;
     prescriptionDetail: string;
@@ -781,7 +782,10 @@ export interface Translations {
     qrTokenPlaceholder: string;
     scannedPrescription: string;
     prescriptionStatus: string;
+    issuedAt: string;
     prescriptionExpiresAt: string;
+    lockedPrescriptionNotice: string;
+    dispensingDeferredNotice: string;
     cannotDispenseLockedPrescription: string;
     cannotDispenseExpiredPrescription: string;
     selectItemsToDispense: string;

@@ -4,13 +4,16 @@ Phase 7.0B — Technical handoff for Phase 7.1+ implementation
 
 Phase 7.1 addendum — Dashboard + verification gate implemented
 
+Phase 7.2 addendum — Manual prescription scan + detail panel implemented
+
 ---
 
 ## Phase 7.1 Status (Implemented)
 
-### Implemented route
+### Implemented routes
 
 - `/app/pharmacist`
+- `/app/pharmacist/scan`
 
 ### Implemented UI scope
 
@@ -18,15 +21,18 @@ Phase 7.1 addendum — Dashboard + verification gate implemented
 - Verification gate notice (approved/pending/rejected/suspended messaging).
 - Pharmacy identity summary card (safe real profile fields only).
 - Workflow quick-action cards:
-  - Scan Prescription (Phase 7.2 message)
-  - Prescription Detail (Phase 7.2 message)
+  - Scan Prescription (live route for approved pharmacists)
+  - Prescription Detail (shown from scan response payload)
   - Dispense Prescription (Phase 7.3 message)
   - Dispensing History (deferred pending backend endpoint)
+- Manual QR scan entry panel for pharmacist-approved users.
+- Scanned prescription detail panel with pharmacist-safe fields.
+- Remaining medication list rendering from `remaining_items`.
+- Locked prescription read-only messaging when backend returns `locked: true`.
 - Privacy and safety notice with backend contract rules.
 
 ### Explicitly deferred (still not implemented)
 
-- `/app/pharmacist/scan` route and scan form.
 - `/app/pharmacist/prescriptions/[id]` detail workflow.
 - `/app/pharmacist/prescriptions/[id]/dispense` submit workflow.
 - Camera QR scanner.
@@ -48,7 +54,7 @@ Phase 7.1 addendum — Dashboard + verification gate implemented
 
 ### Current limitations
 
-- Workflow cards are intentionally disabled until corresponding routes are implemented in later phases.
+- Dispense and history cards remain disabled until later phases.
 - History card remains deferred because backend contract does not expose pharmacist history endpoint.
 - Dashboard shows no fake counters or synthetic activity.
 
@@ -106,8 +112,8 @@ Phase 7.1 addendum — Dashboard + verification gate implemented
 
 ### Services
 
-- `lib/pharmacist/pharmacistService.ts` → Service skeleton (not wired to UI yet)
-  - `scanPrescription(qrToken)` → Phase 7.2
+- `lib/pharmacist/pharmacistService.ts` → Service wired for scan flow
+  - `scanPrescription({ qr_token })` → Phase 7.2
   - `dispensePrescription(prescriptionId, payload)` → Phase 7.3
   - `getPharmacistPrescriptionDetail(id)` → Placeholder; use scan data for now
   - `getPharmacistDispensingHistory()` → Deferred (no backend endpoint in Phase 7.0A)
@@ -140,8 +146,9 @@ Phase 7.1 addendum — Dashboard + verification gate implemented
 
 ### Current State
 
-- `/app/pharmacist` → Placeholder dashboard exists (layout.tsx + page.tsx)
-- No scan, detail, or dispense routes yet
+- `/app/pharmacist` → Dashboard implemented
+- `/app/pharmacist/scan` → Implemented manual scan + detail panel (scan-response-driven)
+- Dedicated detail route and dispense submit route remain deferred
 
 ### Planned Routes (to implement)
 

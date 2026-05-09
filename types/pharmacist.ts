@@ -2,7 +2,8 @@
  * Pharmacist Portal Types
  *
  * Based on PHARMACIST_WORKFLOW_CONTRACT.md from backend Phase 7.0A
- * Defines request/response models for prescription scanning, dispensing, and status tracking
+ * Defines request/response models for prescription scanning, detail display,
+ * and dispensing preparation.
  */
 
 /** Prescription status lifecycle */
@@ -27,6 +28,12 @@ export type DispensePrescriptionItemStatus =
   | "unavailable"
   | string;
 
+export interface PharmacistPersonSummary {
+  id?: string;
+  email?: string;
+  full_name?: string;
+}
+
 /**
  * Request: Scan prescription by QR token
  * POST /api/prescriptions/scan/
@@ -36,27 +43,7 @@ export interface PharmacistPrescriptionScanRequest {
 }
 
 /**
- * Prescription info in scan response
- * Subset of full prescription (patient info omitted for privacy)
- */
-export interface PharmacistScanPrescription {
-  id?: string;
-  status?: PharmacistPrescriptionStatus;
-  doctor?: {
-    id?: string;
-    email?: string;
-    full_name?: string;
-  };
-  issued_at?: string;
-  expires_at?: string;
-  qr_token?: string;
-  created_at?: string;
-  updated_at?: string;
-}
-
-/**
- * Prescription item in remaining_items array
- * Shows only pending items (already-dispensed filtered out)
+ * Pharmacist-safe prescription item payload.
  */
 export interface PharmacistPrescriptionItem {
   id: string;
@@ -67,32 +54,50 @@ export interface PharmacistPrescriptionItem {
   duration?: string | null;
   route?: string | null;
   quantity?: string | null;
+  quantity_dispensed?: string | null;
   instructions?: string | null;
   status?: PharmacistPrescriptionItemStatus;
   dispensed_at?: string | null;
   cancelled_at?: string | null;
   created_at?: string;
+  updated_at?: string;
 }
 
 /**
- * Response: Scan prescription by QR token (success)
- * POST /api/prescriptions/scan/ → 200 OK
+ * Pharmacist-safe prescription detail payload from scan endpoint.
+ */
+export interface PharmacistPrescriptionDetail {
+  id?: string;
+  consultation_id?: string;
+  patient?: PharmacistPersonSummary;
+  pharmacist?: PharmacistPersonSummary;
+  doctor?: PharmacistPersonSummary;
+  status?: PharmacistPrescriptionStatus;
+  items?: PharmacistPrescriptionItem[];
+  issued_at?: string;
+  expires_at?: string;
+  dispensed_at?: string | null;
+  fully_dispensed_at?: string | null;
+  cancelled_at?: string | null;
+  qr_token?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+/**
+ * Scan endpoint result payload.
  */
 export interface PharmacistPrescriptionScanResult {
-  prescription?: PharmacistScanPrescription;
+  prescription: PharmacistPrescriptionDetail;
   remaining_items?: PharmacistPrescriptionItem[];
   locked?: boolean;
   message?: string | null;
 }
 
 /**
- * Service response wrapper for scan
+ * Scan response consumed by frontend service/UI.
  */
-export interface PharmacistScanResponse {
-  success?: boolean;
-  data?: PharmacistPrescriptionScanResult;
-  message?: string;
-}
+export type PharmacistScanResponse = PharmacistPrescriptionScanResult;
 
 /**
  * Single item to be dispensed in dispense request
@@ -117,7 +122,7 @@ export interface PharmacistDispensePrescriptionRequest {
  * POST /api/prescriptions/{id}/dispense/ → 200 OK
  */
 export interface PharmacistDispensePrescriptionResult {
-  prescription?: PharmacistScanPrescription;
+  prescription?: PharmacistPrescriptionDetail;
   remaining_items?: PharmacistPrescriptionItem[];
   locked?: boolean;
   message?: string | null;
@@ -181,11 +186,8 @@ export interface PharmacistPrescriptionUIState {
   dispensedItems?: PharmacistPrescriptionItem[];
   isExpired: boolean;
   expiresAt?: string;
-  doctor?: {
-    id?: string;
-    name?: string;
-    email?: string;
-  };
+  doctor?: PharmacistPersonSummary;
+  patient?: PharmacistPersonSummary;
 }
 
 /**

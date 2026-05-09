@@ -40,17 +40,13 @@ function unwrapData<T>(value: T | ApiEnvelope<T>): T {
  *
  * POST /api/prescriptions/scan/
  *
- * @param qrToken - QR token from patient
+ * @param payload - Scan payload containing qr_token
  * @returns Prescription data with remaining items
  * @throws ApiErrorResponse if invalid token, expired, or unapproved pharmacist
  */
 export async function scanPrescription(
-  qrToken: string
+  payload: PharmacistPrescriptionScanRequest
 ): Promise<PharmacistScanResponse> {
-  const payload: PharmacistPrescriptionScanRequest = {
-    qr_token: qrToken,
-  };
-
   const response = await apiRequest<PharmacistScanResponse | ApiEnvelope<PharmacistScanResponse>>(
     API_ENDPOINTS.pharmacistPrescriptions.scan,
     {

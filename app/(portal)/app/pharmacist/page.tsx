@@ -20,7 +20,7 @@ export default function PharmacistPortalPage() {
   const { user, profile, verification } = useAuth();
   const isApproved = verification?.is_approved === true;
   const canStartWorkflow = canPharmacistScan(isApproved);
-  const hasScanRoute = false;
+  const hasScanRoute = true;
   const hasHistoryEndpoint = false;
 
   const roleProfile = useMemo<PharmacistProfileData | null>(
@@ -116,8 +116,8 @@ export default function PharmacistPortalPage() {
 
         <EmptyState
           icon={<ShieldIcon size={20} />}
-          title={t.pharmacist.scanPrescriptionComingNext}
-          description={t.pharmacist.dispensingComingLater}
+          title={t.pharmacist.dispensingComingLater}
+          description={t.pharmacist.historyComingLater}
         />
       </div>
     </RequireRole>

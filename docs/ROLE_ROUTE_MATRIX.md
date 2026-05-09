@@ -95,6 +95,22 @@ Runtime checks for `/app/pharmacist` confirmed:
 
 Phase 7.1 dashboard keeps scan/detail/dispense/history actions as deferred UI controls.
 
+## Phase 7.2 Pharmacist Scan Guard QA Results
+
+Runtime checks for `/app/pharmacist/scan` confirmed:
+
+- pharmacist-approved -> allowed, can submit manual QR token and view scan payload detail
+- pharmacist-pending -> allowed route shell but scan actions are blocked by verification gate messaging
+- patient -> redirected to `/app/patient`
+- doctor -> redirected to `/app/doctor`
+- laboratorian -> redirected to `/app/lab`
+
+Scan flow scope in Phase 7.2 remains read-only for dispensing:
+
+- Valid scan renders pharmacist-safe prescription detail and `remaining_items`
+- Locked scan responses render read-only lock notice
+- No dispense submit action is exposed until Phase 7.3
+
 ---
 
 ## Phase 6.2B Guard QA Results

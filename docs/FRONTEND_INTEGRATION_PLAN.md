@@ -307,17 +307,17 @@ Remaining limitations for next phases:
 - `/app/pharmacist/prescriptions/[id]/dispense` deferred to Phase 7.3.
 - `/app/pharmacist/history` deferred until backend adds a history endpoint.
 
-## Phase 7.2 — Prescription QR Scan and Detail
+## Phase 7.2 — Prescription QR Scan and Detail ✅ COMPLETE
 
-1. Build `/app/pharmacist/scan` page with manual QR token entry.
-2. Integrate `POST /api/prescriptions/scan/` service call.
-3. Build prescription detail display with remaining_items list.
-4. Show status badges and expiry warnings.
-5. Display doctor context (name, email, ID).
-6. Handle error states (invalid token, expired, locked, unapproved pharmacist).
-7. Add role/verification gating (pharmacist-approved only).
+1. ✅ Implemented `/app/pharmacist/scan` page with manual QR token entry.
+2. ✅ Integrated `POST /api/prescriptions/scan/` through `scanPrescription` service.
+3. ✅ Implemented pharmacist-safe scanned prescription detail panel from scan payload.
+4. ✅ Implemented `remaining_items` list and status badge rendering.
+5. ✅ Added approved-only verification gate on scan page (read-only blocked state when unapproved).
+6. ✅ Wired dashboard scan card to live route for approved pharmacists.
+7. ✅ Kept dispensing deferred to Phase 7.3 (no dispense submit workflow enabled in Phase 7.2).
 
-Expected output: QR scan entry + prescription detail screen ready for Phase 7.3 dispensing.
+Expected output delivered: Manual scan + pharmacist-safe prescription detail view ready for Phase 7.3 dispensing.
 
 ## Phase 7.3 — Prescription Dispensing Workflow
 
