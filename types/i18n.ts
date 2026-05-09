@@ -808,6 +808,25 @@ export interface Translations {
     itemsWillBeLocked: string;
     allItemsProcessed: string;
     dispensingPartial: string;
+    dispensePrescriptionTitle: string;
+    dispensePrescriptionDescription: string;
+    selectAtLeastOneItem: string;
+    dispensingSelectedItems: string;
+    alreadyDispensed: string;
+    quantityToDispense: string;
+    itemDispensingNote: string;
+    confirmDispense: string;
+    cannotDispenseCancelledPrescription: string;
+    cannotDispenseFullyDispensedPrescription: string;
+    partialDispenseSaved: string;
+    fullyDispensedSaved: string;
+    prescriptionStatusUpdated: string;
+    dispensingAuditedNotice: string;
+    scanAgainAfterDispensing: string;
+    noDispensableItems: string;
+    statusDispensed: string;
+    statusUnavailable: string;
+    markAsDispensed: string;
   };
   profile: {
     profilePageSubtitle: string;

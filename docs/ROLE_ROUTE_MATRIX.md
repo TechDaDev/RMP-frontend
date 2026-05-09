@@ -110,6 +110,8 @@ Scan flow scope in Phase 7.2 remains read-only for dispensing:
 - Valid scan renders pharmacist-safe prescription detail and `remaining_items`
 - Locked scan responses render read-only lock notice
 - No dispense submit action is exposed until Phase 7.3
+- ✅ Phase 7.3: Dispense submit action integrated into `/app/pharmacist/scan` via `PharmacistDispensingForm`
+- Partial dispensing supported; locked/fully_dispensed prescriptions disable form
 
 ---
 

@@ -100,7 +100,7 @@ Consultation reject is intentionally excluded in frontend mapping because backen
 | /app/pharmacist | /api/profiles/me/pharmacist/ | GET | pharmacist | Yes | none | envelope | Phase 7.1 | Load verification status for dashboard badge |
 | /app/pharmacist/scan | /api/prescriptions/scan/ | POST | pharmacist-approved | Yes | JSON | envelope | Phase 7.2 complete | Manual QR token entry; frontend renders `prescription` + `remaining_items` + `locked` + `message` |
 | /app/pharmacist/prescriptions/[id] (from scan) | (data from scan response) | — | pharmacist-approved | — | — | — | Phase 7.2 complete | No separate detail endpoint in Phase 7.0A; detail remains scan-response-driven |
-| /app/pharmacist/prescriptions/[id]/dispense | /api/prescriptions/<id>/dispense/ | POST | pharmacist-approved | Yes | JSON | envelope | Phase 7.3 | Dispense selected items with status (dispensed/unavailable) and optional quantity/note |
+| /app/pharmacist/scan (inline dispense) | /api/prescriptions/<id>/dispense/ | POST | pharmacist-approved | Yes | JSON | envelope | Phase 7.3 complete | Dispense form embedded in scan page; partial dispensing, locked state, per-item status (dispensed/unavailable), optional qty/note |
 | /app/pharmacist/history (future) | /api/prescriptions/pharmacist/history/ | GET | pharmacist-approved | Yes | none | envelope | Phase 7.4 | Deferred: Backend does not have this endpoint in Phase 7.0A |
 
 ## 6. Laboratory Portal Mapping

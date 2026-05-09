@@ -321,15 +321,17 @@ Expected output delivered: Manual scan + pharmacist-safe prescription detail vie
 
 ## Phase 7.3 — Prescription Dispensing Workflow
 
-1. Build dispense form/modal on prescription detail or separate route.
-2. Add item checkboxes with status selection (dispensed/unavailable).
-3. Add optional fields: quantity, note.
-4. Integrate `POST /api/prescriptions/{id}/dispense/` service call.
-5. Show result (updated prescription status, remaining items).
-6. Handle partial dispensing: offer "Continue Dispensing" or "Scan Another".
-7. Handle error states (locked, expired, validation errors).
+✅ **COMPLETE** — Commit: `feat: add pharmacist prescription dispensing workflow`
 
-Expected output: Dispensing workflow screen with partial dispensing support.
+1. ✅ Built `PharmacistDispensingForm` inline on the scan page (no separate route).
+2. ✅ Per-item checkboxes with status toggle (dispensed/unavailable).
+3. ✅ Optional fields: dispensed_quantity, note per item.
+4. ✅ Integrated `POST /api/prescriptions/{id}/dispense/` via `dispensePrescription` service.
+5. ✅ Response updates remaining_items, prescription status, locked flag in-memory.
+6. ✅ Partial dispensing: form re-renders with remaining items; dispensed items shown above.
+7. ✅ Error states: locked, cancelled, expired, validation errors all handled.
+
+Expected output delivered: Dispensing workflow with partial dispensing support, fully integrated into scan page.
 
 ## Phase 7.4 — Dispensing History and Status Review (Optional)
 

@@ -15,7 +15,7 @@ import type {
   PharmacistPrescriptionScanRequest,
   PharmacistScanResponse,
   PharmacistDispensePrescriptionRequest,
-  PharmacistDispenseResponse,
+  PharmacistDispensePrescriptionResult,
 } from "@/types/pharmacist";
 
 /**
@@ -96,7 +96,7 @@ export async function getPharmacistPrescriptionDetail(
 export async function dispensePrescription(
   prescriptionId: string,
   payload: PharmacistDispensePrescriptionRequest
-): Promise<PharmacistDispenseResponse> {
+): Promise<PharmacistDispensePrescriptionResult> {
   if (!prescriptionId) {
     throw new Error("Prescription ID is required");
   }
@@ -105,7 +105,7 @@ export async function dispensePrescription(
     throw new Error("At least one item must be provided for dispensing");
   }
 
-  const response = await apiRequest<PharmacistDispenseResponse | ApiEnvelope<PharmacistDispenseResponse>>(
+  const response = await apiRequest<PharmacistDispensePrescriptionResult | ApiEnvelope<PharmacistDispensePrescriptionResult>>(
     API_ENDPOINTS.pharmacistPrescriptions.dispense(prescriptionId),
     {
       auth: true,

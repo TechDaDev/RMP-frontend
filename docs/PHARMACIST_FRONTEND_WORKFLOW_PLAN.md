@@ -645,15 +645,16 @@ Backend sends notifications to doctor on:
 
 ### Phase 7.3 — Prescription Dispensing Workflow
 
-- Build dispense form/modal on prescription detail
-- Add item selection (checkboxes)
-- Add optional quantity + note fields
-- Integrate `POST /api/prescriptions/{id}/dispense/` service call
-- Show dispensing result (updated status, remaining items)
-- Handle partial dispensing flow (offer continue)
-- Handle error states (locked, expired, validation errors)
+✅ **COMPLETE** — Dispensing workflow fully integrated into scan page.
 
-**Output**: Dispensing workflow screen
+- ✅ `PharmacistDispensingForm` component with per-item checkboxes + status toggle
+- ✅ Optional quantity and note per item
+- ✅ Integrated `POST /api/prescriptions/{id}/dispense/` via `dispensePrescription` service
+- ✅ Partial dispensing: remaining items shown, dispensed items tracked separately
+- ✅ Locked/cancelled/expired states disable form with descriptive notice
+- ✅ Error handling for 400/403/locked/validation errors
+
+**Output**: Dispensing workflow embedded in `/app/pharmacist/scan`
 
 ### Phase 7.4 — Dispensing History and Status Review (Optional)
 

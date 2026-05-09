@@ -221,7 +221,7 @@ canViewPrescription(prescription.status) // Allow all except null
 
 ---
 
-## Dispensing Workflow (Phase 7.3)
+## Dispensing Workflow (Phase 7.3) ✅ COMPLETE
 
 1. User selects items from remaining_items with checkboxes
 2. For each selected item:

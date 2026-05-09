@@ -1,11 +1,16 @@
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
+import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
-import type { PharmacistScanResponse } from "@/types/pharmacist";
+import type { PharmacistDispensePrescriptionResult, PharmacistPrescriptionItem, PharmacistScanResponse } from "@/types/pharmacist";
+import { canDispensePrescription } from "@/lib/pharmacist/pharmacistStatus";
+import { PharmacistDispensingForm } from "./PharmacistDispensingForm";
 import { PharmacistPrescriptionItemsList } from "./PharmacistPrescriptionItemsList";
 import { PharmacistPrescriptionStatusBadge } from "./PharmacistPrescriptionStatusBadge";
 
 export interface PharmacistScannedPrescriptionPanelProps {
   scanResponse: PharmacistScanResponse;
+  dispensedItems?: PharmacistPrescriptionItem[];
+  onDispenseComplete?: (result: PharmacistDispensePrescriptionResult) => void;
 }
 
 function formatDate(value?: string | null): string {
@@ -28,11 +33,15 @@ function formatDate(value?: string | null): string {
 
 export function PharmacistScannedPrescriptionPanel({
   scanResponse,
+  dispensedItems = [],
+  onDispenseComplete,
 }: PharmacistScannedPrescriptionPanelProps) {
   const { t } = useAppPreferences();
   const prescription = scanResponse.prescription;
   const status = prescription?.status ?? "issued";
-  const items = scanResponse.remaining_items ?? [];
+  const pendingItems = scanResponse.remaining_items ?? [];
+  const isLocked = scanResponse.locked === true;
+  const isDispensable = canDispensePrescription(status) && !isLocked;
 
   return (
     <Card className="space-y-6 rounded-2xl">
@@ -46,15 +55,11 @@ export function PharmacistScannedPrescriptionPanel({
         <PharmacistPrescriptionStatusBadge status={status} />
       </div>
 
-      {scanResponse.locked ? (
+      {isLocked ? (
         <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-3 text-sm text-[var(--color-muted)]">
           {t.pharmacist.lockedPrescriptionNotice}
         </div>
       ) : null}
-
-      <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-3 text-sm text-[var(--color-muted)]">
-        {t.pharmacist.dispensingDeferredNotice}
-      </div>
 
       <div className="grid gap-4 rounded-xl border border-[var(--color-border)] p-4 text-sm text-[var(--color-muted)] sm:grid-cols-2">
         <div>
@@ -74,7 +79,49 @@ export function PharmacistScannedPrescriptionPanel({
         </div>
       </div>
 
-      <PharmacistPrescriptionItemsList items={items} locked={scanResponse.locked} />
+      {/* Dispensed items section */}
+      {dispensedItems.length > 0 ? (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-base font-semibold text-[var(--color-text)]">{t.pharmacist.dispensedItems}</h3>
+            <Badge tone="success">{dispensedItems.length}</Badge>
+          </div>
+          <div className="space-y-2">
+            {dispensedItems.map((item) => (
+              <div
+                key={item.id}
+                className="flex items-center justify-between rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 py-2"
+              >
+                <span className="text-sm font-medium text-[var(--color-text)]">
+                  {item.medication_name || "-"}
+                  {item.strength ? (
+                    <span className="ml-1 font-normal text-[var(--color-muted)]">{item.strength}</span>
+                  ) : null}
+                </span>
+                <Badge tone="success">{t.pharmacist.statusDispensed}</Badge>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      {/* Pending items or dispensing form */}
+      {isDispensable && onDispenseComplete ? (
+        <PharmacistDispensingForm
+          prescriptionId={prescription.id ?? ""}
+          prescriptionStatus={status}
+          items={pendingItems}
+          locked={isLocked}
+          onSuccess={onDispenseComplete}
+        />
+      ) : (
+        <PharmacistPrescriptionItemsList items={pendingItems} locked={isLocked} />
+      )}
+
+      {/* Privacy notice */}
+      <p className="text-xs text-[var(--color-muted)]">
+        {t.pharmacist.patientDoesNotSeeInternalNotes}
+      </p>
     </Card>
   );
 }

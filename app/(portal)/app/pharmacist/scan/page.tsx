@@ -14,7 +14,11 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { ApiError } from "@/lib/api/errors";
 import { scanPrescription } from "@/lib/pharmacist/pharmacistService";
-import type { PharmacistScanResponse } from "@/types/pharmacist";
+import type {
+  PharmacistDispensePrescriptionResult,
+  PharmacistPrescriptionItem,
+  PharmacistScanResponse,
+} from "@/types/pharmacist";
 
 export default function PharmacistScanPage() {
   const { t } = useAppPreferences();
@@ -23,6 +27,7 @@ export default function PharmacistScanPage() {
   const isApproved = verification?.is_approved === true;
 
   const [scanResponse, setScanResponse] = useState<PharmacistScanResponse | null>(null);
+  const [dispensedItems, setDispensedItems] = useState<PharmacistPrescriptionItem[]>([]);
   const [isScanning, setIsScanning] = useState(false);
   const [scanError, setScanError] = useState<string | null>(null);
 
@@ -41,6 +46,7 @@ export default function PharmacistScanPage() {
         }
 
         setScanResponse(response);
+        setDispensedItems([]);
       } catch (error) {
         if (error instanceof ApiError && error.status === 400) {
           setScanError(error.message || t.pharmacist.invalidQrToken);
@@ -56,9 +62,26 @@ export default function PharmacistScanPage() {
     [t.pharmacist.invalidQrToken, t.pharmacist.scanFailed],
   );
 
+  const handleDispenseComplete = useCallback((result: PharmacistDispensePrescriptionResult) => {
+    setScanResponse((prev) => {
+      if (!prev) return prev;
+      const newRemainingIds = new Set((result.remaining_items ?? []).map((i) => i.id));
+      const newlyDispensed = (prev.remaining_items ?? []).filter((i) => !newRemainingIds.has(i.id));
+      setDispensedItems((d) => [...d, ...newlyDispensed]);
+      return {
+        ...prev,
+        prescription: result.prescription ?? prev.prescription,
+        remaining_items: result.remaining_items ?? [],
+        locked: result.locked ?? false,
+        message: result.message ?? null,
+      };
+    });
+  }, []);
+
   const handleScanAnother = () => {
     setScanResponse(null);
     setScanError(null);
+    setDispensedItems([]);
   };
 
   return (
@@ -90,7 +113,11 @@ export default function PharmacistScanPage() {
               </>
             ) : (
               <>
-                <PharmacistScannedPrescriptionPanel scanResponse={scanResponse} />
+                <PharmacistScannedPrescriptionPanel
+                  scanResponse={scanResponse}
+                  dispensedItems={dispensedItems}
+                  onDispenseComplete={handleDispenseComplete}
+                />
 
                 <div className="flex flex-col gap-3 sm:flex-row">
                   <Button onClick={handleScanAnother} className="sm:flex-1">
