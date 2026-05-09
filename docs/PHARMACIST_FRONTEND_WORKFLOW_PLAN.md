@@ -141,7 +141,7 @@ Frontend gate:
 | `/app/pharmacist/scan` | QR scan entry | Manual prescription QR/code entry; launches detail workflow |
 | `/app/pharmacist/prescriptions/[id]` | Prescription detail | Full prescription view with remaining items and dispensing controls |
 | `/app/pharmacist/prescriptions/[id]/dispense` | Dispense workflow | Item selection, quantity/note entry, dispensing submission |
-| `/app/pharmacist/history` | Dispensing history | Past dispensing actions (if backend supports endpoint) |
+| `/app/pharmacist/history` | Dispensing history | Past dispensing actions (backend-blocked; live probe returned 404) |
 | `/app/pharmacist/profile` or settings | Profile management | Link to profile completion/verification (future; may reuse shared profile page) |
 
 ### Route Guard Conditions

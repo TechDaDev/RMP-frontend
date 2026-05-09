@@ -56,6 +56,7 @@ Phase 7.2 addendum — Manual prescription scan + detail panel implemented
 
 - Dispense and history cards remain disabled until later phases.
 - History card remains deferred because backend contract does not expose pharmacist history endpoint.
+- Live backend probe confirmed `GET /api/prescriptions/pharmacist/history/` returns 404.
 - Dashboard shows no fake counters or synthetic activity.
 
 ---

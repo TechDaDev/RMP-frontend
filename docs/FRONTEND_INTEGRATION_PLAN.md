@@ -339,7 +339,7 @@ Expected output delivered: Dispensing workflow with partial dispensing support, 
 2. Display past dispensing actions with pharmacist, timestamp, status, quantity, note.
 3. Add filter/search by date range or prescription ID.
 
-**Note**: Backend Phase 7.0A does not have a dedicated pharmacist history endpoint. Deferred to Phase 7.4 or future backend phase.
+**Note**: Backend Phase 7.0A does not have a dedicated pharmacist history endpoint. Live probe of `GET /api/prescriptions/pharmacist/history/` returned 404, so Phase 7.4 remains backend-blocked until the endpoint exists.
 
 ## Phase 7.3B — Live QA and Stabilization
 

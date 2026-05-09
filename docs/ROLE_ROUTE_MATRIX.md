@@ -74,7 +74,7 @@ Future routes:
 - `/app/pharmacist/scan` — Prescription QR scan entry
 - `/app/pharmacist/prescriptions/[id]` — Prescription detail with items
 - `/app/pharmacist/prescriptions/[id]/dispense` — Dispensing workflow
-- `/app/pharmacist/history` — Dispensing history (deferred if backend endpoint not available)
+- `/app/pharmacist/history` — Dispensing history (backend-blocked; live probe returned 404)
 
 Canonical pharmacist shell and route family is `/app/pharmacist`.
 
