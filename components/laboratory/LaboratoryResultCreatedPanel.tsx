@@ -2,6 +2,7 @@ import Link from "next/link";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
+import { canCorrectResult } from "@/lib/laboratory/laboratoryStatus";
 import type { LaboratoryResultDetail } from "@/types/laboratory";
 
 interface LaboratoryResultCreatedPanelProps {
@@ -11,6 +12,7 @@ interface LaboratoryResultCreatedPanelProps {
 
 export function LaboratoryResultCreatedPanel({ result, backToScanHref }: LaboratoryResultCreatedPanelProps) {
   const { t } = useAppPreferences();
+  const canCorrect = result.status ? canCorrectResult(result.status) : false;
 
   return (
     <div className="space-y-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
@@ -34,6 +36,21 @@ export function LaboratoryResultCreatedPanel({ result, backToScanHref }: Laborat
       </div>
 
       <p className="text-sm text-[var(--color-muted)]">{t.laboratory.doctorReviewNext}</p>
+
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <Link href={`/app/lab/results/${result.id}`} className="flex-1">
+          <Button variant="secondary" className="w-full">
+            {t.laboratory.viewLabResult || "View Result"}
+          </Button>
+        </Link>
+        {canCorrect && (
+          <Link href={`/app/lab/results/${result.id}/correct`} className="flex-1">
+            <Button variant="secondary" className="w-full">
+              {t.laboratory.correctLabResult || "Correct Result"}
+            </Button>
+          </Link>
+        )}
+      </div>
 
       <div className="flex flex-col gap-3 sm:flex-row">
         <Link href={backToScanHref} className="flex-1">

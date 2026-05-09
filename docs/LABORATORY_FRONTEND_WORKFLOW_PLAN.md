@@ -216,9 +216,26 @@ Validated behaviors:
 
 ### Phase 6.5 - Correct Lab Results
 
-- Build `/app/lab/results/[id]/correct`.
-- Allow original author correction only before release.
-- Preserve immutable file handling.
+- Build `/app/lab/results/[resultId]`. ✅
+- Build `/app/lab/results/[resultId]/correct`. ✅
+- Allow original author correction only before release. ✅
+- Preserve immutable file handling. ✅
+
+Status: Completed (Phase 6.5).
+
+Validated behaviors:
+
+- Result detail page shows current result values, status, and correction action when allowed.
+- Correction action appears only for `submitted` or `corrected` status.
+- Correction is blocked with explanation for `reviewed` or `released` status.
+- Correction form requires reason field (client and backend validated).
+- Dynamic correction fields reuse value-type form from creation.
+- Correction submits via `POST /api/lab-orders/results/{result_id}/correct/`.
+- Backend updates result status to `corrected` on successful submission.
+- File corrections are not supported (backend immutable).
+- Unapproved laboratorians see verification-pending message with disabled form.
+- Patient and doctor users are redirected away from result detail and correction routes.
+- i18n keys for all languages (Arabic, Kurdish, English) are complete.
 
 ### Phase 6.6 - Laboratory Portal Final QA
 

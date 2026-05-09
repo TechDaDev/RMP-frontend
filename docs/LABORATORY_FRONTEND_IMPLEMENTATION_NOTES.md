@@ -173,3 +173,62 @@ Optional future alias (not canonical): `/app/laboratory/*`
 - Result correction remains deferred to Phase 6.5.
 - Doctor review/release remains doctor-portal responsibility.
 - No camera scanning, WebSocket, or RAG additions in this phase.
+
+## Phase 6.5 Laboratory Result Correction (2026-05-09)
+
+### Implemented and verified
+
+- Added result detail route: `/app/lab/results/[resultId]`.
+  - Displays current result value, unit, reference range, flag, and notes.
+  - Shows result status badge with tone styling.
+  - Shows correction action only when status is `submitted` or `corrected` and user is approved.
+  - Hides correction action when status is `reviewed` or `released`.
+  - Includes back links to scan and lab dashboard.
+
+- Added correction route: `/app/lab/results/[resultId]/correct`.
+  - Requires reason field (client-validated and backend-required).
+  - Supports dynamic correction fields for all 5 value types.
+  - Reuses `LaboratoryResultValueFields` for consistent field rendering.
+  - Handles backend field-level validation errors and safe display.
+  - Shows success panel after successful correction with result summary.
+  - Links back to result detail and lab dashboard.
+
+- Integrated `POST /api/lab-orders/results/{result_id}/correct/` via `correctLaboratoryResult`.
+  - Uses FormData when correcting file-only results with new file (NOT currently supported by backend).
+  - Uses JSON payload for all other value type corrections.
+  - Backend correction response updates result status to `corrected`.
+  - Creates audit trail in `LabResultCorrection` model (backend).
+
+- Updated `LaboratoryResultCreatedPanel` to include:
+  - View Result link to `/app/lab/results/{resultId}`.
+  - Correct Result link to `/app/lab/results/{resultId}/correct` (shown only if status allows).
+
+- Added i18n keys for all Phase 6.5 components in Arabic, Kurdish, and English.
+
+### Correction behavior
+
+- Only original laboratorian can correct (backend enforces).
+- Can correct only while status is `submitted` or `corrected`.
+- Cannot correct once status is `reviewed` or `released`.
+- File correction is immutable (correction endpoint ignores file-only result_file changes per backend contract).
+- Reason field is required and client-validated.
+
+### Role and access QA
+
+- Laboratorian approved: can access result detail and correction routes.
+- Laboratorian unapproved: sees "Verification pending" message with disabled correction form.
+- Patient: redirected away from `/app/lab/results/[resultId]` and `/app/lab/results/[resultId]/correct`.
+- Doctor: redirected away from `/app/lab/results/[resultId]` and `/app/lab/results/[resultId]/correct`.
+
+### Locale and theme QA
+
+- Arabic renders RTL and includes all Phase 6.5 translation keys.
+- Kurdish renders RTL and includes all Phase 6.5 translation keys.
+- English renders LTR and includes all Phase 6.5 translation keys.
+- Theme toggle works on both result detail and correction pages.
+
+### Known limitations
+
+- Correction history is not displayed (would require additional backend endpoint or payload structure).
+- File-only corrections cannot change the file (backend immutable).
+- Doctor review/release remains outside laboratory portal scope.

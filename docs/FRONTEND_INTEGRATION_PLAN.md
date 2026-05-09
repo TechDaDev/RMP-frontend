@@ -210,6 +210,21 @@ Notes:
 - Added completed-item create-result action from scanned-order completed section.
 - Preserved phase boundary: correction UI deferred to Phase 6.5.
 
+### Phase 6.5 — Laboratory Result Correction ✅ COMPLETE
+
+- Implemented route `/app/lab/results/[resultId]` for result detail viewing.
+- Implemented route `/app/lab/results/[resultId]/correct` for result correction workflow.
+- Added dynamic correction form with required reason field.
+- Integrated `POST /api/lab-orders/results/{result_id}/correct/` with envelope handling.
+- Added FormData upload handling for file corrections (if backend supports).
+- Added result detail panel showing current values and correction action availability.
+- Added correction success panel with result summary.
+- Wired create-result panel with links to view and correct result.
+- Added status gating: correction allowed for `submitted`/`corrected`, blocked for `reviewed`/`released`.
+- Added role gating: patient/doctor redirected away from correction routes.
+- Added verification gating: unapproved laboratorians see pending message with disabled form.
+- Updated i18n keys for all languages (Arabic, Kurdish, English).
+
 ## Phase 7 — Pharmacist Portal
 
 1. Prescription scan workflow.

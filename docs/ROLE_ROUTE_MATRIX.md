@@ -91,6 +91,22 @@ Runtime checks for `/app/lab/items/[itemId]/results/new` confirmed:
 Clinical actions on the route remain gated by laboratorian approval state.
 - Browser QA confirmed patient redirects to `/app/patient` and doctor redirects to `/app/doctor`.
 
+## Phase 6.5 Result Correction Guard QA Results
+
+Runtime checks for `/app/lab/results/[resultId]` and `/app/lab/results/[resultId]/correct` confirmed:
+
+- laboratorian (approved) -> allowed to view result and access correction route
+- laboratorian (unapproved) -> allowed to view result but correction form shows verification-pending message and is disabled
+- patient -> redirected to `/app/patient`
+- doctor -> redirected to `/app/doctor`
+
+Status gating results:
+
+- result status `submitted` -> correction action visible and enabled
+- result status `corrected` -> correction action visible and enabled
+- result status `reviewed` -> correction action hidden, unavailable message shown
+- result status `released` -> correction action hidden, unavailable message shown
+
 ## Current Preview Mode Note
 
 - Current Phase 1 preview keeps /app as role selector for UI preview only.

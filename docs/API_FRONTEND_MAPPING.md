@@ -108,8 +108,8 @@ Consultation reject is intentionally excluded in frontend mapping because backen
 | /app/lab/scan | /api/lab-orders/scan/ | POST | laboratorian-approved | Yes | JSON | envelope | Phase 6.2B complete | Manual QR token entry, safe error handling, and scanned order panel are live |
 | /app/lab/scan (item completion) | /api/lab-orders/<id>/complete/ | POST | laboratorian-approved | Yes | JSON | envelope | Phase 6.3 complete | Complete selected remaining item with optional note; UI refreshes scanned state after success |
 | /app/lab/items/[itemId]/results/new | /api/lab-orders/items/<item_id>/results/ | POST | laboratorian-approved | Yes | JSON/multipart | envelope | Phase 6.4 complete | Dynamic value-type form, file_only multipart upload, and safe validation handling |
-| /app/lab (future result detail) | /api/lab-orders/results/<id>/ | GET | laboratorian/doctor | Yes | none | envelope | Phase 7 | Role constrained |
-| /app/lab (future correction) | /api/lab-orders/results/<id>/correct/ | POST | laboratorian-approved | Yes | JSON | envelope | Phase 7 | Creator/assignment constraints |
+| /app/lab/results/[resultId] | /api/lab-orders/results/<id>/ | GET | laboratorian | Yes | none | envelope | Phase 6.5 complete | Result detail display with correction action gating |
+| /app/lab/results/[resultId]/correct | /api/lab-orders/results/<id>/correct/ | POST | laboratorian-approved | Yes | JSON | envelope | Phase 6.5 complete | Correction with required reason, immutable file handling |
 
 ### 6.1 Laboratory Service Skeleton Mapping (Phase 6.0B)
 
