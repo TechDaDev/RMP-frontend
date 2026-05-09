@@ -10,7 +10,6 @@ import { PharmacistVerificationNotice } from "@/components/pharmacist/Pharmacist
 import { PharmacistWorkflowCard } from "@/components/pharmacist/PharmacistWorkflowCard";
 import { FileTextIcon, PharmacyIcon, PrescriptionIcon, ShieldIcon } from "@/components/icons";
 import { Badge } from "@/components/ui/Badge";
-import { EmptyState } from "@/components/ui/EmptyState";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { canPharmacistScan } from "@/lib/pharmacist/pharmacistStatus";
 import type { PharmacistProfileData, UserProfileData } from "@/types/backend";
@@ -114,12 +113,6 @@ export default function PharmacistPortalPage() {
         </div>
 
         <PharmacistPrivacyNotice />
-
-        <EmptyState
-          icon={<ShieldIcon size={20} />}
-          title={t.pharmacist.dispensingComingLater}
-          description={t.pharmacist.historyComingLater}
-        />
       </div>
     </RequireRole>
   );

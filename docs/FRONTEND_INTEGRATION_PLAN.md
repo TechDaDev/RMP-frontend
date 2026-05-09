@@ -363,6 +363,13 @@ Expected output delivered: Dispensing workflow with partial dispensing support, 
 
 Expected output: QA report + fixes + final commit for pharmacist portal.
 
+### Phase 7.5 Status Update
+
+- Completed final pharmacist QA run on 2026-05-09 against live backend/frontend.
+- Runtime, role-guard, locale/theme, mobile, and dispensing-flow checks were executed.
+- Stabilization fixes were applied for dashboard copy, approved verification messaging, locale-aware history timestamps, and locked-message localization mapping.
+- See `docs/PHARMACIST_PORTAL_FINAL_QA.md` for detailed evidence and outcomes.
+
 ## Phase 8 — Doctor Lab Result Review/Release
 
 1. Doctor lab result review workflow.

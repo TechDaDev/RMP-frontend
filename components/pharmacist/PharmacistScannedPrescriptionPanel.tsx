@@ -42,14 +42,18 @@ export function PharmacistScannedPrescriptionPanel({
   const pendingItems = scanResponse.remaining_items ?? [];
   const isLocked = scanResponse.locked === true;
   const isDispensable = canDispensePrescription(status) && !isLocked;
+  const localizedMessage =
+    scanResponse.message === "This prescription is no longer available for dispensing."
+      ? t.pharmacist.lockedPrescriptionNotice
+      : scanResponse.message;
 
   return (
     <Card className="space-y-6 rounded-2xl">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-lg font-bold text-[var(--color-text)]">{t.pharmacist.scannedPrescription}</h2>
-          {scanResponse.message ? (
-            <p className="mt-1 text-sm text-[var(--color-muted)]">{scanResponse.message}</p>
+          {localizedMessage ? (
+            <p className="mt-1 text-sm text-[var(--color-muted)]">{localizedMessage}</p>
           ) : null}
         </div>
         <PharmacistPrescriptionStatusBadge status={status} />

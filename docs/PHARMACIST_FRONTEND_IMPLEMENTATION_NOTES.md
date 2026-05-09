@@ -275,6 +275,19 @@ Frontend workflow:
 - Verified pharmacist, patient, doctor, and laboratorian route gates from real browser sessions.
 - QR token is kept in runtime memory only; no persistence changes were added.
 
+## Phase 7.5 Final QA Pass
+
+- Completed final live QA pass on pharmacist dashboard, scan, and history routes.
+- Confirmed role redirects for patient/doctor/laboratorian away from pharmacist routes.
+- Confirmed doctor handoff behavior after full dispensing (`fully_dispensed` visible in doctor flow).
+- Confirmed no pharmacist-history privacy leak for patient-facing access.
+- Applied final stabilization fixes:
+  - Removed stale deferred history empty-state from dashboard.
+  - Corrected approved-verification copy and action summary.
+  - Localized history timestamps by active app locale.
+  - Localized known locked-prescription backend message.
+- Full evidence report is documented in `docs/PHARMACIST_PORTAL_FINAL_QA.md`.
+
 ---
 
 ## Patient Privacy Rules

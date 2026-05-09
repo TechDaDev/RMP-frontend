@@ -11,10 +11,10 @@ interface PharmacistDispensingHistoryCardProps {
 export function PharmacistDispensingHistoryCard({
   record,
 }: PharmacistDispensingHistoryCardProps) {
-  const { t } = useAppPreferences();
+  const { t, locale } = useAppPreferences();
 
   const dispensedAtDate = record.dispensed_at
-    ? new Date(record.dispensed_at).toLocaleDateString("en-US", {
+    ? new Date(record.dispensed_at).toLocaleDateString(locale, {
         year: "numeric",
         month: "short",
         day: "numeric",
