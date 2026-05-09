@@ -242,17 +242,37 @@ Notes:
 
 See `docs/LABORATORY_PORTAL_FINAL_QA.md` for full evidence and Phase 6.6.1 addendum details.
 
+### Phase 6.7B — Frontend Laboratory Portal Hardening After Backend Scan Payload Fix ✅ COMPLETE
+
+- Backend Phase 6.7A deployed: scan endpoint now returns `lab_order.completed_items` for partially_completed and fully_completed orders.
+- Frontend verified clean consumption of backend payload on cold rescan (fresh order → complete → scan-another → rescan same token without local state).
+- Cold rescan test: PASS
+   - Remaining items: 0
+   - Completed items: 1 (from backend payload)
+   - Order locked as `fully_completed`
+   - Backend payload consumed directly; fallback normalization remains defensive layer.
+- Fallback normalization (`lib/laboratory/laboratoryScanState.ts`) kept unchanged per user requirement; defensive inference still necessary.
+- Backend-origin message localization added:
+   - Created `lib/laboratory/laboratoryErrorMessages.ts` mapper to translate known backend English messages to i18n keys.
+   - Updated `LaboratoryScannedOrderPanel` to localize backend messages (e.g., `"This lab order is no longer available for completion."` now renders in user's locale).
+   - Mapper extensible for new messages as they emerge.
+- Mobile responsive layout already validated; no redesign needed.
+- Validation: TypeScript ✅, ESLint ✅, Build ✅ (26/26 routes).
+- Files changed: 1 modified (LaboratoryScannedOrderPanel.tsx), 1 created (laboratoryErrorMessages.ts).
+
+See `docs/LABORATORY_PORTAL_FINAL_QA.md` Phase 6.7B addendum for full details.
+
 ## Phase 7 — Pharmacist Portal
 
 1. Prescription scan workflow.
 2. Pending item display and dispensing workflow.
 3. Verification-gated action enforcement.
 
-## Phase 8 — Laboratory Portal
+## Phase 8 — Doctor Lab Result Review/Release
 
-1. Lab order scan workflow.
-2. Complete lab order items.
-3. Create/correct lab results.
+1. Doctor lab result review workflow.
+2. Lab result release to patient.
+3. Link result to medical record.
 4. Verification-gated action enforcement.
 
 ## Phase 9 — Admin/Staff Portal

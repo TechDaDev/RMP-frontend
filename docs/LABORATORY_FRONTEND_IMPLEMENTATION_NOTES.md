@@ -322,3 +322,51 @@ See `docs/LABORATORY_PORTAL_FINAL_QA.md` for full final QA report.
   - result detail route loads
   - correction route enforces required reason
   - valid correction succeeds and detail shows corrected status/value
+
+## Phase 6.7B Frontend Hardening After Backend Scan Payload Fix (2026-05-09)
+
+### Backend Phase 6.7A Status
+- Completed: `POST /api/lab-orders/scan/` now returns `lab_order.completed_items` for partially_completed and fully_completed orders
+- Frontend verified clean consumption of backend payload on cold rescan
+
+### Frontend Changes
+
+#### New File: lib/laboratory/laboratoryErrorMessages.ts
+- Maps known backend English error/status messages to frontend i18n keys
+- Currently supports: locked order, invalid QR token, expired order, cancelled order
+- Falls back to original message if mapping not found
+- Enables backend message localization without backend i18n changes
+
+#### Updated File: components/laboratory/LaboratoryScannedOrderPanel.tsx
+- Imports `localizeLaboratoryMessage` helper
+- Applies message localization in both scanned-order summary and locked-order warning sections
+- Backend message `"This lab order is no longer available for completion."` now renders in user's locale
+
+### Cold Rescan Verification (Live)
+- Test: Fresh order → laboratorian scan → complete item → "Scan Another Order" → rescan same token
+- Result: PASS
+  - Remaining items: 0
+  - Completed items: 1 (backend payload consumed directly)
+  - Order status: fully_completed (locked)
+  - Completed item detail (test name, sample type, completion date) all present
+
+### Fallback Normalization Assessment
+- `lib/laboratory/laboratoryScanState.ts` remains unchanged
+- Defensive inference layer still necessary — backend variant handling preserved
+- No simplification applied per user requirement to keep fallback
+
+### Message Localization Impact
+- Backend scan responses with locked order now render localized message
+- Tested in Arabic (rendered in Arabic instead of English)
+- Mapper extensible for new backend messages as they emerge
+
+### Validation Results
+- ✅ TypeScript: No compilation errors
+- ✅ ESLint: No linting issues
+- ✅ Next.js Build: 26/26 routes successful
+
+### Files Changed Summary
+- Modified: 1 (LaboratoryScannedOrderPanel.tsx)
+- Created: 1 (laboratoryErrorMessages.ts)
+- Total diff: +49 lines, -4 lines
+

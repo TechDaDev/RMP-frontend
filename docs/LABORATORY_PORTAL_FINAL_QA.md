@@ -220,3 +220,72 @@ PASS (quick):
 ## Final Phase 6.6 Status
 
 - Phase 6.6 is marked COMPLETE after Phase 6.6.1 stabilization and live chain closure.
+
+## Phase 6.7B Addendum (Frontend Laboratory Portal Hardening After Backend Scan Payload Fix)
+
+### Context
+- Backend Phase 6.7A deployed: `POST /api/lab-orders/scan/` now returns `lab_order.completed_items` for partially_completed and fully_completed orders
+- Frontend previously relied on fallback normalization in `lib/laboratory/laboratoryScanState.ts`
+- Phase 6.7B verifies clean consumption of backend completed_items on cold rescan and polishes remaining UX issues
+
+### Step 1: Current Frontend Scan Handling Review
+- **Normalization behavior**: `normalizeScannedOrderState` robustly merges payload variants (rescan → completion → previous) and infers completed items from remaining-item diffs
+- **Completed_items consumption**: Backend scan responses directly populate `lab_order.completed_items` via service; completion callback passes explicit item IDs for defensive merging
+- **Fallback inference necessity**: Preserved as defensive layer — backend payload variants may still omit arrays even with `status=fully_completed`
+- **Cleanup assessment**: No duplication bugs, display logic sound, status gating correct, i18n coverage verified
+
+### Step 2: Cold Rescan Verification (Live Test)
+- **Test scenario**: Fresh lab order created, laboratorian scanned → completed item → clicked "Scan Another Order" → rescanned same token without prior UI state
+- **Result**: PASS
+  - Remaining items: 0
+  - Completed items: 1 (CBC with completion date 05/09/2026, 04:08 PM)
+  - Order locked as `fully_completed`
+  - Backend's `completed_items` properly consumed directly on cold scan
+- **Conclusion**: Frontend cleanly handles backend payload with completed_items; fallback normalization still necessary as defensive layer
+
+### Step 3: Fallback Normalization Status
+- No edits applied; kept as-is per user requirement
+- Defensive inference layer remains functional and necessary
+
+### Step 4: Backend-Origin Message Localization
+- **Issue identified**: Backend scan response returns hardcoded English message `"This lab order is no longer available for completion."` when order is locked
+- **Solution implemented**: Created `lib/laboratory/laboratoryErrorMessages.ts` mapper
+  - Maps known backend English messages to frontend i18n keys
+  - Currently mapped: locked order, invalid token, expired, cancelled status messages
+  - Falls back to original message if no mapping found
+  - Unknown messages safely preserved without error
+- **Component updated**: `components/laboratory/LaboratoryScannedOrderPanel.tsx` now uses `localizeLaboratoryMessage()` to localize backend messages
+- **Result**: Backend message now renders in user's locale (Arabic/Kurdish/English) instead of English-only
+
+### Step 5: Mobile Narrow Viewport Polish
+- Lab portal layout already responsive
+- No obvious horizontal overflow or layout issues detected
+- Core structure handles narrow viewport (`390x844`) without redesign needed
+- Skipped detailed polish as no visual regressions observed
+
+### Step 6: Focused Regression QA
+- **Scan → Complete → Cold Rescan flow**: PASS (detailed verification in Step 2)
+- **Backend completed_items consumption**: PASS (verified on live cold rescan)
+- **Role guards**: Previously verified (laboratorian allowed, patient/doctor redirected)
+- **Language/theme/mobile**: Previously verified (no regressions from Phase 6.6.1)
+- **Message localization**: PASS (backend message now renders in Arabic)
+
+### Files Modified
+1. `components/laboratory/LaboratoryScannedOrderPanel.tsx` - Added message localization
+2. `lib/laboratory/laboratoryErrorMessages.ts` - NEW: Backend message mapper
+
+### Validation Results
+- ✅ TypeScript: No errors
+- ✅ ESLint: No errors
+- ✅ Build: 26/26 routes successful
+- ✅ Git status: Only frontend code modified (no credentials, QR tokens, or test files staged)
+
+### Remaining Limitations
+1. Backend messages are mapped only for known patterns; new backend messages require mapper extension
+2. Message localization works for lab scan responses; other API messages may still arrive in English (cross-cutting, deferred to broader API message standardization effort)
+3. No WebSocket, RAG, or doctor review controls added per scope boundaries
+
+### Recommended Next Phase
+- Phase 6.8: Doctor-side lab result review/release workflow (if planned)
+- Or: Continue to Phase 7+ (pharmacist, patient features)
+

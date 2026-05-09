@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { LaboratoryOrderStatusBadge } from "./LaboratoryOrderStatusBadge";
 import { LaboratoryOrderItemsList } from "./LaboratoryOrderItemsList";
+import { localizeLaboratoryMessage } from "@/lib/laboratory/laboratoryErrorMessages";
 import type { LaboratoryCompletionResult, LaboratoryOrderScanResponse } from "@/types/laboratory";
 
 export interface LaboratoryScannedOrderPanelProps {
@@ -38,6 +39,7 @@ export function LaboratoryScannedOrderPanel({
 }: LaboratoryScannedOrderPanelProps) {
   const { t } = useAppPreferences();
   const { lab_order, remaining_items, locked, message } = scanResponse;
+  const localizedMessage = localizeLaboratoryMessage(message, t);
 
   return (
     <div className="space-y-6">
@@ -46,8 +48,8 @@ export function LaboratoryScannedOrderPanel({
         <div className="space-y-6">
           <div>
             <h2 className="text-lg font-bold text-[var(--color-text)]">{t.laboratory.scannedOrder}</h2>
-            {message && (
-              <p className="mt-2 text-sm text-[var(--color-info)]">{message}</p>
+            {localizedMessage && (
+              <p className="mt-2 text-sm text-[var(--color-info)]">{localizedMessage}</p>
             )}
           </div>
 
@@ -111,7 +113,9 @@ export function LaboratoryScannedOrderPanel({
       {locked && (
         <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-6 text-center">
           <p className="text-sm font-semibold text-[var(--color-text)]">{t.laboratory.orderLocked}</p>
-          <p className="mt-2 text-sm text-[var(--color-muted)]">{message || t.laboratory.ordersCannotBeModified}</p>
+          <p className="mt-2 text-sm text-[var(--color-muted)]">
+            {localizedMessage || t.laboratory.ordersCannotBeModified}
+          </p>
         </div>
       )}
     </div>
