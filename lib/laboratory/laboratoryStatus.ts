@@ -19,7 +19,7 @@ export function canCreateResultForItem(itemStatus: string, orderStatus?: string)
     return true;
   }
 
-  return !isLabOrderLocked(orderStatus);
+  return orderStatus !== "expired" && orderStatus !== "cancelled";
 }
 
 export function canCorrectResult(status: string): boolean {

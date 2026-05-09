@@ -274,3 +274,51 @@ Optional future alias (not canonical): `/app/laboratory/*`
 - `NODE_OPTIONS=--max-old-space-size=4096 npm run build` -> pass
 
 See `docs/LABORATORY_PORTAL_FINAL_QA.md` for full final QA report.
+
+## Phase 6.6.1 Completed-Item Handoff Stabilization (2026-05-09)
+
+### Root cause confirmed from live payloads
+
+- Live completion and rescan payload variant observed for a fresh one-item order:
+  - completion response keys: `lab_order`, `locked`, `message`, `remaining_items`
+  - no `completed_items` and no `lab_order.completed_items`
+  - rescan response also lacked completed item details while `remaining_items` was already `0` and order status was `fully_completed`
+- Because completed item details were omitted in this variant, naive replacement logic could render completed count as `0` even after successful completion.
+
+### Stabilization implementation
+
+- Added `lib/laboratory/laboratoryScanState.ts` with `normalizeScannedOrderState`.
+- Normalizer behavior:
+  - preserves previous scanned item detail set
+  - merges completion and rescan payloads when available
+  - infers completed items from removal diff (`previous.remaining_items - next.remaining_items`)
+  - accepts explicit completed item id(s) from completion action path
+  - deduplicates completed items by id
+  - removes inferred/known completed ids from remaining list
+  - preserves backend status/locked/message precedence when present
+  - avoids empty rescan payload overwriting inferred completed items
+
+### Completion callback chain update
+
+- Updated callback signature to propagate completed item ids:
+  - `LaboratoryCompleteItemButton` -> `LaboratoryOrderItemsList` -> `LaboratoryScannedOrderPanel` -> scan page handler
+- Scan page now applies one normalized state update per completion cycle, optionally enriched by in-memory rescan.
+
+### Create-result handoff correction
+
+- Updated `canCreateResultForItem` in `lib/laboratory/laboratoryStatus.ts`:
+  - completed items remain eligible for result creation when order is `fully_completed`
+  - still blocked for `expired` and `cancelled`
+
+### Live chain verification result
+
+- Verified full chain on live backend:
+  - scan with fresh order token
+  - complete item
+  - completed section updates to `1`
+  - create-result action appears for completed item
+  - create numeric result succeeds
+  - duplicate create attempt returns safe backend error
+  - result detail route loads
+  - correction route enforces required reason
+  - valid correction succeeds and detail shows corrected status/value

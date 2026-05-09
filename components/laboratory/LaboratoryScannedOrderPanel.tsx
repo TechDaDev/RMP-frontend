@@ -7,7 +7,10 @@ import type { LaboratoryCompletionResult, LaboratoryOrderScanResponse } from "@/
 
 export interface LaboratoryScannedOrderPanelProps {
   scanResponse: LaboratoryOrderScanResponse;
-  onItemCompleted: (result: LaboratoryCompletionResult) => Promise<void> | void;
+  onItemCompleted: (
+    result: LaboratoryCompletionResult,
+    completedItemIds?: string[],
+  ) => Promise<void> | void;
   completionDisabled?: boolean;
   resultActionDisabled?: boolean;
 }

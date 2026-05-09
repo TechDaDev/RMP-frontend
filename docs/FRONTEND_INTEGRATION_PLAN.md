@@ -225,21 +225,22 @@ Notes:
 - Added verification gating: unapproved laboratorians see pending message with disabled form.
 - Updated i18n keys for all languages (Arabic, Kurdish, English).
 
-### Phase 6.6 — Laboratory Portal Final QA ⚠️ IN PROGRESS
+### Phase 6.6 — Laboratory Portal Final QA ✅ COMPLETE
 
-- Executed final QA pass for role guards, dashboard, scan flow, and invalid-ID safety states.
-- Confirmed route guards:
-   - laboratorian -> allowed
-   - patient -> redirected to `/app/patient`
-   - doctor -> redirected to `/app/doctor`
-- Confirmed backend/frontend runtime health and build integrity (`lint`, `tsc`, `build` passing).
-- Applied QA fixes:
-   - Localized hardcoded scan label (`Created At`) to translation key usage.
-   - Improved `/app/lab/scan` completion state merge to infer completed items when backend completion payload is partial.
-- Remaining blocker before marking complete:
-   - Completed-items handoff still shows `0` in at least one real completion scenario, which blocks reliable full closure of create-result -> detail -> correction real-data E2E.
+- Phase 6.6.1 stabilization pass closed the completed-item handoff blocker in live flow.
+- Root cause:
+   - backend completion and rescan payloads can return only `remaining_items` and status flags without any `completed_items` detail.
+   - previous UI logic allowed this minimal payload shape to leave completed section empty in some real paths.
+- Fix strategy:
+   - added scan-state normalization to preserve prior scanned item details, infer completed items from removed `remaining_items`, merge backend + inferred completed data, and prevent empty rescan payloads from wiping inferred completed state.
+   - updated completion callback chain to pass explicit completed item id(s) from button -> list -> panel -> scan page handler.
+   - updated create-result availability rule so completed items can still create results when order status is `fully_completed` (while still blocking cancelled/expired).
+- Live E2E closure achieved:
+   - scan -> complete item -> completed count updates -> create result -> duplicate create safe error -> result detail -> correction validation -> corrected result detail state.
+- Guard/privacy sanity re-verified:
+   - laboratorian allowed; patient and doctor redirected from lab routes.
 
-See `docs/LABORATORY_PORTAL_FINAL_QA.md` for full evidence, limitations, and deferred checks.
+See `docs/LABORATORY_PORTAL_FINAL_QA.md` for full evidence and Phase 6.6.1 addendum details.
 
 ## Phase 7 — Pharmacist Portal
 

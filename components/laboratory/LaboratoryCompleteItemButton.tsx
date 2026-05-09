@@ -9,7 +9,10 @@ interface LaboratoryCompleteItemButtonProps {
   orderId: string;
   item: LaboratoryOrderItem;
   disabled?: boolean;
-  onCompleted: (result: LaboratoryCompletionResult) => Promise<void> | void;
+  onCompleted: (
+    result: LaboratoryCompletionResult,
+    completedItemIds?: string[],
+  ) => Promise<void> | void;
 }
 
 export function LaboratoryCompleteItemButton({
@@ -58,7 +61,7 @@ export function LaboratoryCompleteItemButton({
         ],
       });
 
-      await onCompleted(response);
+      await onCompleted(response, [item.id]);
       setIsFormOpen(false);
       setNote("");
     } catch (caughtError) {

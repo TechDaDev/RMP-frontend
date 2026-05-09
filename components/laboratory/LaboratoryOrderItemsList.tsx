@@ -13,7 +13,10 @@ export interface LaboratoryOrderItemsListProps {
   locked?: boolean;
   remainingItems?: LaboratoryOrderItem[];
   completedItems?: LaboratoryOrderItem[];
-  onItemCompleted: (result: LaboratoryCompletionResult) => Promise<void> | void;
+  onItemCompleted: (
+    result: LaboratoryCompletionResult,
+    completedItemIds?: string[],
+  ) => Promise<void> | void;
   completionDisabled?: boolean;
   resultActionDisabled?: boolean;
 }

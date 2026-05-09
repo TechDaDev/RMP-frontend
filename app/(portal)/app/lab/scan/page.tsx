@@ -12,7 +12,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { ShieldIcon, ArrowIcon } from "@/components/icons";
 import { scanLabOrder } from "@/lib/laboratory/laboratoryService";
-import { isLabOrderLocked } from "@/lib/laboratory/laboratoryStatus";
+import { normalizeScannedOrderState } from "@/lib/laboratory/laboratoryScanState";
 import type { LaboratoryCompletionResult, LaboratoryOrderScanResponse } from "@/types/laboratory";
 
 export default function LaboratoryScanPage() {
@@ -51,30 +51,8 @@ export default function LaboratoryScanPage() {
     [t.laboratory.scanFailed],
   );
 
-  const refreshScannedOrder = useCallback(async () => {
-    if (!activeQrToken) {
-      return;
-    }
-
-    setIsRefreshingOrder(true);
-
-    try {
-      const refreshed = await scanLabOrder({ qr_token: activeQrToken });
-      setScanResponse(refreshed);
-      setScanError(null);
-    } catch (error) {
-      if (error instanceof Error) {
-        setScanError(error.message);
-      } else {
-        setScanError(t.laboratory.scanFailed);
-      }
-    } finally {
-      setIsRefreshingOrder(false);
-    }
-  }, [activeQrToken, t.laboratory.scanFailed]);
-
   const handleItemCompleted = useCallback(
-    async (result: LaboratoryCompletionResult) => {
+    async (result: LaboratoryCompletionResult, completedItemIds: string[] = []) => {
       setScanError(null);
       setCompletionNotice(
         result.lab_order?.status === "fully_completed"
@@ -82,46 +60,36 @@ export default function LaboratoryScanPage() {
           : t.laboratory.partialCompletionSaved,
       );
 
-      let inferredCompletedCount = 0;
-
-      if (scanResponse) {
-        const nextRemaining =
-          result.remaining_items ?? result.lab_order?.remaining_items ?? scanResponse.remaining_items;
-        const existingCompleted =
-          result.lab_order?.completed_items ?? result.completed_items ?? scanResponse.lab_order.completed_items ?? [];
-
-        const newlyCompletedFromDiff = scanResponse.remaining_items.filter(
-          (item) => !nextRemaining.some((nextItem) => nextItem.id === item.id),
-        );
-        inferredCompletedCount = newlyCompletedFromDiff.length;
-        const mergedCompleted = [...existingCompleted];
-        newlyCompletedFromDiff.forEach((item) => {
-          if (!mergedCompleted.some((completed) => completed.id === item.id)) {
-            mergedCompleted.push(item);
-          }
-        });
-
-        setScanResponse({
-          lab_order: {
-            ...scanResponse.lab_order,
-            ...result.lab_order,
-            completed_items: mergedCompleted,
-          },
-          remaining_items: nextRemaining,
-          locked:
-            result.locked ??
-            (result.lab_order?.status ? isLabOrderLocked(result.lab_order.status) : scanResponse.locked),
-          message: result.message ?? scanResponse.message,
-        });
+      if (!scanResponse) {
+        return;
       }
 
-      const hasCompletedItemsInResponse =
-        Array.isArray(result.lab_order?.completed_items) || Array.isArray(result.completed_items);
-      if (!hasCompletedItemsInResponse && inferredCompletedCount === 0) {
-        await refreshScannedOrder();
+      setIsRefreshingOrder(true);
+
+      try {
+        let rescanResponse: LaboratoryOrderScanResponse | null = null;
+
+        if (activeQrToken) {
+          try {
+            rescanResponse = await scanLabOrder({ qr_token: activeQrToken });
+          } catch {
+            rescanResponse = null;
+          }
+        }
+
+        const normalized = normalizeScannedOrderState({
+          previousScan: scanResponse,
+          completionResponse: result,
+          rescanResponse,
+          completedItemIds,
+        });
+
+        setScanResponse(normalized);
+      } finally {
+        setIsRefreshingOrder(false);
       }
     },
-    [refreshScannedOrder, scanResponse, t.laboratory.allItemsCompleted, t.laboratory.partialCompletionSaved],
+    [activeQrToken, scanResponse, t.laboratory.allItemsCompleted, t.laboratory.partialCompletionSaved],
   );
 
   const handleScanAnother = () => {
