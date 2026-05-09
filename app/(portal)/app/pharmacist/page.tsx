@@ -21,7 +21,7 @@ export default function PharmacistPortalPage() {
   const isApproved = verification?.is_approved === true;
   const canStartWorkflow = canPharmacistScan(isApproved);
   const hasScanRoute = true;
-  const hasHistoryEndpoint = false;
+  const hasHistoryEndpoint = true;
 
   const roleProfile = useMemo<PharmacistProfileData | null>(
     () => (profile?.role_profile && "pharmacy_name" in profile.role_profile ? profile.role_profile : null),
@@ -69,7 +69,8 @@ export default function PharmacistPortalPage() {
       statusTone: hasHistoryEndpoint ? "primary" : "warning",
       actionLabel: hasHistoryEndpoint ? t.pharmacist.dispensingHistory : t.pharmacist.historyComingLater,
       icon: FileTextIcon,
-      disabled: !hasHistoryEndpoint,
+      href: hasHistoryEndpoint && canStartWorkflow ? "/app/pharmacist/history" : undefined,
+      disabled: !hasHistoryEndpoint || !canStartWorkflow,
     },
   ];
 

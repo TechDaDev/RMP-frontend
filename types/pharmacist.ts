@@ -200,3 +200,58 @@ export interface SelectedDispenseItem {
   dispensedQuantity?: string;
   note?: string;
 }
+
+/**
+ * Pharmacist-safe patient summary for dispensing history
+ */
+export interface PharmacistDispensingHistoryPatientSummary {
+  id?: string;
+  full_name?: string;
+  gender?: string | null;
+  age?: number | null;
+}
+
+/**
+ * Pharmacist-safe doctor summary for dispensing history
+ */
+export interface PharmacistDispensingHistoryDoctorSummary {
+  id?: string;
+  full_name?: string;
+  specialty?: string | null;
+}
+
+/**
+ * Individual dispensing history record from pharmacist history endpoint
+ * GET /api/prescriptions/pharmacist/history/
+ */
+export interface PharmacistDispensingHistoryItem {
+  id: string;
+  prescription_id?: string;
+  prescription_status?: PharmacistPrescriptionStatus;
+  item_id?: string;
+  medication_name?: string;
+  strength?: string | null;
+  dosage?: string | null;
+  frequency?: string | null;
+  duration?: string | null;
+  route?: string | null;
+  quantity?: string | null;
+  dispensed_quantity?: string | number | null;
+  status?: string;
+  dispensed_at?: string | null;
+  patient?: PharmacistDispensingHistoryPatientSummary | null;
+  doctor?: PharmacistDispensingHistoryDoctorSummary | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+/**
+ * Paginated history response from pharmacist history endpoint
+ * GET /api/prescriptions/pharmacist/history/
+ */
+export interface PharmacistDispensingHistoryResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: PharmacistDispensingHistoryItem[];
+}

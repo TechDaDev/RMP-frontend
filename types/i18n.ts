@@ -827,6 +827,24 @@ export interface Translations {
     statusDispensed: string;
     statusUnavailable: string;
     markAsDispensed: string;
+    dispensingHistoryTitle: string;
+    dispensingHistoryDescription: string;
+    dispensingHistoryCount: string;
+    dispensingHistoryEmpty: string;
+    dispensingHistoryLoadFailed: string;
+    dispensedQuantity: string;
+    historyPrescriptionId: string;
+    historyMedication: string;
+    historyPatient: string;
+    historyDoctor: string;
+    historyStatus: string;
+    historySafeNotice: string;
+    historyReadOnlyNotice: string;
+    historyActionsThroughScan: string;
+    goToPrescriptionScan: string;
+    noDispensingHistoryRecords: string;
+    historyRecord: string;
+    historyRecords: string;
   };
   profile: {
     profilePageSubtitle: string;

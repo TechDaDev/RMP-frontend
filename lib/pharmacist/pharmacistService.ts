@@ -16,6 +16,7 @@ import type {
   PharmacistScanResponse,
   PharmacistDispensePrescriptionRequest,
   PharmacistDispensePrescriptionResult,
+  PharmacistDispensingHistoryResponse,
 } from "@/types/pharmacist";
 
 /**
@@ -119,21 +120,37 @@ export async function dispensePrescription(
 /**
  * Get pharmacist dispensing history
  *
- * Note: Backend does not currently have a dedicated pharmacist history endpoint.
- * Dispensing records are available in doctor prescription detail.
- * This is a placeholder for future implementation if backend adds:
  * GET /api/prescriptions/pharmacist/history/
  *
- * @returns Array of past dispensing actions
- * @throws ApiErrorResponse if endpoint not available
+ * @param params - Optional pagination parameters
+ * @param params.limit - Number of records per page (default: 20)
+ * @param params.offset - Starting offset for pagination (default: 0)
+ * @returns Paginated dispensing history
+ * @throws ApiErrorResponse if not approved pharmacist
  */
-export async function getPharmacistDispensingHistory(): Promise<unknown> {
-  // Placeholder: Not implemented in Phase 7.0A backend
-  // Future: If backend adds GET /api/prescriptions/pharmacist/history/, implement here
-  throw new Error(
-    "Not implemented: Backend does not have pharmacist history endpoint in Phase 7.0A"
-  );
+export async function getPharmacistDispensingHistory(params?: {
+  limit?: number;
+  offset?: number;
+}): Promise<PharmacistDispensingHistoryResponse> {
+  const queryParams = new URLSearchParams();
+  if (params?.limit !== undefined) {
+    queryParams.append("limit", params.limit.toString());
+  }
+  if (params?.offset !== undefined) {
+    queryParams.append("offset", params.offset.toString());
+  }
+
+  const url = `${API_ENDPOINTS.pharmacistPrescriptions.history}${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
+
+  const response = await apiRequest<
+    PharmacistDispensingHistoryResponse | ApiEnvelope<PharmacistDispensingHistoryResponse>
+  >(url, {
+    auth: true,
+  });
+
+  return unwrapData(response);
 }
+
 
 /**
  * Normalize pharmacist scan/dispense response

@@ -70,6 +70,7 @@ export const API_ENDPOINTS = {
     scan: "/api/prescriptions/scan/",
     detail: (prescriptionId: string) => `/api/prescriptions/${prescriptionId}/`,
     dispense: (prescriptionId: string) => `/api/prescriptions/${prescriptionId}/dispense/`,
+    history: "/api/prescriptions/pharmacist/history/",
   },
   labOrders: {
     tests: "/api/lab-orders/tests/",
