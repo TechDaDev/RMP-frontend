@@ -26,7 +26,7 @@ import {
 import { Badge } from "@/components/ui/Badge";
 import { Button, buttonClassName } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { portalRoles, roleMetadata } from "@/lib/roles";
+import { roleMetadata } from "@/lib/roles";
 import type { UserRole } from "@/types/roles";
 
 interface PortalShellProps {
@@ -112,6 +112,45 @@ export function PortalShell({ children }: PortalShellProps) {
     },
   ];
 
+  const pharmacistNavItems = [
+    {
+      href: "/app/pharmacist",
+      label: t.dashboards.pharmacistTitle || t.roles.pharmacist,
+      icon: PrescriptionIcon,
+    },
+    {
+      href: "/app/profile",
+      label: t.portal.profile,
+      icon: UserIcon,
+    },
+  ];
+
+  const laboratoryNavItems = [
+    {
+      href: "/app/lab",
+      label: t.laboratory.dashboardTitle || t.roles.laboratory,
+      icon: LabIcon,
+    },
+    {
+      href: "/app/profile",
+      label: t.portal.profile,
+      icon: UserIcon,
+    },
+  ];
+
+  const adminNavItems = [
+    {
+      href: "/app/admin",
+      label: t.dashboards.adminTitle || t.roles.admin,
+      icon: GridIcon,
+    },
+    {
+      href: "/app/profile",
+      label: t.portal.profile,
+      icon: UserIcon,
+    },
+  ];
+
   function handleLogout() {
     logout();
     router.push("/login");
@@ -179,6 +218,66 @@ export function PortalShell({ children }: PortalShellProps) {
               </Link>
             );
           })
+        ) : user?.user_type === "pharmacist" ? (
+          pharmacistNavItems.map((item) => {
+            const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+            const Icon = item.icon;
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={buttonClassName({
+                  variant: isActive ? "primary" : "ghost",
+                  className: "w-full justify-start rounded-2xl",
+                })}
+                onClick={() => setMenuOpen(false)}
+              >
+                <Icon size={18} />
+                {item.label}
+              </Link>
+            );
+          })
+        ) : user?.user_type === "laboratorian" ? (
+          laboratoryNavItems.map((item) => {
+            const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+            const Icon = item.icon;
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={buttonClassName({
+                  variant: isActive ? "primary" : "ghost",
+                  className: "w-full justify-start rounded-2xl",
+                })}
+                onClick={() => setMenuOpen(false)}
+              >
+                <Icon size={18} />
+                {item.label}
+              </Link>
+            );
+          })
+        ) : user?.user_type === "admin" ? (
+          adminNavItems.map((item) => {
+            const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+            const Icon = item.icon;
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={buttonClassName({
+                  variant: isActive ? "primary" : "ghost",
+                  className: "w-full justify-start rounded-2xl",
+                })}
+                onClick={() => setMenuOpen(false)}
+              >
+                <Icon size={18} />
+                {item.label}
+              </Link>
+            );
+          })
         ) : (
           <>
             <Link
@@ -203,24 +302,6 @@ export function PortalShell({ children }: PortalShellProps) {
               <UserIcon size={18} />
               {t.portal.profile}
             </Link>
-            {portalRoles.map((role) => {
-              const meta = roleMetadata[role];
-              const isActive = meta.defaultRoute === pathname;
-              return (
-                <Link
-                  key={role}
-                  href={meta.defaultRoute}
-                  className={buttonClassName({
-                    variant: isActive ? "secondary" : "ghost",
-                    className: "w-full justify-start rounded-2xl",
-                  })}
-                  onClick={() => setMenuOpen(false)}
-                >
-                  <meta.Icon size={18} />
-                  {meta.labels[locale]}
-                </Link>
-              );
-            })}
           </>
         )}
       </nav>

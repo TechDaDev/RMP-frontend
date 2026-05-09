@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { LaboratoryResultValueFields, type LaboratoryResultFormState } from "@/components/laboratory/LaboratoryResultValueFields";
 import { correctLaboratoryResult } from "@/lib/laboratory/laboratoryService";
 import { ApiError } from "@/lib/api/errors";
-import type { LaboratoryResultDetail, CorrectLaboratoryResultRequest } from "@/types/laboratory";
+import type { LaboratoryResultDetail, CorrectLaboratoryResultRequest, LaboratoryResultValueType } from "@/types/laboratory";
 
 interface LaboratoryResultCorrectionFormProps {
   result: LaboratoryResultDetail;
@@ -22,7 +22,7 @@ export function LaboratoryResultCorrectionForm({
   const { t } = useAppPreferences();
   const [reason, setReason] = useState("");
   const [formState, setFormState] = useState<LaboratoryResultFormState>({
-    valueType: (result.value_type as any) || "numeric",
+     valueType: (result.value_type as LaboratoryResultValueType) || "numeric",
     numericValue: result.numeric_value?.toString() || "",
     textValue: result.text_value || "",
     bloodGroupValue: result.blood_group_value || "",
@@ -55,7 +55,7 @@ export function LaboratoryResultCorrectionForm({
 
       const payload: CorrectLaboratoryResultRequest = {
         reason,
-        value_type: formState.valueType as any,
+          value_type: formState.valueType as LaboratoryResultValueType,
         numeric_value: formState.numericValue ? Number(formState.numericValue) : undefined,
         text_value: formState.textValue || undefined,
         blood_group_value: formState.bloodGroupValue || undefined,
