@@ -79,7 +79,7 @@ export function LaboratoryScannedOrderPanel({
 
             {lab_order.created_at && (
               <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-3">
-                <p className="text-xs font-medium uppercase text-[var(--color-muted)]">Created At</p>
+                  <p className="text-xs font-medium uppercase text-[var(--color-muted)]">{t.patient.createdAt}</p>
                 <p className="mt-2 text-sm text-[var(--color-text)]">{formatDate(lab_order.created_at)}</p>
               </div>
             )}

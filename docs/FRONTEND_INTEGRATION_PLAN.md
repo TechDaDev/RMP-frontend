@@ -225,6 +225,22 @@ Notes:
 - Added verification gating: unapproved laboratorians see pending message with disabled form.
 - Updated i18n keys for all languages (Arabic, Kurdish, English).
 
+### Phase 6.6 — Laboratory Portal Final QA ⚠️ IN PROGRESS
+
+- Executed final QA pass for role guards, dashboard, scan flow, and invalid-ID safety states.
+- Confirmed route guards:
+   - laboratorian -> allowed
+   - patient -> redirected to `/app/patient`
+   - doctor -> redirected to `/app/doctor`
+- Confirmed backend/frontend runtime health and build integrity (`lint`, `tsc`, `build` passing).
+- Applied QA fixes:
+   - Localized hardcoded scan label (`Created At`) to translation key usage.
+   - Improved `/app/lab/scan` completion state merge to infer completed items when backend completion payload is partial.
+- Remaining blocker before marking complete:
+   - Completed-items handoff still shows `0` in at least one real completion scenario, which blocks reliable full closure of create-result -> detail -> correction real-data E2E.
+
+See `docs/LABORATORY_PORTAL_FINAL_QA.md` for full evidence, limitations, and deferred checks.
+
 ## Phase 7 — Pharmacist Portal
 
 1. Prescription scan workflow.

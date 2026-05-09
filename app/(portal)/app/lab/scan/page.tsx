@@ -82,17 +82,32 @@ export default function LaboratoryScanPage() {
           : t.laboratory.partialCompletionSaved,
       );
 
+      let inferredCompletedCount = 0;
+
       if (scanResponse) {
+        const nextRemaining =
+          result.remaining_items ?? result.lab_order?.remaining_items ?? scanResponse.remaining_items;
+        const existingCompleted =
+          result.lab_order?.completed_items ?? result.completed_items ?? scanResponse.lab_order.completed_items ?? [];
+
+        const newlyCompletedFromDiff = scanResponse.remaining_items.filter(
+          (item) => !nextRemaining.some((nextItem) => nextItem.id === item.id),
+        );
+        inferredCompletedCount = newlyCompletedFromDiff.length;
+        const mergedCompleted = [...existingCompleted];
+        newlyCompletedFromDiff.forEach((item) => {
+          if (!mergedCompleted.some((completed) => completed.id === item.id)) {
+            mergedCompleted.push(item);
+          }
+        });
+
         setScanResponse({
           lab_order: {
             ...scanResponse.lab_order,
             ...result.lab_order,
-            completed_items:
-              result.lab_order?.completed_items ??
-              result.completed_items ??
-              scanResponse.lab_order.completed_items,
+            completed_items: mergedCompleted,
           },
-          remaining_items: result.remaining_items ?? result.lab_order?.remaining_items ?? scanResponse.remaining_items,
+          remaining_items: nextRemaining,
           locked:
             result.locked ??
             (result.lab_order?.status ? isLabOrderLocked(result.lab_order.status) : scanResponse.locked),
@@ -102,7 +117,7 @@ export default function LaboratoryScanPage() {
 
       const hasCompletedItemsInResponse =
         Array.isArray(result.lab_order?.completed_items) || Array.isArray(result.completed_items);
-      if (!hasCompletedItemsInResponse) {
+      if (!hasCompletedItemsInResponse && inferredCompletedCount === 0) {
         await refreshScannedOrder();
       }
     },

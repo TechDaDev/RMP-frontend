@@ -232,3 +232,45 @@ Optional future alias (not canonical): `/app/laboratory/*`
 - Correction history is not displayed (would require additional backend endpoint or payload structure).
 - File-only corrections cannot change the file (backend immutable).
 - Doctor review/release remains outside laboratory portal scope.
+
+## Phase 6.6 Laboratory Final QA Pass (2026-05-09)
+
+### Runtime QA completed
+
+- Verified health/runtime:
+  - backend `GET /api/health/` healthy
+  - frontend dev server reachable on `http://localhost:3000`
+- Verified laboratorian route access and guard behavior on:
+  - `/app/lab`
+  - `/app/lab/scan`
+  - `/app/lab/items/[itemId]/results/new`
+  - `/app/lab/results/[resultId]`
+  - `/app/lab/results/[resultId]/correct`
+- Verified patient and doctor are redirected away from all laboratorian routes.
+- Verified invalid token and invalid ID paths return safe error states.
+
+### Defects found and fixed
+
+1. **Hardcoded English UI label in scan panel**
+   - File: `components/laboratory/LaboratoryScannedOrderPanel.tsx`
+   - Fix: replaced hardcoded `Created At` label with localized key usage.
+
+2. **Partial completion payload could leave completed section stale**
+   - File: `app/(portal)/app/lab/scan/page.tsx`
+   - Fix:
+     - infer newly completed items from remaining-item diff
+     - merge inferred items into `completed_items`
+     - avoid immediate rescan overwrite when inferred completion exists
+
+### Remaining blocker
+
+- In at least one real flow, completed items still render as empty after successful completion, preventing reliable UI handoff to result creation from completed-item actions.
+- Because of this, Phase 6.6 is not marked fully complete in this pass.
+
+### Validation state
+
+- `npm run lint` -> pass
+- `npx tsc --noEmit` -> pass
+- `NODE_OPTIONS=--max-old-space-size=4096 npm run build` -> pass
+
+See `docs/LABORATORY_PORTAL_FINAL_QA.md` for full final QA report.
