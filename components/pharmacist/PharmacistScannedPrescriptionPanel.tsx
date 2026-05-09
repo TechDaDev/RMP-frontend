@@ -108,6 +108,7 @@ export function PharmacistScannedPrescriptionPanel({
       {/* Pending items or dispensing form */}
       {isDispensable && onDispenseComplete ? (
         <PharmacistDispensingForm
+          key={`${status}-${isLocked ? "locked" : "open"}-${pendingItems.map((item) => item.id).join("-")}`}
           prescriptionId={prescription.id ?? ""}
           prescriptionStatus={status}
           items={pendingItems}

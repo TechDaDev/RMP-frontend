@@ -69,7 +69,7 @@ export function PharmacistDispensingForm({
     [],
   );
 
-  const selectedCount = Object.values(selections).filter((s) => s.selected).length;
+  const selectedCount = items.filter((item) => selections[item.id]?.selected).length;
 
   const handleSubmit = useCallback(async () => {
     if (selectedCount === 0) {

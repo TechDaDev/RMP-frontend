@@ -341,6 +341,14 @@ Expected output delivered: Dispensing workflow with partial dispensing support, 
 
 **Note**: Backend Phase 7.0A does not have a dedicated pharmacist history endpoint. Deferred to Phase 7.4 or future backend phase.
 
+## Phase 7.3B — Live QA and Stabilization
+
+- Completed live browser QA of the pharmacist dispensing workflow against the real backend.
+- Confirmed partial dispense transitions the prescription to `partially_dispensed` and keeps the remaining item available.
+- Confirmed full dispense transitions the prescription to `fully_dispensed`, hides/locks dispense controls, and keeps rescan locked.
+- Fixed duplicate dispensed-item rendering and stale remaining-item selection state during QA.
+- No QR token persistence was added; token stays in runtime memory only.
+
 ## Phase 7.5 — Pharmacist Portal Final QA Pass
 
 1. End-to-end QA of all screens and workflows.

@@ -62,21 +62,34 @@ export default function PharmacistScanPage() {
     [t.pharmacist.invalidQrToken, t.pharmacist.scanFailed],
   );
 
-  const handleDispenseComplete = useCallback((result: PharmacistDispensePrescriptionResult) => {
-    setScanResponse((prev) => {
-      if (!prev) return prev;
-      const newRemainingIds = new Set((result.remaining_items ?? []).map((i) => i.id));
-      const newlyDispensed = (prev.remaining_items ?? []).filter((i) => !newRemainingIds.has(i.id));
-      setDispensedItems((d) => [...d, ...newlyDispensed]);
-      return {
-        ...prev,
-        prescription: result.prescription ?? prev.prescription,
-        remaining_items: result.remaining_items ?? [],
+  const handleDispenseComplete = useCallback(
+    (result: PharmacistDispensePrescriptionResult) => {
+      if (!scanResponse) return;
+
+      const nextRemainingItems = result.remaining_items ?? [];
+      const nextRemainingIds = new Set(nextRemainingItems.map((item) => item.id));
+      const newlyDispensed = (scanResponse.remaining_items ?? []).filter(
+        (item) => !nextRemainingIds.has(item.id),
+      );
+
+      if (newlyDispensed.length > 0) {
+        setDispensedItems((current) => {
+          const merged = [...current, ...newlyDispensed];
+          const uniqueById = new Map(merged.map((item) => [item.id, item]));
+          return Array.from(uniqueById.values());
+        });
+      }
+
+      setScanResponse({
+        ...scanResponse,
+        prescription: result.prescription ?? scanResponse.prescription,
+        remaining_items: nextRemainingItems,
         locked: result.locked ?? false,
         message: result.message ?? null,
-      };
-    });
-  }, []);
+      });
+    },
+    [scanResponse],
+  );
 
   const handleScanAnother = () => {
     setScanResponse(null);

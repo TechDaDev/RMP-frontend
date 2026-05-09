@@ -266,6 +266,14 @@ Frontend workflow:
 2. If any items remain: offer "Continue Dispensing" button → return to detail, refresh item list
 3. If no items remain: show "All items processed" → offer "Scan Another Prescription"
 
+## Phase 7.3B Live QA
+
+- Browser QA completed on the live backend for scan → partial dispense → full dispense → locked rescan.
+- Fixed duplicated dispensed-item rendering by deduplicating merged dispensed items by `id` in the scan page state update.
+- Fixed stale per-item checkbox state by rebuilding selection state when the remaining item list changes.
+- Verified pharmacist, patient, doctor, and laboratorian route gates from real browser sessions.
+- QR token is kept in runtime memory only; no persistence changes were added.
+
 ---
 
 ## Patient Privacy Rules

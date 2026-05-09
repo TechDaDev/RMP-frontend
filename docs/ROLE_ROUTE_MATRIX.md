@@ -112,6 +112,8 @@ Scan flow scope in Phase 7.2 remains read-only for dispensing:
 - No dispense submit action is exposed until Phase 7.3
 - ✅ Phase 7.3: Dispense submit action integrated into `/app/pharmacist/scan` via `PharmacistDispensingForm`
 - Partial dispensing supported; locked/fully_dispensed prescriptions disable form
+- Phase 7.3B QA: patient, doctor, and laboratorian redirect away from pharmacist routes; pharmacist remains allowed.
+- Phase 7.3B QA: English/Arabic language toggle and theme controls remain present on portal shells; Arabic defaults remain intact.
 
 ---
 

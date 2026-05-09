@@ -656,6 +656,13 @@ Backend sends notifications to doctor on:
 
 **Output**: Dispensing workflow embedded in `/app/pharmacist/scan`
 
+### Phase 7.3B — Live QA and Stabilization
+
+- Completed a real browser walk-through on the live backend: scan, partial dispense, full dispense, locked rescan.
+- Stabilized the scan page state merge to avoid duplicated dispensed items after success callbacks.
+- Stabilized the dispensing form selection lifecycle so the remaining-item list resets cleanly after partial dispense.
+- Verified route guarding across patient, doctor, laboratorian, and pharmacist accounts.
+
 ### Phase 7.4 — Dispensing History and Status Review (Optional)
 
 - Build `/app/pharmacist/history` page (if backend supports history endpoint)
