@@ -1,33 +1,16 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { usePathname } from "next/navigation";
-import { useState, type ReactNode } from "react";
+import { useCallback, useMemo, useState, type ReactNode } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { useAuth } from "@/components/auth/AuthProvider";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { Logo } from "@/components/Logo";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import {
-  BellIcon,
-  CloseIcon,
-  DoctorIcon,
-  FileTextIcon,
-  GridIcon,
-  LabIcon,
-  LogOutIcon,
-  MenuIcon,
-  MessageIcon,
-  PrescriptionIcon,
-  SettingsIcon,
-  UserIcon,
-} from "@/components/icons";
 import { Badge } from "@/components/ui/Badge";
-import { Button, buttonClassName } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
 import { roleMetadata } from "@/lib/roles";
 import type { UserRole } from "@/types/roles";
+import { PortalMobileDrawer } from "./PortalMobileDrawer";
+import { PortalSidebar } from "./PortalSidebar";
+import { PortalTopbar } from "./PortalTopbar";
+import { getActivePortalNavHref, getPortalNavItems } from "./portalNav";
 
 interface PortalShellProps {
   children: ReactNode;
@@ -51,105 +34,12 @@ export function PortalShell({ children }: PortalShellProps) {
   const activeRole = activeRoleFromPath(pathname);
   const currentRoleLabel = activeRole ? roleMetadata[activeRole].labels[locale] : t.portal.chooseRole;
 
-  const patientNavItems = [
-    {
-      href: "/app/patient",
-      label: t.patient.dashboardTitle,
-      icon: GridIcon,
-    },
-    {
-      href: "/app/profile",
-      label: t.portal.profile,
-      icon: UserIcon,
-    },
-    {
-      href: "/app/patient/consultations",
-      label: t.patient.consultationsTitle,
-      icon: MessageIcon,
-    },
-    {
-      href: "/app/patient/prescriptions",
-      label: t.patient.prescriptionsTitle,
-      icon: PrescriptionIcon,
-    },
-    {
-      href: "/app/patient/lab-orders",
-      label: t.patient.labOrdersTitle,
-      icon: FileTextIcon,
-    },
-    {
-      href: "/app/patient/lab-results",
-      label: t.patient.labResultsTitle,
-      icon: LabIcon,
-    },
-    {
-      href: "/app/patient/medical-record",
-      label: t.patient.medicalRecordTitle,
-      icon: FileTextIcon,
-    },
-  ];
+  const navItems = useMemo(() => getPortalNavItems(user?.user_type, t), [t, user?.user_type]);
+  const activeHref = useMemo(() => getActivePortalNavHref(pathname, navItems), [navItems, pathname]);
 
-  const doctorNavItems = [
-    {
-      href: "/app/doctor",
-      label: t.doctor.doctorDashboard,
-      icon: GridIcon,
-    },
-    {
-      href: "/app/doctor/consultations/pending",
-      label: t.doctor.pendingConsultations,
-      icon: MessageIcon,
-    },
-    {
-      href: "/app/doctor/consultations/assigned",
-      label: t.doctor.assignedConsultations,
-      icon: DoctorIcon,
-    },
-    {
-      href: "/app/profile",
-      label: t.portal.profile,
-      icon: UserIcon,
-    },
-  ];
-
-  const pharmacistNavItems = [
-    {
-      href: "/app/pharmacist",
-      label: t.dashboards.pharmacistTitle || t.roles.pharmacist,
-      icon: PrescriptionIcon,
-    },
-    {
-      href: "/app/profile",
-      label: t.portal.profile,
-      icon: UserIcon,
-    },
-  ];
-
-  const laboratoryNavItems = [
-    {
-      href: "/app/lab",
-      label: t.laboratory.dashboardTitle || t.roles.laboratory,
-      icon: LabIcon,
-    },
-    {
-      href: "/app/profile",
-      label: t.portal.profile,
-      icon: UserIcon,
-    },
-  ];
-
-  const adminNavItems = [
-    {
-      href: "/app/admin",
-      label: t.dashboards.adminTitle || t.roles.admin,
-      icon: GridIcon,
-    },
-    {
-      href: "/app/profile",
-      label: t.portal.profile,
-      icon: UserIcon,
-    },
-  ];
+  const closeMenu = useCallback(() => {
+    setMenuOpen(false);
+  }, []);
 
   function handleLogout() {
     logout();
@@ -157,244 +47,55 @@ export function PortalShell({ children }: PortalShellProps) {
   }
 
   const sidebar = (
-    <div className="flex h-full flex-col gap-5">
-      <div className="flex items-center justify-between gap-3 lg:block">
-        <Link href="/" className="focus-ring rounded-xl" onClick={() => setMenuOpen(false)}>
-          <Logo locale={locale} />
-        </Link>
-        <button
-          type="button"
-          className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] lg:hidden"
-          onClick={() => setMenuOpen(false)}
-          aria-label={t.ui.closePortalNavigation}
-        >
-          <CloseIcon size={18} />
-        </button>
-      </div>
-
-      <Card className="rounded-[2rem] bg-[color:color-mix(in_srgb,var(--color-primary)_8%,var(--color-surface))] p-4">
-        <Badge tone="primary">{t.portal.currentRole}</Badge>
-        <p className="mt-3 text-base font-bold text-[var(--color-text)]">{currentRoleLabel}</p>
-        <p className="mt-2 text-sm leading-7 text-[var(--color-muted)]">{user ? t.portal.connectedNotice : t.portal.previewNotice}</p>
-      </Card>
-
-      <nav className="space-y-2" aria-label={t.ui.portalNavigation}>
-        {user?.user_type === "patient" ? (
-          patientNavItems.map((item) => {
-            const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={buttonClassName({
-                  variant: isActive ? "primary" : "ghost",
-                  className: "w-full justify-start rounded-2xl",
-                })}
-                onClick={() => setMenuOpen(false)}
-              >
-                <Icon size={18} />
-                {item.label}
-              </Link>
-            );
-          })
-        ) : user?.user_type === "doctor" ? (
-          doctorNavItems.map((item) => {
-            const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
-            const Icon = item.icon;
-
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={buttonClassName({
-                  variant: isActive ? "primary" : "ghost",
-                  className: "w-full justify-start rounded-2xl",
-                })}
-                onClick={() => setMenuOpen(false)}
-              >
-                <Icon size={18} />
-                {item.label}
-              </Link>
-            );
-          })
-        ) : user?.user_type === "pharmacist" ? (
-          pharmacistNavItems.map((item) => {
-            const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
-            const Icon = item.icon;
-
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={buttonClassName({
-                  variant: isActive ? "primary" : "ghost",
-                  className: "w-full justify-start rounded-2xl",
-                })}
-                onClick={() => setMenuOpen(false)}
-              >
-                <Icon size={18} />
-                {item.label}
-              </Link>
-            );
-          })
-        ) : user?.user_type === "laboratorian" ? (
-          laboratoryNavItems.map((item) => {
-            const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
-            const Icon = item.icon;
-
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={buttonClassName({
-                  variant: isActive ? "primary" : "ghost",
-                  className: "w-full justify-start rounded-2xl",
-                })}
-                onClick={() => setMenuOpen(false)}
-              >
-                <Icon size={18} />
-                {item.label}
-              </Link>
-            );
-          })
-        ) : user?.user_type === "admin" ? (
-          adminNavItems.map((item) => {
-            const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
-            const Icon = item.icon;
-
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={buttonClassName({
-                  variant: isActive ? "primary" : "ghost",
-                  className: "w-full justify-start rounded-2xl",
-                })}
-                onClick={() => setMenuOpen(false)}
-              >
-                <Icon size={18} />
-                {item.label}
-              </Link>
-            );
-          })
-        ) : (
-          <>
-            <Link
-              href="/app"
-              className={buttonClassName({
-                variant: pathname === "/app" ? "primary" : "ghost",
-                className: "w-full justify-start rounded-2xl",
-              })}
-              onClick={() => setMenuOpen(false)}
-            >
-              <GridIcon size={18} />
-              {t.portal.dashboard}
-            </Link>
-            <Link
-              href="/app/profile"
-              className={buttonClassName({
-                variant: pathname === "/app/profile" ? "primary" : "ghost",
-                className: "w-full justify-start rounded-2xl",
-              })}
-              onClick={() => setMenuOpen(false)}
-            >
-              <UserIcon size={18} />
-              {t.portal.profile}
-            </Link>
-          </>
-        )}
-      </nav>
-
-        <div className="mt-auto space-y-3 rounded-[2rem] border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-        <div className="flex items-center gap-3">
-          <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--color-surface-alt)] text-[var(--color-primary)]">
-            <UserIcon size={18} />
-          </span>
-          <div>
-            <p className="text-sm font-bold text-[var(--color-text)]">{user ? user.full_name ?? `${user.first_name} ${user.last_name}`.trim() : t.portal.demoUser}</p>
-            <p className="text-xs text-[var(--color-muted)]">{user ? user.email : currentRoleLabel}</p>
-          </div>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <LanguageSwitcher locale={locale} onChange={setLocale} t={t} compact onAfterChange={() => setMenuOpen(false)} ariaLabel={t.ui.languageSwitcherLabel} />
-          <ThemeToggle theme={theme} onToggle={toggleTheme} t={t} compact ariaLabel={t.ui.themeToggleLabel} />
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Link href="/" className={buttonClassName({ variant: "secondary", className: "flex-1" })} onClick={() => setMenuOpen(false)}>
-            {t.common.backToHome}
-          </Link>
-          <button
-            type="button"
-            className={buttonClassName({ variant: "ghost", className: "flex-1" })}
-            onClick={() => { setMenuOpen(false); handleLogout(); }}
-          >
-            <LogOutIcon size={16} />
-            {t.portal.logout}
-          </button>
-        </div>
-      </div>
-    </div>
+    <PortalSidebar
+      locale={locale}
+      theme={theme}
+      t={t}
+      user={user}
+      currentRoleLabel={currentRoleLabel}
+      navItems={navItems}
+      activeHref={activeHref}
+      onLocaleChange={setLocale}
+      onThemeToggle={toggleTheme}
+      onLogout={handleLogout}
+      onNavigate={closeMenu}
+    />
   );
 
   return (
-    <div className="min-h-screen bg-transparent">
-      <div className="container-grid flex min-h-screen gap-6 py-4 md:py-6">
-        <aside className="hidden w-80 shrink-0 lg:block">{sidebar}</aside>
+    <div className="min-h-screen overflow-x-hidden bg-transparent">
+      <div className="container-grid flex min-h-screen gap-5 py-3 md:py-5">
+        <aside className="hidden w-72 shrink-0 lg:block xl:w-76">
+          <div className="sticky top-5 max-h-[calc(100vh-2.5rem)] overflow-hidden rounded-3xl border border-[var(--color-border)] bg-[color:color-mix(in_srgb,var(--color-surface)_94%,transparent)] p-4 shadow-[var(--card-shadow)] backdrop-blur">
+            {sidebar}
+          </div>
+        </aside>
 
         <div className="flex min-w-0 flex-1 flex-col gap-4">
-          <header className="sticky top-3 z-30 rounded-[2rem] border border-[var(--color-border)] bg-[color:color-mix(in_srgb,var(--color-bg)_90%,transparent)] px-4 py-3 backdrop-blur-md">
-            <div className="flex flex-wrap items-center gap-3">
-              <button
-                type="button"
-                className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] lg:hidden"
-                onClick={() => setMenuOpen(true)}
-                aria-label={t.ui.openPortalNavigation}
-              >
-                <MenuIcon size={18} />
-              </button>
+          <PortalTopbar
+            t={t}
+            currentRoleLabel={currentRoleLabel}
+            user={user}
+            menuOpen={menuOpen}
+            onMenuOpen={() => setMenuOpen(true)}
+          />
 
-              <div className="min-w-0 flex-1">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-muted)]">{t.portal.dashboard}</p>
-                <div className="mt-1 flex flex-wrap items-center gap-2">
-                  <h2 className="text-lg font-bold text-[var(--color-text)]">{currentRoleLabel}</h2>
-                  <Badge tone="success">{t.common.previewBadge}</Badge>
-                </div>
-              </div>
-
-              <div className="hidden items-center gap-2 md:flex">
-                <Button variant="ghost" aria-label={t.portal.notifications}>
-                  <BellIcon size={18} />
-                  <span className="hidden lg:inline">{t.portal.notifications}</span>
-                </Button>
-                <Button variant="ghost" aria-label={t.portal.messages}>
-                  <MessageIcon size={18} />
-                  <span className="hidden lg:inline">{t.portal.messages}</span>
-                </Button>
-                <Button variant="ghost" aria-label={t.portal.settings}>
-                  <SettingsIcon size={18} />
-                  <span className="hidden lg:inline">{t.portal.settings}</span>
-                </Button>
-              </div>
-            </div>
-          </header>
-
-          {/* Verification / info banner */}
           {verification?.required && verification.is_approved === true ? (
-            <div role="status" className="rounded-[2rem] border border-green-200 bg-green-50 px-4 py-3 text-sm font-medium text-green-700 dark:border-green-800 dark:bg-green-950 dark:text-green-300">
-              ✓ {t.auth.verificationApprovedBadge}
+            <div role="status" className="rounded-2xl border border-green-200 bg-green-50 px-4 py-2.5 text-sm font-medium text-green-700 dark:border-green-800 dark:bg-green-950 dark:text-green-300">
+              <Badge tone="success" className="me-2">✓</Badge>
+              {t.auth.verificationApprovedBadge}
             </div>
           ) : verification?.required && !verification.is_approved ? (
             verification.status === "pending" ? (
-              <div role="status" className="rounded-[2rem] border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200">
+              <div role="status" className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm font-medium text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200">
                 <span className="font-bold">{t.auth.verificationPendingTitle}:</span> {t.auth.verificationPendingDesc}
               </div>
             ) : verification.status === "rejected" ? (
-              <div role="alert" className="rounded-[2rem] border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300">
+              <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-medium text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300">
                 <span className="font-bold">{t.auth.verificationRejectedTitle}:</span> {t.auth.verificationRejectedDesc}
               </div>
             ) : verification.status === "suspended" ? (
-              <div role="alert" className="rounded-[2rem] border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300">
+              <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-medium text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300">
                 <span className="font-bold">{t.auth.verificationSuspendedTitle}:</span> {t.auth.verificationSuspendedDesc}
               </div>
             ) : null
@@ -406,17 +107,23 @@ export function PortalShell({ children }: PortalShellProps) {
         </div>
       </div>
 
-      {menuOpen ? (
-        <div className="fixed inset-0 z-40 bg-[rgba(3,10,20,0.4)] lg:hidden" role="presentation">
-          <button
-            type="button"
-            className="absolute inset-0 h-full w-full"
-            onClick={() => setMenuOpen(false)}
-            aria-label={t.ui.closePortalNavigation}
-          />
-          <div className="relative z-10 h-full max-w-xs bg-[var(--color-bg)] p-4 shadow-2xl">{sidebar}</div>
-        </div>
-      ) : null}
+      <PortalMobileDrawer open={menuOpen} locale={locale} t={t} onClose={closeMenu}>
+        <PortalSidebar
+          locale={locale}
+          theme={theme}
+          t={t}
+          user={user}
+          currentRoleLabel={currentRoleLabel}
+          navItems={navItems}
+          activeHref={activeHref}
+          onLocaleChange={setLocale}
+          onThemeToggle={toggleTheme}
+          onLogout={handleLogout}
+          onNavigate={closeMenu}
+          onClose={closeMenu}
+          showClose
+        />
+      </PortalMobileDrawer>
     </div>
   );
 }

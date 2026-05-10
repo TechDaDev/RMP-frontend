@@ -377,6 +377,16 @@ Expected output: QA report + fixes + final commit for pharmacist portal.
 3. Link result to medical record.
 4. Verification-gated action enforcement.
 
+### Phase 8.1 — PortalShell and Navigation Polish
+
+- PortalShell was split into focused shell, sidebar, topbar, mobile drawer, nav item, and nav model modules.
+- Role navigation is centralized through one typed nav structure and one active-route resolver.
+- Laboratory and pharmacist nav now include already-implemented scan/history child routes.
+- Sticky header visual weight was reduced and inactive notification/message/settings controls were removed from the shell.
+- Mobile drawer semantics were improved with dialog markup, modal state, Escape close, overlay close, and locale-aware side placement.
+- No API, auth, permission, route guard, backend contract, or workflow behavior changes were made.
+- QA covered role portal navigation, RTL/LTR language switching, theme switching, mobile drawer behavior, and build validation.
+
 ## Phase 9 — Admin/Staff Portal
 
 1. Knowledge base document operations.
