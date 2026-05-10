@@ -422,6 +422,15 @@ Expected output: QA report + fixes + final commit for pharmacist portal.
 - No API, auth, permission, QR scan, completion, result creation/correction/release, backend contract, or workflow behavior changes were made.
 - QA covered laboratory dashboard and scan/result pages across desktop, mobile, RTL/LTR language direction, and build validation.
 
+### Phase 8.6 — Pharmacist Portal UI Polish
+
+- Pharmacist scan, scanned-prescription, dispensing-form, and dispensing-history screens were polished with consistent section, card, badge, and state-card patterns.
+- Pharmacist-specific UI helpers were added for page spacing, reusable label/value rows, and scan/history item cards.
+- Manual token entry, prescription scan, dispensing controls, partial/full dispensing states, and history loading remain on the existing frontend services and conditions.
+- History remains read-only and does not expose QR tokens, internal notes, private patient fields, or dispensing actions.
+- No API, auth, permission, prescription scan, dispensing, history, backend contract, or workflow behavior changes were made.
+- QA covered pharmacist dashboard, scan, and history pages across desktop, mobile, RTL/LTR language direction, and build validation.
+
 ## Phase 9 — Admin/Staff Portal
 
 1. Knowledge base document operations.

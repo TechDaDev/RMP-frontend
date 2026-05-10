@@ -10,6 +10,7 @@ import { PharmacistDashboardSummary } from "@/components/pharmacist/PharmacistDa
 import { PharmacistPrivacyNotice } from "@/components/pharmacist/PharmacistPrivacyNotice";
 import { PharmacistVerificationNotice } from "@/components/pharmacist/PharmacistVerificationNotice";
 import { PharmacistWorkflowCard } from "@/components/pharmacist/PharmacistWorkflowCard";
+import { PharmacistPageFrame } from "@/components/pharmacist/ui/PharmacistPageFrame";
 import { FileTextIcon, PharmacyIcon, PrescriptionIcon, ShieldIcon } from "@/components/icons";
 import { Badge } from "@/components/ui/Badge";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -77,7 +78,7 @@ export default function PharmacistPortalPage() {
 
   return (
     <RequireRole role="pharmacist">
-      <div className="space-y-6">
+      <PharmacistPageFrame>
         <PageHeader
           badge={<Badge tone={isApproved ? "success" : "warning"}>{t.roles.pharmacist}</Badge>}
           title={t.pharmacist.dashboardTitle}
@@ -102,26 +103,26 @@ export default function PharmacistPortalPage() {
 
         <DashboardSection title={t.pharmacist.workflowStartsWithQr} description={t.pharmacist.scanPrescriptionSubtitle}>
           <DashboardGrid columns="four">
-          {workflowCards.map((card) => (
-            <PharmacistWorkflowCard
-              key={card.title}
-              title={card.title}
-              subtitle={card.subtitle}
-              status={card.status}
-              statusTone={card.statusTone as "primary" | "warning"}
-              actionLabel={card.actionLabel}
-              icon={card.icon}
-              href={card.href}
-              disabled={card.disabled}
-            />
-          ))}
+            {workflowCards.map((card) => (
+              <PharmacistWorkflowCard
+                key={card.title}
+                title={card.title}
+                subtitle={card.subtitle}
+                status={card.status}
+                statusTone={card.statusTone as "primary" | "warning"}
+                actionLabel={card.actionLabel}
+                icon={card.icon}
+                href={card.href}
+                disabled={card.disabled}
+              />
+            ))}
           </DashboardGrid>
         </DashboardSection>
 
         <DashboardSection title={t.pharmacist.prescriptionSafetyNotice} description={t.pharmacist.patientPrivacyNotice}>
           <PharmacistPrivacyNotice />
         </DashboardSection>
-      </div>
+      </PharmacistPageFrame>
     </RequireRole>
   );
 }

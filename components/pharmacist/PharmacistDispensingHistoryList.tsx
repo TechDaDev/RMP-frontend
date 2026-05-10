@@ -1,6 +1,7 @@
 "use client";
 
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
+import { DashboardStateCard } from "@/components/dashboard/DashboardStateCard";
 import { PharmacistDispensingHistoryCard } from "@/components/pharmacist/PharmacistDispensingHistoryCard";
 import type { PharmacistDispensingHistoryItem } from "@/types/pharmacist";
 
@@ -15,11 +16,11 @@ export function PharmacistDispensingHistoryList({
 
   if (!records || records.length === 0) {
     return (
-      <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-8 text-center dark:border-neutral-800 dark:bg-neutral-900">
-        <p className="text-sm text-neutral-600 dark:text-neutral-400">
-          {t.pharmacist.noDispensingHistoryRecords}
-        </p>
-      </div>
+      <DashboardStateCard
+        state="empty"
+        title={t.pharmacist.noDispensingHistoryRecords}
+        description={t.pharmacist.dispensingHistoryEmpty}
+      />
     );
   }
 

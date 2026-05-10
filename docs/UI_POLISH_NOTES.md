@@ -140,3 +140,24 @@
 
 - Phase 8.6 Pharmacist Portal UI Polish
 - Phase 8.7 Mobile + RTL Final Polish
+
+## Phase 8.6 - Pharmacist Portal UI Polish
+
+### Pharmacist page primitives
+
+- Added pharmacist-specific UI helpers:
+  - `PharmacistPageFrame`
+  - `PharmacistInfoRow`
+  - `PharmacistListCard`
+- Helpers are UI-only and standardize page spacing, label/value rows, scan item cards, and history record cards.
+
+### Pharmacist page alignment
+
+- Pharmacist dashboard now uses the same page frame as other polished role pages.
+- Manual prescription scan, scanned prescription review, dispensing controls, and dispensing history now use consistent section and state-card wrappers.
+- Prescription metadata, pending/dispensed item lists, dispensing controls, and history records now use consistent badges, muted metadata, label/value rows, and mobile-safe actions.
+- History remains read-only with no dispensing actions, QR token display, internal notes, or private patient fields added.
+
+### Remaining role portal polish
+
+- Phase 8.7 Mobile + RTL Final Polish

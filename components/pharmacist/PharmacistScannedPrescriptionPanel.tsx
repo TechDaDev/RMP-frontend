@@ -1,6 +1,10 @@
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
+import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
+import { DashboardStateCard } from "@/components/dashboard/DashboardStateCard";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
+import { PharmacistInfoRow } from "@/components/pharmacist/ui/PharmacistInfoRow";
+import { PharmacistListCard } from "@/components/pharmacist/ui/PharmacistListCard";
 import type { PharmacistDispensePrescriptionResult, PharmacistPrescriptionItem, PharmacistScanResponse } from "@/types/pharmacist";
 import { canDispensePrescription } from "@/lib/pharmacist/pharmacistStatus";
 import { PharmacistDispensingForm } from "./PharmacistDispensingForm";
@@ -48,42 +52,31 @@ export function PharmacistScannedPrescriptionPanel({
       : scanResponse.message;
 
   return (
-    <Card className="space-y-6 rounded-2xl">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-lg font-bold text-[var(--color-text)]">{t.pharmacist.scannedPrescription}</h2>
-          {localizedMessage ? (
-            <p className="mt-1 text-sm text-[var(--color-muted)]">{localizedMessage}</p>
-          ) : null}
+    <div className="space-y-6">
+      <Card className="space-y-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0">
+            <h2 className="text-lg font-bold text-[var(--color-text)]">{t.pharmacist.scannedPrescription}</h2>
+            {localizedMessage ? (
+              <p className="mt-1 text-sm leading-7 text-[var(--color-muted)]">{localizedMessage}</p>
+            ) : null}
+          </div>
+          <PharmacistPrescriptionStatusBadge status={status} />
         </div>
-        <PharmacistPrescriptionStatusBadge status={status} />
-      </div>
 
-      {isLocked ? (
-        <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-3 text-sm text-[var(--color-muted)]">
-          {t.pharmacist.lockedPrescriptionNotice}
-        </div>
-      ) : null}
+        {isLocked ? (
+          <DashboardStateCard state="empty" title={t.pharmacist.lockedPrescriptionNotice} description={t.pharmacist.cannotDispenseLockedPrescription} />
+        ) : null}
 
-      <div className="grid gap-4 rounded-xl border border-[var(--color-border)] p-4 text-sm text-[var(--color-muted)] sm:grid-cols-2">
-        <div>
-          <span className="font-medium">ID:</span> {prescription.id ?? "-"}
-        </div>
-        <div>
-          <span className="font-medium">{t.pharmacist.prescriptionStatus}:</span> {status}
-        </div>
-        <div>
-          <span className="font-medium">{t.pharmacist.doctorInfo}:</span> {prescription.doctor?.full_name ?? "-"}
-        </div>
-        <div>
-          <span className="font-medium">{t.pharmacist.issuedAt}:</span> {formatDate(prescription.issued_at)}
-        </div>
-        <div>
-          <span className="font-medium">{t.pharmacist.prescriptionExpiresAt}:</span> {formatDate(prescription.expires_at)}
-        </div>
-      </div>
+        <DashboardGrid columns="two">
+          <PharmacistInfoRow label="ID" value={prescription.id ?? "-"} mono />
+          <PharmacistInfoRow label={t.pharmacist.prescriptionStatus} value={status} />
+          <PharmacistInfoRow label={t.pharmacist.doctorInfo} value={prescription.doctor?.full_name ?? "-"} />
+          <PharmacistInfoRow label={t.pharmacist.issuedAt} value={formatDate(prescription.issued_at)} muted />
+          <PharmacistInfoRow label={t.pharmacist.prescriptionExpiresAt} value={formatDate(prescription.expires_at)} muted />
+        </DashboardGrid>
+      </Card>
 
-      {/* Dispensed items section */}
       {dispensedItems.length > 0 ? (
         <div className="space-y-3">
           <div className="flex items-center justify-between">
@@ -92,24 +85,19 @@ export function PharmacistScannedPrescriptionPanel({
           </div>
           <div className="space-y-2">
             {dispensedItems.map((item) => (
-              <div
+              <PharmacistListCard
                 key={item.id}
-                className="flex items-center justify-between rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 py-2"
+                title={item.medication_name || "-"}
+                meta={item.strength}
+                badge={<Badge tone="success">{t.pharmacist.statusDispensed}</Badge>}
               >
-                <span className="text-sm font-medium text-[var(--color-text)]">
-                  {item.medication_name || "-"}
-                  {item.strength ? (
-                    <span className="ml-1 font-normal text-[var(--color-muted)]">{item.strength}</span>
-                  ) : null}
-                </span>
-                <Badge tone="success">{t.pharmacist.statusDispensed}</Badge>
-              </div>
+                <p className="text-sm leading-7 text-[var(--color-muted)]">{t.pharmacist.dispensingAuditedNotice}</p>
+              </PharmacistListCard>
             ))}
           </div>
         </div>
       ) : null}
 
-      {/* Pending items or dispensing form */}
       {isDispensable && onDispenseComplete ? (
         <PharmacistDispensingForm
           key={`${status}-${isLocked ? "locked" : "open"}-${pendingItems.map((item) => item.id).join("-")}`}
@@ -123,10 +111,9 @@ export function PharmacistScannedPrescriptionPanel({
         <PharmacistPrescriptionItemsList items={pendingItems} locked={isLocked} />
       )}
 
-      {/* Privacy notice */}
       <p className="text-xs text-[var(--color-muted)]">
         {t.pharmacist.patientDoesNotSeeInternalNotes}
       </p>
-    </Card>
+    </div>
   );
 }

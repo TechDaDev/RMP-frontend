@@ -22,5 +22,5 @@ export function PharmacistHistoryStatusBadge({
     }
   };
 
-  return <Badge tone={getTone(status)}>{status || "Unknown"}</Badge>;
+  return <Badge tone={getTone(status)}>{status || "-"}</Badge>;
 }

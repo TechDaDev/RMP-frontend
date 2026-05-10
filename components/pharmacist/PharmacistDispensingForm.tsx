@@ -2,7 +2,10 @@
 
 import { useCallback, useState } from "react";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
+import { DashboardStateCard } from "@/components/dashboard/DashboardStateCard";
+import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
 import { ApiError } from "@/lib/api/errors";
 import { dispensePrescription } from "@/lib/pharmacist/pharmacistService";
 import { canDispensePrescription } from "@/lib/pharmacist/pharmacistStatus";
@@ -110,38 +113,42 @@ export function PharmacistDispensingForm({
 
   if (!canDispense) {
     return (
-      <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-3 text-sm text-[var(--color-muted)]">
-        {locked
+      <DashboardStateCard
+        state="empty"
+        title={t.pharmacist.lockedPrescriptionNotice}
+        description={locked
           ? t.pharmacist.cannotDispenseLockedPrescription
           : prescriptionStatus === "cancelled"
             ? t.pharmacist.cannotDispenseCancelledPrescription
             : prescriptionStatus === "expired"
               ? t.pharmacist.cannotDispenseExpiredPrescription
               : t.pharmacist.cannotDispenseFullyDispensedPrescription}
-      </div>
+      />
     );
   }
 
   if (items.length === 0) {
     return (
-      <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-3 text-sm text-[var(--color-muted)]">
-        {t.pharmacist.noDispensableItems}
-      </div>
+      <DashboardStateCard
+        state="empty"
+        title={t.pharmacist.noPendingItems}
+        description={t.pharmacist.noDispensableItems}
+      />
     );
   }
 
   return (
-    <div className="space-y-4">
+    <Card className="space-y-5">
       <div className="flex items-center justify-between">
         <h3 className="text-base font-semibold text-[var(--color-text)]">
           {t.pharmacist.dispensePrescriptionTitle}
         </h3>
-        <span className="text-xs text-[var(--color-muted)]">
+        <Badge tone={selectedCount > 0 ? "primary" : "neutral"}>
           {selectedCount} / {items.length}
-        </span>
+        </Badge>
       </div>
 
-      <p className="text-sm text-[var(--color-muted)]">{t.pharmacist.dispensePrescriptionDescription}</p>
+      <p className="text-sm leading-7 text-[var(--color-muted)]">{t.pharmacist.dispensePrescriptionDescription}</p>
 
       <div className="space-y-3">
         {items.map((item) => {
@@ -160,6 +167,7 @@ export function PharmacistDispensingForm({
             >
               <label className="flex cursor-pointer items-start gap-3">
                 <input
+                  name={`dispense-item-${item.id}`}
                   type="checkbox"
                   checked={sel.selected}
                   onChange={() => toggleItem(item.id)}
@@ -184,7 +192,6 @@ export function PharmacistDispensingForm({
 
               {sel.selected ? (
                 <div className="mt-3 space-y-3 ps-7">
-                  {/* Status toggle */}
                   <div className="flex gap-2">
                     <button
                       type="button"
@@ -212,13 +219,14 @@ export function PharmacistDispensingForm({
                     </button>
                   </div>
 
-                  {/* Optional quantity */}
                   <label className="block space-y-1">
                     <span className="text-xs text-[var(--color-muted)]">
                       {t.pharmacist.quantityToDispense}
                     </span>
                     <input
+                      name={`dispensed-quantity-${item.id}`}
                       type="text"
+                      autoComplete="off"
                       value={sel.dispensed_quantity}
                       onChange={(e) => setItemField(item.id, "dispensed_quantity", e.target.value)}
                       placeholder={item.quantity || ""}
@@ -226,13 +234,14 @@ export function PharmacistDispensingForm({
                     />
                   </label>
 
-                  {/* Optional note */}
                   <label className="block space-y-1">
                     <span className="text-xs text-[var(--color-muted)]">
                       {t.pharmacist.itemDispensingNote}
                     </span>
                     <input
+                      name={`dispensing-note-${item.id}`}
                       type="text"
+                      autoComplete="off"
                       value={sel.note}
                       onChange={(e) => setItemField(item.id, "note", e.target.value)}
                       className="min-h-9 w-full rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 text-sm text-[var(--color-text)] outline-none placeholder:text-[var(--color-muted)] focus:border-[var(--color-primary)]"
@@ -246,23 +255,23 @@ export function PharmacistDispensingForm({
       </div>
 
       {error ? (
-        <p className="rounded-xl border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300">
+        <p className="rounded-xl border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300" aria-live="polite">
           {error}
         </p>
       ) : null}
 
-      <div className="flex items-center gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <p className="flex-1 text-xs text-[var(--color-muted)]">{t.pharmacist.dispensingAuditedNotice}</p>
         <Button
           onClick={handleSubmit}
           disabled={isSubmitting || selectedCount === 0}
-          className="shrink-0"
+          className="w-full sm:w-auto sm:shrink-0"
         >
           {isSubmitting
             ? t.pharmacist.dispensingSelectedItems
             : `${t.pharmacist.confirmDispense} (${selectedCount})`}
         </Button>
       </div>
-    </div>
+    </Card>
   );
 }

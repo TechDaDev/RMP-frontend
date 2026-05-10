@@ -5,12 +5,14 @@ import Link from "next/link";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { RequireRole } from "@/components/auth/RequireRole";
-import { ArrowIcon, ShieldIcon } from "@/components/icons";
+import { ArrowIcon } from "@/components/icons";
+import { DashboardSection } from "@/components/dashboard/DashboardSection";
+import { DashboardStateCard } from "@/components/dashboard/DashboardStateCard";
 import { PharmacistQrManualEntry } from "@/components/pharmacist/PharmacistQrManualEntry";
 import { PharmacistScannedPrescriptionPanel } from "@/components/pharmacist/PharmacistScannedPrescriptionPanel";
+import { PharmacistPageFrame } from "@/components/pharmacist/ui/PharmacistPageFrame";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { EmptyState } from "@/components/ui/EmptyState";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { ApiError } from "@/lib/api/errors";
 import { scanPrescription } from "@/lib/pharmacist/pharmacistService";
@@ -99,7 +101,7 @@ export default function PharmacistScanPage() {
 
   return (
     <RequireRole role="pharmacist">
-      <div className="space-y-6">
+      <PharmacistPageFrame>
         <PageHeader
           badge={<Badge tone={isApproved ? "success" : "warning"}>{t.roles.pharmacist}</Badge>}
           title={t.pharmacist.scanPrescription}
@@ -107,9 +109,9 @@ export default function PharmacistScanPage() {
         />
 
         {isApproved ? (
-          <div className="space-y-6">
+          <>
             {!scanResponse ? (
-              <>
+              <DashboardSection title={t.pharmacist.manualQrEntry} description={t.pharmacist.scanPrescriptionSubtitle}>
                 <PharmacistQrManualEntry
                   onSubmit={handleScan}
                   isLoading={isScanning}
@@ -123,14 +125,16 @@ export default function PharmacistScanPage() {
                     {t.pharmacist.backToPharmacistDashboard}
                   </Button>
                 </Link>
-              </>
+              </DashboardSection>
             ) : (
               <>
-                <PharmacistScannedPrescriptionPanel
-                  scanResponse={scanResponse}
-                  dispensedItems={dispensedItems}
-                  onDispenseComplete={handleDispenseComplete}
-                />
+                <DashboardSection title={t.pharmacist.scannedPrescription} description={t.pharmacist.partialDispensingSupported}>
+                  <PharmacistScannedPrescriptionPanel
+                    scanResponse={scanResponse}
+                    dispensedItems={dispensedItems}
+                    onDispenseComplete={handleDispenseComplete}
+                  />
+                </DashboardSection>
 
                 <div className="flex flex-col gap-3 sm:flex-row">
                   <Button onClick={handleScanAnother} className="sm:flex-1">
@@ -145,15 +149,15 @@ export default function PharmacistScanPage() {
                 </div>
               </>
             )}
-          </div>
+          </>
         ) : (
-          <EmptyState
-            icon={<ShieldIcon size={20} />}
+          <DashboardStateCard
+            state="empty"
             title={t.pharmacist.pharmacistVerificationPending}
             description={t.pharmacist.pharmacistActionsDisabled}
           />
         )}
-      </div>
+      </PharmacistPageFrame>
     </RequireRole>
   );
 }

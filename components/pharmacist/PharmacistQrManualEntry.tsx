@@ -40,7 +40,7 @@ export function PharmacistQrManualEntry({
   };
 
   return (
-    <Card className="rounded-2xl">
+    <Card>
       <div className="space-y-6">
         <div>
           <h2 className="text-lg font-bold text-[var(--color-text)]">{t.pharmacist.manualQrEntry}</h2>
@@ -51,8 +51,11 @@ export function PharmacistQrManualEntry({
           <div>
             <Input
               id="pharmacist-qr-token"
+              name="pharmacist-qr-token"
               label={t.pharmacist.qrToken}
               type="text"
+              autoComplete="off"
+              spellCheck={false}
               value={qrToken}
               placeholder={t.pharmacist.qrTokenPlaceholder}
               onChange={(event) => {
@@ -61,8 +64,8 @@ export function PharmacistQrManualEntry({
               }}
               disabled={disabled || isLoading}
             />
-            {validationError ? <p className="mt-2 text-sm text-[var(--color-danger)]">{validationError}</p> : null}
-            {error ? <p className="mt-2 text-sm text-[var(--color-danger)]">{error}</p> : null}
+            {validationError ? <p className="mt-2 text-sm text-[var(--color-danger)]" aria-live="polite">{validationError}</p> : null}
+            {error ? <p className="mt-2 text-sm text-[var(--color-danger)]" aria-live="polite">{error}</p> : null}
           </div>
 
           <Button

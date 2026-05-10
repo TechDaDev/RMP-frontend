@@ -6,13 +6,16 @@ import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { RequireRole } from "@/components/auth/RequireRole";
 import { getPharmacistDispensingHistory } from "@/lib/pharmacist/pharmacistService";
+import { DashboardSection } from "@/components/dashboard/DashboardSection";
+import { DashboardStateCard } from "@/components/dashboard/DashboardStateCard";
 import { PharmacistDispensingHistoryList } from "@/components/pharmacist/PharmacistDispensingHistoryList";
 import { PharmacistPrivacyNotice } from "@/components/pharmacist/PharmacistPrivacyNotice";
 import { PharmacistVerificationNotice } from "@/components/pharmacist/PharmacistVerificationNotice";
+import { PharmacistPageFrame } from "@/components/pharmacist/ui/PharmacistPageFrame";
 import { Badge } from "@/components/ui/Badge";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { Button } from "@/components/ui/Button";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { ArrowIcon, FileTextIcon } from "@/components/icons";
+import { ArrowIcon } from "@/components/icons";
 import type { PharmacistDispensingHistoryResponse } from "@/types/pharmacist";
 
 export default function PharmacistHistoryPage() {
@@ -39,7 +42,7 @@ export default function PharmacistHistoryPage() {
         });
         setHistory(response);
       } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : "Failed to load dispensing history";
+        const errorMessage = err instanceof Error ? err.message : t.pharmacist.dispensingHistoryLoadFailed;
         setError(errorMessage);
       } finally {
         setIsLoading(false);
@@ -47,16 +50,16 @@ export default function PharmacistHistoryPage() {
     };
 
     loadHistory();
-  }, [isApproved]);
+  }, [isApproved, t.pharmacist.dispensingHistoryLoadFailed]);
 
   return (
     <RequireRole role="pharmacist">
-      <div className="space-y-6">
+      <PharmacistPageFrame>
         <Link
           href="/app/pharmacist"
-          className="inline-flex items-center gap-2 rounded px-3 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800"
+          className="inline-flex min-h-10 items-center gap-2 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm font-semibold text-[var(--color-text)] transition hover:bg-[var(--color-surface-alt)]"
         >
-          <ArrowIcon size={16} style={{ transform: "rotate(180deg)" }} />
+          <ArrowIcon size={16} />
           {t.pharmacist.backToPharmacistDashboard}
         </Link>
 
@@ -69,8 +72,8 @@ export default function PharmacistHistoryPage() {
         <PharmacistVerificationNotice verification={verification} />
 
         {!isApproved && (
-          <EmptyState
-            icon={<FileTextIcon size={20} />}
+          <DashboardStateCard
+            state="empty"
             title={t.pharmacist.verificationRequired}
             description={t.pharmacist.verificationRequiredDescription}
           />
@@ -79,58 +82,45 @@ export default function PharmacistHistoryPage() {
         {isApproved && (
           <>
             {isLoading && (
-              <div className="rounded-lg border border-neutral-200 bg-white p-8 text-center dark:border-neutral-800 dark:bg-neutral-950">
-                <div className="inline-flex items-center gap-3">
-                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-neutral-300 border-t-blue-500 dark:border-neutral-700 dark:border-t-blue-400"></div>
-                  <span className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                    {t.common.loading}
-                  </span>
-                </div>
-              </div>
+              <DashboardStateCard state="loading" title={t.common.loading} description={t.pharmacist.dispensingHistoryDescription} />
             )}
 
             {error && !isLoading && (
-              <EmptyState
-                icon={<FileTextIcon size={20} />}
+              <DashboardStateCard
+                state="error"
                 title={t.pharmacist.dispensingHistoryLoadFailed}
                 description={error}
               />
             )}
 
             {!isLoading && !error && history && history.results.length === 0 && (
-              <div className="space-y-4">
-                <EmptyState
-                  icon={<FileTextIcon size={20} />}
-                  title={t.pharmacist.noDispensingHistoryRecords}
-                  description={t.pharmacist.dispensingHistoryEmpty}
-                />
-                <div className="text-center">
-                  <Link
-                    href="/app/pharmacist/scan"
-                    className="inline-flex items-center gap-2 rounded bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
-                  >
-                    {t.pharmacist.goToPrescriptionScan}
+              <DashboardStateCard
+                state="empty"
+                title={t.pharmacist.noDispensingHistoryRecords}
+                description={t.pharmacist.dispensingHistoryEmpty}
+                action={
+                  <Link href="/app/pharmacist/scan" className="inline-flex">
+                    <Button>{t.pharmacist.goToPrescriptionScan}</Button>
                   </Link>
-                </div>
-              </div>
+                }
+              />
             )}
 
             {!isLoading && !error && history && history.results.length > 0 && (
               <>
-                <div className="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-950">
-                  <p className="text-sm font-medium text-neutral-700 dark:text-neutral-300">
-                    {t.pharmacist.dispensingHistoryCount}: <span className="font-bold text-blue-600 dark:text-blue-400">{history.count}</span>
-                  </p>
-                </div>
+                <DashboardSection
+                  title={t.pharmacist.dispensingHistoryTitle}
+                  description={`${t.pharmacist.dispensingHistoryCount}: ${history.count}`}
+                  actions={
+                    <Badge tone="info">{String(history.count)}</Badge>
+                  }
+                >
+                  <PharmacistDispensingHistoryList records={history.results} />
+                </DashboardSection>
 
-                <PharmacistDispensingHistoryList records={history.results} />
-
-                <div className="text-center">
-                  <Link
-                    href="/app/pharmacist/scan"
-                    className="inline-flex items-center gap-2 rounded bg-blue-500 px-4 py-2 text-sm font-medium text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
-                  >
-                    {t.pharmacist.goToPrescriptionScan}
+                <div className="flex justify-center">
+                  <Link href="/app/pharmacist/scan" className="inline-flex">
+                    <Button>{t.pharmacist.goToPrescriptionScan}</Button>
                   </Link>
                 </div>
               </>
@@ -139,7 +129,7 @@ export default function PharmacistHistoryPage() {
         )}
 
         <PharmacistPrivacyNotice />
-      </div>
+      </PharmacistPageFrame>
     </RequireRole>
   );
 }
