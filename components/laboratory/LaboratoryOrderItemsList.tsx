@@ -1,8 +1,10 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
+import { DashboardStateCard } from "@/components/dashboard/DashboardStateCard";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { LaboratoryListCard } from "@/components/laboratory/ui/LaboratoryListCard";
 import { canCompleteLabOrder, canCreateResultForItem } from "@/lib/laboratory/laboratoryStatus";
 import type { LaboratoryCompletionResult, LaboratoryOrderItem } from "@/types/laboratory";
 import { LaboratoryCompleteItemButton } from "./LaboratoryCompleteItemButton";
@@ -63,34 +65,34 @@ function ItemRow({ item, action }: { item: LaboratoryOrderItem; action?: ReactNo
   const { t } = useAppPreferences();
 
   return (
-    <div className="flex items-start justify-between gap-4 rounded-lg border border-[var(--color-border)] p-3">
-      <div className="flex-1 min-w-0">
-        <h4 className="font-semibold text-[var(--color-text)]">{item.test_name || "—"}</h4>
-        <div className="mt-2 grid gap-2 text-sm text-[var(--color-muted)]">
-          {item.category && (
-            <div>
-              <span className="font-medium">{t.laboratory.testCategory}:</span> {item.category}
-            </div>
-          )}
-          {item.sample_type && (
-            <div>
-              <span className="font-medium">{t.laboratory.sampleType}:</span> {item.sample_type}
-            </div>
-          )}
-          {item.instructions && (
-            <div>
-              <span className="font-medium">{t.laboratory.instructions}:</span> {item.instructions}
-            </div>
-          )}
-          {item.completed_at && (
-            <div>
-              <span className="font-medium">{t.laboratory.completedAt}:</span> {formatItemDate(item.completed_at)}
-            </div>
-          )}
-        </div>
+    <LaboratoryListCard
+      title={item.test_name || "—"}
+      badge={<Badge tone={item.status === "completed" ? "success" : "primary"}>{item.status || "pending"}</Badge>}
+      action={action ? <div className="min-w-0 lg:min-w-40">{action}</div> : undefined}
+    >
+      <div className="grid gap-2 text-sm leading-7 text-[var(--color-muted)]">
+        {item.category ? (
+          <p>
+            <span className="font-semibold text-[var(--color-text)]">{t.laboratory.testCategory}:</span> {item.category}
+          </p>
+        ) : null}
+        {item.sample_type ? (
+          <p>
+            <span className="font-semibold text-[var(--color-text)]">{t.laboratory.sampleType}:</span> {item.sample_type}
+          </p>
+        ) : null}
+        {item.instructions ? (
+          <p>
+            <span className="font-semibold text-[var(--color-text)]">{t.laboratory.instructions}:</span> {item.instructions}
+          </p>
+        ) : null}
+        {item.completed_at ? (
+          <p>
+            <span className="font-semibold text-[var(--color-text)]">{t.laboratory.completedAt}:</span> {formatItemDate(item.completed_at)}
+          </p>
+        ) : null}
       </div>
-      {action ? <div className="min-w-[10rem]">{action}</div> : null}
-    </div>
+    </LaboratoryListCard>
   );
 }
 
@@ -110,9 +112,11 @@ export function LaboratoryOrderItemsList({
   return (
     <div className="space-y-6">
       {locked ? (
-        <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-3 text-sm text-[var(--color-muted)]">
-          {t.laboratory.cannotCompleteLockedOrder}
-        </div>
+        <DashboardStateCard
+          state="empty"
+          title={t.laboratory.orderLocked}
+          description={t.laboratory.cannotCompleteLockedOrder}
+        />
       ) : null}
 
       <div>
@@ -138,7 +142,11 @@ export function LaboratoryOrderItemsList({
             ))}
           </div>
         ) : (
-          <p className="text-sm text-[var(--color-muted)]">{t.laboratory.noRemainingItems}</p>
+          <DashboardStateCard
+            state="empty"
+            title={t.laboratory.noRemainingItems}
+            description={t.laboratory.resultCreationStillDeferred}
+          />
         )}
       </div>
 
@@ -199,14 +207,20 @@ export function LaboratoryOrderItemsList({
             ))}
           </div>
         ) : (
-          <p className="text-sm text-[var(--color-muted)]">{t.laboratory.noCompletedItems}</p>
+          <DashboardStateCard
+            state="empty"
+            title={t.laboratory.noCompletedItems}
+            description={t.laboratory.noCompletedItems}
+          />
         )}
       </div>
 
       {remainingItems.length === 0 && completedItems.length === 0 && (
-        <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-6 text-center">
-          <p className="text-sm text-[var(--color-muted)]">{t.laboratory.noRemainingItems}</p>
-        </div>
+        <DashboardStateCard
+          state="empty"
+          title={t.laboratory.noRemainingItems}
+          description={t.laboratory.noCompletedItems}
+        />
       )}
     </div>
   );

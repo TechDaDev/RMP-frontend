@@ -58,6 +58,7 @@ export function LaboratoryResultValueFields({ state, onChange, fieldErrors }: La
       <label className="block space-y-2">
         <span className="text-sm font-semibold text-[var(--color-text)]">{t.laboratory.resultValueType}</span>
         <select
+          name="result-value-type"
           className="min-h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm text-[var(--color-text)] outline-none transition focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[color:color-mix(in_srgb,var(--color-primary)_18%,transparent)]"
           value={state.valueType}
           onChange={(event) => onChange({ valueType: event.target.value as LaboratoryResultValueType | "" })}
@@ -77,6 +78,10 @@ export function LaboratoryResultValueFields({ state, onChange, fieldErrors }: La
           <label className="block space-y-2 sm:col-span-2">
             <span className="text-sm font-semibold text-[var(--color-text)]">{t.laboratory.numericValue}</span>
             <input
+              name="numeric-value"
+              type="number"
+              inputMode="decimal"
+              autoComplete="off"
               className="min-h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm text-[var(--color-text)] outline-none transition focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[color:color-mix(in_srgb,var(--color-primary)_18%,transparent)]"
               value={state.numericValue}
               onChange={(event) => onChange({ numericValue: event.target.value })}
@@ -88,6 +93,9 @@ export function LaboratoryResultValueFields({ state, onChange, fieldErrors }: La
           <label className="block space-y-2">
             <span className="text-sm font-semibold text-[var(--color-text)]">{t.laboratory.unit}</span>
             <input
+              name="result-unit"
+              type="text"
+              autoComplete="off"
               className="min-h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm text-[var(--color-text)] outline-none transition focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[color:color-mix(in_srgb,var(--color-primary)_18%,transparent)]"
               value={state.unit}
               onChange={(event) => onChange({ unit: event.target.value })}
@@ -99,6 +107,9 @@ export function LaboratoryResultValueFields({ state, onChange, fieldErrors }: La
           <label className="block space-y-2">
             <span className="text-sm font-semibold text-[var(--color-text)]">{t.laboratory.referenceRange}</span>
             <input
+              name="reference-range"
+              type="text"
+              autoComplete="off"
               className="min-h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm text-[var(--color-text)] outline-none transition focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[color:color-mix(in_srgb,var(--color-primary)_18%,transparent)]"
               value={state.referenceRange}
               onChange={(event) => onChange({ referenceRange: event.target.value })}
@@ -113,6 +124,8 @@ export function LaboratoryResultValueFields({ state, onChange, fieldErrors }: La
         <label className="block space-y-2">
           <span className="text-sm font-semibold text-[var(--color-text)]">{t.laboratory.textValue}</span>
           <textarea
+            name="text-value"
+            autoComplete="off"
             className="min-h-24 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-2 text-sm text-[var(--color-text)] outline-none transition focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[color:color-mix(in_srgb,var(--color-primary)_18%,transparent)]"
             value={state.textValue}
             onChange={(event) => onChange({ textValue: event.target.value })}
@@ -125,6 +138,7 @@ export function LaboratoryResultValueFields({ state, onChange, fieldErrors }: La
         <label className="block space-y-2">
           <span className="text-sm font-semibold text-[var(--color-text)]">{t.laboratory.bloodGroupValue}</span>
           <select
+            name="blood-group-value"
             className="min-h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm text-[var(--color-text)] outline-none transition focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[color:color-mix(in_srgb,var(--color-primary)_18%,transparent)]"
             value={state.bloodGroupValue}
             onChange={(event) => onChange({ bloodGroupValue: event.target.value })}
@@ -144,6 +158,7 @@ export function LaboratoryResultValueFields({ state, onChange, fieldErrors }: La
         <label className="block space-y-2">
           <span className="text-sm font-semibold text-[var(--color-text)]">{t.laboratory.textValue}</span>
           <select
+            name="positive-negative-value"
             className="min-h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm text-[var(--color-text)] outline-none transition focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[color:color-mix(in_srgb,var(--color-primary)_18%,transparent)]"
             value={state.textValue}
             onChange={(event) => onChange({ textValue: event.target.value })}
@@ -161,6 +176,7 @@ export function LaboratoryResultValueFields({ state, onChange, fieldErrors }: La
           <span className="text-sm font-semibold text-[var(--color-text)]">{t.laboratory.resultFile}</span>
           <input
             type="file"
+            name="result-file"
             className="min-h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-text)] outline-none transition file:mr-3 file:rounded-xl file:border-0 file:bg-[var(--color-surface-alt)] file:px-3 file:py-2 file:text-sm file:font-semibold file:text-[var(--color-text)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[color:color-mix(in_srgb,var(--color-primary)_18%,transparent)]"
             onChange={handleFileChange}
           />
@@ -175,6 +191,7 @@ export function LaboratoryResultValueFields({ state, onChange, fieldErrors }: La
         <label className="block space-y-2">
           <span className="text-sm font-semibold text-[var(--color-text)]">{t.laboratory.resultFlag}</span>
           <select
+            name="result-flag"
             className="min-h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm text-[var(--color-text)] outline-none transition focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[color:color-mix(in_srgb,var(--color-primary)_18%,transparent)]"
             value={state.flag}
             onChange={(event) => onChange({ flag: event.target.value })}
@@ -194,6 +211,8 @@ export function LaboratoryResultValueFields({ state, onChange, fieldErrors }: La
         <label className="block space-y-2">
           <span className="text-sm font-semibold text-[var(--color-text)]">{t.laboratory.laboratorianNotes}</span>
           <textarea
+            name="laboratorian-notes"
+            autoComplete="off"
             className="min-h-24 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-2 text-sm text-[var(--color-text)] outline-none transition focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[color:color-mix(in_srgb,var(--color-primary)_18%,transparent)]"
             value={state.laboratorianNotes}
             onChange={(event) => onChange({ laboratorianNotes: event.target.value })}

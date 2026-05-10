@@ -1,6 +1,9 @@
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
+import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
+import { DashboardStateCard } from "@/components/dashboard/DashboardStateCard";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
+import { LaboratoryInfoRow } from "@/components/laboratory/ui/LaboratoryInfoRow";
 import { LaboratoryOrderStatusBadge } from "./LaboratoryOrderStatusBadge";
 import { LaboratoryOrderItemsList } from "./LaboratoryOrderItemsList";
 import { localizeLaboratoryMessage } from "@/lib/laboratory/laboratoryErrorMessages";
@@ -43,57 +46,43 @@ export function LaboratoryScannedOrderPanel({
 
   return (
     <div className="space-y-6">
-      {/* Order Summary Card */}
-      <Card className="rounded-2xl">
+      <Card>
         <div className="space-y-6">
-          <div>
-            <h2 className="text-lg font-bold text-[var(--color-text)]">{t.laboratory.scannedOrder}</h2>
-            {localizedMessage && (
-              <p className="mt-2 text-sm text-[var(--color-info)]">{localizedMessage}</p>
-            )}
-          </div>
-
-          {/* Status and Lock Warning */}
-          <div className="flex flex-wrap items-center gap-3">
-            <LaboratoryOrderStatusBadge status={lab_order.status || "issued"} />
-            {locked && (
-              <Badge tone="neutral">{t.laboratory.orderLocked}</Badge>
-            )}
-          </div>
-
-          {/* Order Details Grid */}
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-3">
-              <p className="text-xs font-medium uppercase text-[var(--color-muted)]">{t.laboratory.orderStatus}</p>
-              <p className="mt-2 text-sm text-[var(--color-text)]">{lab_order.status || "—"}</p>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div className="min-w-0">
+              <h2 className="text-lg font-bold text-[var(--color-text)]">{t.laboratory.scannedOrder}</h2>
+              {localizedMessage && (
+                <p className="mt-2 text-sm leading-7 text-[var(--color-info)]">{localizedMessage}</p>
+              )}
             </div>
+            <div className="flex shrink-0 flex-wrap items-center gap-2">
+              <LaboratoryOrderStatusBadge status={lab_order.status || "issued"} />
+              {locked ? <Badge tone="neutral">{t.laboratory.orderLocked}</Badge> : null}
+            </div>
+          </div>
+
+          <DashboardGrid columns="two">
+            <LaboratoryInfoRow label={t.laboratory.orderStatus} value={lab_order.status || "—"} />
 
             {lab_order.expires_at && (
-              <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-3">
-                <p className="text-xs font-medium uppercase text-[var(--color-muted)]">{t.laboratory.orderExpiresAt}</p>
-                <p className="mt-2 text-sm text-[var(--color-text)]">{formatDate(lab_order.expires_at)}</p>
-              </div>
+              <LaboratoryInfoRow label={t.laboratory.orderExpiresAt} value={formatDate(lab_order.expires_at)} muted />
             )}
 
             {lab_order.doctor && (
-              <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-3">
-                <p className="text-xs font-medium uppercase text-[var(--color-muted)]">{t.laboratory.doctorInfo}</p>
-                <p className="mt-2 text-sm text-[var(--color-text)]">{lab_order.doctor.full_name || lab_order.doctor.email || "—"}</p>
-              </div>
+              <LaboratoryInfoRow
+                label={t.laboratory.doctorInfo}
+                value={lab_order.doctor.full_name || lab_order.doctor.email || "—"}
+              />
             )}
 
             {lab_order.created_at && (
-              <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-3">
-                  <p className="text-xs font-medium uppercase text-[var(--color-muted)]">{t.patient.createdAt}</p>
-                <p className="mt-2 text-sm text-[var(--color-text)]">{formatDate(lab_order.created_at)}</p>
-              </div>
+              <LaboratoryInfoRow label={t.patient.createdAt} value={formatDate(lab_order.created_at)} muted />
             )}
-          </div>
+          </DashboardGrid>
         </div>
       </Card>
 
-      {/* Items List */}
-      <Card className="rounded-2xl">
+      <Card>
         <div className="space-y-4">
           <h2 className="text-lg font-bold text-[var(--color-text)]">{t.laboratory.labOrderItems}</h2>
           <LaboratoryOrderItemsList
@@ -109,14 +98,12 @@ export function LaboratoryScannedOrderPanel({
         </div>
       </Card>
 
-      {/* Locked Message */}
       {locked && (
-        <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-6 text-center">
-          <p className="text-sm font-semibold text-[var(--color-text)]">{t.laboratory.orderLocked}</p>
-          <p className="mt-2 text-sm text-[var(--color-muted)]">
-            {localizedMessage || t.laboratory.ordersCannotBeModified}
-          </p>
-        </div>
+        <DashboardStateCard
+          state="empty"
+          title={t.laboratory.orderLocked}
+          description={localizedMessage || t.laboratory.ordersCannotBeModified}
+        />
       )}
     </div>
   );

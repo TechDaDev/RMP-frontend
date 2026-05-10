@@ -118,3 +118,25 @@
 - Phase 8.5 Laboratory Portal UI Polish
 - Phase 8.6 Pharmacist Portal UI Polish
 - Phase 8.7 Mobile + RTL Final Polish
+
+## Phase 8.5 - Laboratory Portal UI Polish
+
+### Laboratory page primitives
+
+- Added laboratory-specific UI helpers:
+  - `LaboratoryPageFrame`
+  - `LaboratoryInfoRow`
+  - `LaboratoryListCard`
+- Helpers are UI-only and standardize page spacing, label/value rows, and laboratory item card hierarchy.
+
+### Laboratory page alignment
+
+- Laboratory dashboard now uses the same page frame as other polished role pages.
+- Manual QR scan, scanned order review, item completion, result creation, result detail, and result correction pages now use consistent section and state-card wrappers.
+- Scanned order metadata, remaining/completed item lists, and result summary panels now use consistent badges, muted metadata, label/value rows, and mobile-safe action placement.
+- Result creation/correction forms were visually tightened without changing payloads, validation rules, service calls, correction gates, or release/review behavior.
+
+### Remaining role portal polish
+
+- Phase 8.6 Pharmacist Portal UI Polish
+- Phase 8.7 Mobile + RTL Final Polish

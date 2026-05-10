@@ -11,6 +11,7 @@ import { LaboratoryPrivacyNotice } from "@/components/laboratory/LaboratoryPriva
 import { LaboratoryTestCatalogPreview } from "@/components/laboratory/LaboratoryTestCatalogPreview";
 import { LaboratoryVerificationNotice } from "@/components/laboratory/LaboratoryVerificationNotice";
 import { LaboratoryWorkflowCard } from "@/components/laboratory/LaboratoryWorkflowCard";
+import { LaboratoryPageFrame } from "@/components/laboratory/ui/LaboratoryPageFrame";
 import { Badge } from "@/components/ui/Badge";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { getLabTestCatalog } from "@/lib/laboratory/laboratoryService";
@@ -67,7 +68,7 @@ export default function LaboratoryPortalPage() {
   }, [isApproved, t.laboratory.noLabTestsAvailable]);
 
   return (
-    <div className="space-y-6">
+    <LaboratoryPageFrame>
       <PageHeader
         badge={<Badge tone={isApproved ? "success" : "primary"}>{t.roles.laboratory}</Badge>}
         title={t.laboratory.dashboardTitle}
@@ -84,8 +85,8 @@ export default function LaboratoryPortalPage() {
         <>
           <DashboardSection title={t.laboratory.workflowStartsWithQr} description={t.laboratory.laboratoryActionsDisabled}>
             <DashboardGrid columns="two">
-            <LaboratoryWorkflowCard />
-            <LaboratoryPrivacyNotice />
+              <LaboratoryWorkflowCard />
+              <LaboratoryPrivacyNotice />
             </DashboardGrid>
           </DashboardSection>
           <DashboardSection title={t.laboratory.testCatalogPreview} description={t.laboratory.workflowStartsWithQr}>
@@ -99,6 +100,6 @@ export default function LaboratoryPortalPage() {
           description={t.laboratory.laboratoryActionsDisabled}
         />
       )}
-    </div>
+    </LaboratoryPageFrame>
   );
 }

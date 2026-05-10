@@ -6,13 +6,14 @@ import { useParams } from "next/navigation";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { RequireRole } from "@/components/auth/RequireRole";
+import { DashboardSection } from "@/components/dashboard/DashboardSection";
+import { DashboardStateCard } from "@/components/dashboard/DashboardStateCard";
 import { LaboratoryResultCorrectionForm } from "@/components/laboratory/LaboratoryResultCorrectionForm";
 import { LaboratoryResultCorrectionPanel } from "@/components/laboratory/LaboratoryResultCorrectionPanel";
+import { LaboratoryPageFrame } from "@/components/laboratory/ui/LaboratoryPageFrame";
 import { Badge } from "@/components/ui/Badge";
-import { EmptyState } from "@/components/ui/EmptyState";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
-import { ShieldIcon } from "@/components/icons";
 import { getLaboratoryResultDetail } from "@/lib/laboratory/laboratoryService";
 import { canCorrectResult } from "@/lib/laboratory/laboratoryStatus";
 import type { LaboratoryResultDetail } from "@/types/laboratory";
@@ -55,11 +56,18 @@ export default function LaboratoryCorrectResultPage() {
   if (!resultId) {
     return (
       <RequireRole role="laboratorian">
-        <EmptyState
-          icon={<ShieldIcon size={20} />}
-          title={t.laboratory.correctionUnavailable || "Correction unavailable"}
-          description=""
-        />
+        <LaboratoryPageFrame>
+          <PageHeader
+            badge={<Badge tone="primary">{t.roles.laboratory}</Badge>}
+            title={t.laboratory.correctLabResultTitle}
+            description=""
+          />
+          <DashboardStateCard
+            state="empty"
+            title={t.laboratory.correctionUnavailable}
+            description=""
+          />
+        </LaboratoryPageFrame>
       </RequireRole>
     );
   }
@@ -67,16 +75,14 @@ export default function LaboratoryCorrectResultPage() {
   if (loading) {
     return (
       <RequireRole role="laboratorian">
-        <PageHeader
-          badge={<Badge tone="primary">{t.roles.laboratory}</Badge>}
-          title={t.laboratory.correctLabResultTitle || "Correct Result"}
-          description=""
-        />
-        <EmptyState
-          icon={<ShieldIcon size={20} />}
-          title={t.common.loading || "Loading..."}
-          description=""
-        />
+        <LaboratoryPageFrame>
+          <PageHeader
+            badge={<Badge tone="primary">{t.roles.laboratory}</Badge>}
+            title={t.laboratory.correctLabResultTitle}
+            description=""
+          />
+          <DashboardStateCard state="loading" title={t.common.loading} description="" />
+        </LaboratoryPageFrame>
       </RequireRole>
     );
   }
@@ -84,16 +90,14 @@ export default function LaboratoryCorrectResultPage() {
   if (error || !result) {
     return (
       <RequireRole role="laboratorian">
-        <PageHeader
-          badge={<Badge tone="primary">{t.roles.laboratory}</Badge>}
-          title={t.laboratory.correctLabResultTitle || "Correct Result"}
-          description=""
-        />
-        <EmptyState
-          icon={<ShieldIcon size={20} />}
-          title={t.common.error || "Error"}
-          description={error || "Result not found"}
-        />
+        <LaboratoryPageFrame>
+          <PageHeader
+            badge={<Badge tone="primary">{t.roles.laboratory}</Badge>}
+            title={t.laboratory.correctLabResultTitle}
+            description=""
+          />
+          <DashboardStateCard state="error" title={t.common.error} description={error || t.laboratory.resultNotFound} />
+        </LaboratoryPageFrame>
       </RequireRole>
     );
   }
@@ -101,65 +105,67 @@ export default function LaboratoryCorrectResultPage() {
   if (correctedResult) {
     return (
       <RequireRole role="laboratorian">
-        <div className="space-y-6">
+        <LaboratoryPageFrame>
           <PageHeader
             badge={<Badge tone="success">{t.roles.laboratory}</Badge>}
-            title={t.laboratory.labResultCorrected || "Result Corrected"}
+            title={t.laboratory.labResultCorrected}
             description=""
           />
           <LaboratoryResultCorrectionPanel result={correctedResult} resultId={resultId} />
-        </div>
+        </LaboratoryPageFrame>
       </RequireRole>
     );
   }
 
   return (
     <RequireRole role="laboratorian">
-      <div className="space-y-6">
+      <LaboratoryPageFrame>
         <PageHeader
           badge={<Badge tone={isApproved ? "success" : "primary"}>{t.roles.laboratory}</Badge>}
-          title={t.laboratory.correctLabResultTitle || "Correct Result"}
-          description={t.laboratory.correctLabResultDescription || "Submit corrected result values"}
+          title={t.laboratory.correctLabResultTitle}
+          description={t.laboratory.correctLabResultDescription}
         />
 
         {!isApproved ? (
-          <EmptyState
-            icon={<ShieldIcon size={20} />}
-            title={t.laboratory.laboratoryVerificationPending || "Verification pending"}
-            description={t.laboratory.verificationRequiredForCorrection || "Complete profile verification to correct results"}
+          <DashboardStateCard
+            state="empty"
+            title={t.laboratory.laboratoryVerificationPending}
+            description={t.laboratory.verificationRequiredForCorrection}
           />
         ) : !canCorrect ? (
-          <EmptyState
-            icon={<ShieldIcon size={20} />}
-            title={t.laboratory.correctionUnavailable || "Correction unavailable"}
+          <DashboardStateCard
+            state="empty"
+            title={t.laboratory.correctionUnavailable}
             description={
               result.status === "reviewed" || result.status === "released"
-                ? t.laboratory.correctionUnavailableReviewed || "Cannot correct after doctor review"
-                : t.laboratory.correctionUnavailableReleased || "Cannot correct released results"
+                ? t.laboratory.correctionUnavailableReviewed
+                : t.laboratory.correctionUnavailableReleased
             }
           />
         ) : (
           <>
-            <LaboratoryResultCorrectionForm
-              result={result}
-              resultId={resultId}
-              onCorrected={setCorrectedResult}
-            />
+            <DashboardSection title={t.laboratory.correctLabResultTitle} description={t.laboratory.correctLabResultDescription}>
+              <LaboratoryResultCorrectionForm
+                result={result}
+                resultId={resultId}
+                onCorrected={setCorrectedResult}
+              />
+            </DashboardSection>
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link href={`/app/lab/results/${resultId}`} className="flex-1">
                 <Button variant="secondary" className="w-full">
-                  {t.laboratory.backToResultDetail || "Back to Result"}
+                  {t.laboratory.backToResultDetail}
                 </Button>
               </Link>
               <Link href="/app/lab" className="flex-1">
                 <Button variant="secondary" className="w-full">
-                  {t.laboratory.backToLabDashboard || "Back to Lab Dashboard"}
+                  {t.laboratory.backToLabDashboard}
                 </Button>
               </Link>
             </div>
           </>
         )}
-      </div>
+      </LaboratoryPageFrame>
     </RequireRole>
   );
 }

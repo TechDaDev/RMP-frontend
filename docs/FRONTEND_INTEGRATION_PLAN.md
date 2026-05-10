@@ -413,6 +413,15 @@ Expected output: QA report + fixes + final commit for pharmacist portal.
 - No API, auth, permission, route guard, status lifecycle, backend contract, or workflow behavior changes were made.
 - QA covered doctor queue/detail/workspace pages across desktop, mobile, RTL/LTR language direction, and build validation.
 
+### Phase 8.5 — Laboratory Portal UI Polish
+
+- Laboratory scan, scanned-order, item-completion, result-creation, result-detail, and result-correction screens were polished with consistent section, card, badge, and state-card patterns.
+- Laboratory-specific UI helpers were added for page spacing, reusable label/value rows, and item cards.
+- Manual QR entry, completion controls, locked-order messaging, and result action states keep the same runtime behavior and backend calls.
+- Loading, error, empty, unavailable, and success states now use consistent dashboard wrappers where practical.
+- No API, auth, permission, QR scan, completion, result creation/correction/release, backend contract, or workflow behavior changes were made.
+- QA covered laboratory dashboard and scan/result pages across desktop, mobile, RTL/LTR language direction, and build validation.
+
 ## Phase 9 — Admin/Staff Portal
 
 1. Knowledge base document operations.

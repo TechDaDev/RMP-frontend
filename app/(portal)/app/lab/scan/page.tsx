@@ -4,13 +4,15 @@ import { useCallback, useState } from "react";
 import Link from "next/link";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { DashboardSection } from "@/components/dashboard/DashboardSection";
+import { DashboardStateCard } from "@/components/dashboard/DashboardStateCard";
 import { LaboratoryQrManualEntry } from "@/components/laboratory/LaboratoryQrManualEntry";
 import { LaboratoryScannedOrderPanel } from "@/components/laboratory/LaboratoryScannedOrderPanel";
+import { LaboratoryPageFrame } from "@/components/laboratory/ui/LaboratoryPageFrame";
 import { Badge } from "@/components/ui/Badge";
-import { EmptyState } from "@/components/ui/EmptyState";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
-import { ShieldIcon, ArrowIcon } from "@/components/icons";
+import { ArrowIcon } from "@/components/icons";
 import { scanLabOrder } from "@/lib/laboratory/laboratoryService";
 import { normalizeScannedOrderState } from "@/lib/laboratory/laboratoryScanState";
 import type { LaboratoryCompletionResult, LaboratoryOrderScanResponse } from "@/types/laboratory";
@@ -100,7 +102,7 @@ export default function LaboratoryScanPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <LaboratoryPageFrame>
       <PageHeader
         badge={<Badge tone={isApproved ? "success" : "primary"}>{t.roles.laboratory}</Badge>}
         title={t.laboratory.scanLabOrder}
@@ -108,9 +110,9 @@ export default function LaboratoryScanPage() {
       />
 
       {isApproved ? (
-        <div className="space-y-6">
+        <>
           {!scanResponse ? (
-            <>
+            <DashboardSection title={t.laboratory.scanLabOrder} description={t.laboratory.manualQrOnly}>
               <LaboratoryQrManualEntry
                 onSubmit={handleScan}
                 isLoading={isScanning}
@@ -126,21 +128,21 @@ export default function LaboratoryScanPage() {
                   </Button>
                 </Link>
               </div>
-            </>
+            </DashboardSection>
           ) : (
             <>
               {completionNotice ? (
-                <div className="rounded-2xl border border-green-500/40 bg-green-500/10 p-3 text-sm font-medium text-green-700 dark:text-green-300">
-                  {completionNotice}
-                </div>
+                <DashboardStateCard state="success" title={t.laboratory.orderUpdated} description={completionNotice} />
               ) : null}
 
-              <LaboratoryScannedOrderPanel
-                scanResponse={scanResponse}
-                onItemCompleted={handleItemCompleted}
-                completionDisabled={isRefreshingOrder}
-                resultActionDisabled={isRefreshingOrder}
-              />
+              <DashboardSection title={t.laboratory.scannedOrder} description={t.laboratory.workflowStartsWithQr}>
+                <LaboratoryScannedOrderPanel
+                  scanResponse={scanResponse}
+                  onItemCompleted={handleItemCompleted}
+                  completionDisabled={isRefreshingOrder}
+                  resultActionDisabled={isRefreshingOrder}
+                />
+              </DashboardSection>
 
               <div className="flex flex-col gap-3 sm:flex-row">
                 <Button onClick={handleScanAnother} className="flex-1">
@@ -155,14 +157,14 @@ export default function LaboratoryScanPage() {
               </div>
             </>
           )}
-        </div>
+        </>
       ) : (
-        <EmptyState
-          icon={<ShieldIcon size={20} />}
+        <DashboardStateCard
+          state="empty"
           title={t.laboratory.laboratoryVerificationPending}
           description={t.laboratory.laboratoryActionsDisabled}
         />
       )}
-    </div>
+    </LaboratoryPageFrame>
   );
 }

@@ -6,12 +6,12 @@ import { useParams } from "next/navigation";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { RequireRole } from "@/components/auth/RequireRole";
+import { DashboardStateCard } from "@/components/dashboard/DashboardStateCard";
 import { LaboratoryResultDetailPanel } from "@/components/laboratory/LaboratoryResultDetailPanel";
+import { LaboratoryPageFrame } from "@/components/laboratory/ui/LaboratoryPageFrame";
 import { Badge } from "@/components/ui/Badge";
-import { EmptyState } from "@/components/ui/EmptyState";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
-import { ShieldIcon } from "@/components/icons";
 import { getLaboratoryResultDetail } from "@/lib/laboratory/laboratoryService";
 import { canCorrectResult } from "@/lib/laboratory/laboratoryStatus";
 import type { LaboratoryResultDetail } from "@/types/laboratory";
@@ -52,29 +52,29 @@ export default function LaboratoryResultDetailPage() {
 
   return (
     <RequireRole role="laboratorian">
-      <div className="space-y-6">
+      <LaboratoryPageFrame>
         <PageHeader
           badge={<Badge tone={isApproved ? "success" : "primary"}>{t.roles.laboratory}</Badge>}
-          title={t.laboratory.labResultDetail || "Lab Result"}
-          description={t.laboratory.resultDetailDescription || "View and manage lab result"}
+          title={t.laboratory.labResultDetail}
+          description={t.laboratory.resultDetailDescription}
         />
 
         {!resultId || loading ? (
-          <EmptyState
-            icon={<ShieldIcon size={20} />}
-            title={t.common.loading || "Loading..."}
+          <DashboardStateCard
+            state="loading"
+            title={t.common.loading}
             description=""
           />
         ) : error ? (
-          <EmptyState
-            icon={<ShieldIcon size={20} />}
-            title={t.common.error || "Error"}
+          <DashboardStateCard
+            state="error"
+            title={t.common.error}
             description={error}
           />
         ) : !result ? (
-          <EmptyState
-            icon={<ShieldIcon size={20} />}
-            title={t.laboratory.resultNotFound || "Result not found"}
+          <DashboardStateCard
+            state="empty"
+            title={t.laboratory.resultNotFound}
             description=""
           />
         ) : (
@@ -88,18 +88,18 @@ export default function LaboratoryResultDetailPage() {
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link href="/app/lab/scan" className="flex-1">
                 <Button variant="secondary" className="w-full">
-                  {t.laboratory.backToScan || "Back to Scan"}
+                  {t.laboratory.backToScan}
                 </Button>
               </Link>
               <Link href="/app/lab" className="flex-1">
                 <Button variant="secondary" className="w-full">
-                  {t.laboratory.backToLabDashboard || "Back to Lab Dashboard"}
+                  {t.laboratory.backToLabDashboard}
                 </Button>
               </Link>
             </div>
           </>
         )}
-      </div>
+      </LaboratoryPageFrame>
     </RequireRole>
   );
 }

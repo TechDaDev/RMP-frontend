@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
 import { createLabResultForItem } from "@/lib/laboratory/laboratoryService";
 import { ApiError } from "@/lib/api/errors";
 import type { LaboratoryResultCreateRequest, LaboratoryResultDetail } from "@/types/laboratory";
@@ -171,10 +172,10 @@ export function LaboratoryResultForm({ itemId, disabled = false, onCreated }: La
   };
 
   return (
-    <div className="space-y-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+    <Card className="space-y-5">
       <LaboratoryResultValueFields state={state} onChange={patchState} fieldErrors={fieldErrors} />
 
-      {error ? <p className="text-sm font-medium text-red-600 dark:text-red-300">{error}</p> : null}
+      {error ? <p className="text-sm font-medium text-red-600 dark:text-red-300" aria-live="polite">{error}</p> : null}
 
       <Button fullWidth onClick={handleSubmit} disabled={isBlocked}>
         {isSubmitting ? t.laboratory.submittingLabResult : t.laboratory.submitLabResult}
@@ -183,6 +184,6 @@ export function LaboratoryResultForm({ itemId, disabled = false, onCreated }: La
       {!canSubmit && !error ? (
         <p className="text-xs text-[var(--color-muted)]">{t.laboratory.resultFieldRequired}</p>
       ) : null}
-    </div>
+    </Card>
   );
 }

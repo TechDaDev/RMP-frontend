@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
 import { LaboratoryResultValueFields, type LaboratoryResultFormState } from "@/components/laboratory/LaboratoryResultValueFields";
 import { correctLaboratoryResult } from "@/lib/laboratory/laboratoryService";
 import { ApiError } from "@/lib/api/errors";
@@ -22,7 +23,7 @@ export function LaboratoryResultCorrectionForm({
   const { t } = useAppPreferences();
   const [reason, setReason] = useState("");
   const [formState, setFormState] = useState<LaboratoryResultFormState>({
-     valueType: (result.value_type as LaboratoryResultValueType) || "numeric",
+    valueType: (result.value_type as LaboratoryResultValueType) || "numeric",
     numericValue: result.numeric_value?.toString() || "",
     textValue: result.text_value || "",
     bloodGroupValue: result.blood_group_value || "",
@@ -37,7 +38,7 @@ export function LaboratoryResultCorrectionForm({
   const [globalError, setGlobalError] = useState<string | null>(null);
 
   const handleStateChange = (patch: Partial<LaboratoryResultFormState>) => {
-    setFormState(prev => ({ ...prev, ...patch }));
+    setFormState((prev) => ({ ...prev, ...patch }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -46,7 +47,7 @@ export function LaboratoryResultCorrectionForm({
     setGlobalError(null);
 
     if (!reason.trim()) {
-      setErrors({ reason: [t.laboratory.correctionRequiresReason || "Reason is required"] });
+      setErrors({ reason: [t.laboratory.correctionRequiresReason] });
       return;
     }
 
@@ -55,7 +56,7 @@ export function LaboratoryResultCorrectionForm({
 
       const payload: CorrectLaboratoryResultRequest = {
         reason,
-          value_type: formState.valueType as LaboratoryResultValueType,
+        value_type: formState.valueType as LaboratoryResultValueType,
         numeric_value: formState.numericValue ? Number(formState.numericValue) : undefined,
         text_value: formState.textValue || undefined,
         blood_group_value: formState.bloodGroupValue || undefined,
@@ -72,7 +73,7 @@ export function LaboratoryResultCorrectionForm({
       if (error instanceof ApiError && error.fieldErrors) {
         setErrors(error.fieldErrors);
       } else {
-        setGlobalError(error instanceof Error ? error.message : "Failed to correct result");
+        setGlobalError(error instanceof Error ? error.message : t.laboratory.labResultCreateFailed);
       }
     } finally {
       setSubmitting(false);
@@ -80,65 +81,71 @@ export function LaboratoryResultCorrectionForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
-      {globalError && (
-        <div className="rounded-lg border border-[var(--color-danger)] bg-[var(--color-danger-light)] p-3">
-          <p className="text-sm text-[var(--color-danger-text)]">{globalError}</p>
-        </div>
-      )}
-
-      <div>
-        <label className="block text-sm font-medium text-[var(--color-text)]">
-          {t.laboratory.correctionReason || "Reason for Correction"}
-          <span className="text-[var(--color-danger)]">*</span>
-        </label>
-        <textarea
-          value={reason}
-          onChange={(e) => setReason(e.target.value)}
-          placeholder={t.laboratory.correctionReasonPlaceholder || "Explain why correction is needed"}
-          className="mt-2 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-3 py-2 text-sm text-[var(--color-text)] placeholder-[var(--color-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
-          rows={3}
-        />
-        {errors.reason && (
-          <p className="mt-1 text-xs text-[var(--color-danger)]">{errors.reason[0]}</p>
+    <Card>
+      <form onSubmit={handleSubmit} className="space-y-5">
+        {globalError && (
+          <div className="rounded-2xl border border-[var(--color-danger)] bg-[var(--color-danger-light)] p-3" aria-live="polite">
+            <p className="text-sm text-[var(--color-danger-text)]">{globalError}</p>
+          </div>
         )}
-      </div>
 
-      <div>
-        <label className="block text-sm font-medium text-[var(--color-text)]">
-          {t.laboratory.resultValueType || "Value Type"}
-        </label>
-        <p className="mt-2 text-sm text-[var(--color-text-muted)]">{formState.valueType}</p>
-      </div>
+        <div>
+          <label className="block text-sm font-medium text-[var(--color-text)]">
+            {t.laboratory.correctionReason}
+            <span className="text-[var(--color-danger)]">*</span>
+          </label>
+          <textarea
+            name="correction-reason"
+            autoComplete="off"
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            placeholder={t.laboratory.correctionReasonPlaceholder}
+            className="mt-2 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-3 py-2 text-sm text-[var(--color-text)] placeholder-[var(--color-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+            rows={3}
+          />
+          {errors.reason && (
+            <p className="mt-1 text-xs text-[var(--color-danger)]">{errors.reason[0]}</p>
+          )}
+        </div>
 
-      <LaboratoryResultValueFields
-        state={formState}
-        onChange={handleStateChange}
-        fieldErrors={errors}
-      />
+        <div>
+          <label className="block text-sm font-medium text-[var(--color-text)]">
+            {t.laboratory.resultValueType}
+          </label>
+          <p className="mt-2 text-sm text-[var(--color-text-muted)]">{formState.valueType}</p>
+        </div>
 
-      <div>
-        <label className="block text-sm font-medium text-[var(--color-text)]">
-          {t.laboratory.labNotes || "Lab Notes"}
-        </label>
-        <textarea
-          value={formState.laboratorianNotes}
-          onChange={(e) => handleStateChange({ laboratorianNotes: e.target.value })}
-          placeholder={t.laboratory.labNotesPlaceholder || "Optional notes"}
-          className="mt-2 w-full rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-3 py-2 text-sm text-[var(--color-text)] placeholder-[var(--color-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
-          rows={2}
+        <LaboratoryResultValueFields
+          state={formState}
+          onChange={handleStateChange}
+          fieldErrors={errors}
         />
-      </div>
 
-      <Button
-        type="submit"
-        disabled={submitting}
-        className="w-full"
-      >
-        {submitting
-          ? t.laboratory.submittingCorrection || "Submitting..."
-          : t.laboratory.submitCorrection || "Submit Correction"}
-      </Button>
-    </form>
+        <div>
+          <label className="block text-sm font-medium text-[var(--color-text)]">
+            {t.laboratory.labNotes}
+          </label>
+          <textarea
+            name="correction-lab-notes"
+            autoComplete="off"
+            value={formState.laboratorianNotes}
+            onChange={(e) => handleStateChange({ laboratorianNotes: e.target.value })}
+            placeholder={t.laboratory.labNotesPlaceholder}
+            className="mt-2 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-3 py-2 text-sm text-[var(--color-text)] placeholder-[var(--color-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]"
+            rows={2}
+          />
+        </div>
+
+        <Button
+          type="submit"
+          disabled={submitting}
+          className="w-full"
+        >
+          {submitting
+            ? t.laboratory.submittingCorrection
+            : t.laboratory.submitCorrection}
+        </Button>
+      </form>
+    </Card>
   );
 }

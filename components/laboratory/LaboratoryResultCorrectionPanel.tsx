@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
+import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
+import { Card } from "@/components/ui/Card";
+import { LaboratoryInfoRow } from "@/components/laboratory/ui/LaboratoryInfoRow";
 import type { LaboratoryResultDetail } from "@/types/laboratory";
 
 interface LaboratoryResultCorrectionPanelProps {
@@ -16,48 +19,39 @@ export function LaboratoryResultCorrectionPanel({
   const { t } = useAppPreferences();
 
   return (
-    <div className="space-y-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
+    <Card className="space-y-5">
       <div className="flex flex-wrap items-center gap-2">
         <h2 className="text-lg font-bold text-[var(--color-text)]">
-          {t.laboratory.labResultCorrected || "Result Corrected"}
+          {t.laboratory.labResultCorrected}
         </h2>
         <Badge tone="success">{result.status || "corrected"}</Badge>
       </div>
 
       <p className="text-sm text-[var(--color-muted)]">
-        {t.laboratory.correctedResultSummary || "Your correction has been submitted successfully"}
+        {t.laboratory.correctedResultSummary}
       </p>
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-3">
-          <p className="text-xs font-medium uppercase text-[var(--color-muted)]">ID</p>
-          <p className="mt-1 text-sm font-mono text-[var(--color-text)]">{result.id}</p>
-        </div>
-
-        <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-3">
-          <p className="text-xs font-medium uppercase text-[var(--color-muted)]">
-            {t.laboratory.status || "Status"}
-          </p>
-          <p className="mt-1 text-sm text-[var(--color-text)]">{result.status || "corrected"}</p>
-        </div>
-      </div>
+      <DashboardGrid columns="two">
+        <LaboratoryInfoRow label="ID" value={result.id} mono />
+        <LaboratoryInfoRow label={t.laboratory.status} value={result.status || "corrected"} />
+      </DashboardGrid>
 
       <p className="text-sm text-[var(--color-muted)]">
-        {t.laboratory.doctorReviewNext || "Doctor will review the corrected result"}
+        {t.laboratory.doctorReviewNext}
       </p>
 
       <div className="flex flex-col gap-3 sm:flex-row">
         <Link href={`/app/lab/results/${resultId}`} className="flex-1">
           <Button variant="secondary" className="w-full">
-            {t.laboratory.viewCorrectedResult || "View Result"}
+            {t.laboratory.viewCorrectedResult}
           </Button>
         </Link>
         <Link href="/app/lab" className="flex-1">
           <Button variant="secondary" className="w-full">
-            {t.laboratory.backToLabDashboard || "Back to Lab Dashboard"}
+            {t.laboratory.backToLabDashboard}
           </Button>
         </Link>
       </div>
-    </div>
+    </Card>
   );
 }

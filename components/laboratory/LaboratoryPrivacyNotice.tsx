@@ -12,12 +12,12 @@ export function LaboratoryPrivacyNotice() {
   ];
 
   return (
-    <Card className="rounded-[2rem]">
-      <div className="flex items-center gap-3">
-        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--color-surface-alt)] text-[var(--color-primary)]">
+    <Card>
+      <div className="flex items-start gap-3">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[var(--color-surface-alt)] text-[var(--color-primary)]">
           <LockIcon size={18} />
         </div>
-        <div>
+        <div className="min-w-0">
           <h2 className="text-lg font-bold text-[var(--color-text)]">{t.laboratory.labPrivacyNotice}</h2>
           <p className="mt-1 text-sm leading-7 text-[var(--color-muted)]">{t.laboratory.laboratoryActionsDisabled}</p>
         </div>

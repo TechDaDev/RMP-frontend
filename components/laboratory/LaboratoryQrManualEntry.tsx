@@ -53,6 +53,9 @@ export function LaboratoryQrManualEntry({
               id="qr-token"
               label={t.laboratory.qrToken}
               type="text"
+              name="qr-token"
+              autoComplete="off"
+              spellCheck={false}
               placeholder={t.laboratory.qrTokenPlaceholder}
               value={qrToken}
               onChange={(e) => {
@@ -63,10 +66,10 @@ export function LaboratoryQrManualEntry({
               className="mt-2"
             />
             {validationError && (
-              <p className="mt-2 text-sm text-[var(--color-danger)]">{validationError}</p>
+              <p className="mt-2 text-sm text-[var(--color-danger)]" aria-live="polite">{validationError}</p>
             )}
             {error && (
-              <p className="mt-2 text-sm text-[var(--color-danger)]">{error}</p>
+              <p className="mt-2 text-sm text-[var(--color-danger)]" aria-live="polite">{error}</p>
             )}
           </div>
 

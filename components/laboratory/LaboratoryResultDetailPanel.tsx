@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
+import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
+import { Card } from "@/components/ui/Card";
+import { LaboratoryInfoRow } from "@/components/laboratory/ui/LaboratoryInfoRow";
 import { getLabResultStatusTone } from "@/lib/laboratory/laboratoryStatus";
 import type { LaboratoryResultDetail } from "@/types/laboratory";
 
@@ -22,65 +25,37 @@ export function LaboratoryResultDetailPanel({
     switch (result.value_type) {
       case "numeric":
         return (
-          <div className="grid gap-2 sm:grid-cols-2">
-            <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-3">
-              <p className="text-xs font-medium uppercase text-[var(--color-muted)]">
-                {t.laboratory.resultValue || "Value"}
-              </p>
-              <p className="mt-1 text-sm font-semibold text-[var(--color-text)]">
-                {result.numeric_value}
-              </p>
-              {result.unit && (
-                <p className="text-xs text-[var(--color-muted)]">{result.unit}</p>
-              )}
-            </div>
+          <DashboardGrid columns="two">
+            <LaboratoryInfoRow
+              label={t.laboratory.resultValue}
+              value={
+                <span>
+                  {result.numeric_value}
+                  {result.unit ? <span className="block text-xs font-normal text-[var(--color-muted)]">{result.unit}</span> : null}
+                </span>
+              }
+            />
             {result.reference_range && (
-              <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-3">
-                <p className="text-xs font-medium uppercase text-[var(--color-muted)]">
-                  {t.laboratory.referenceRange || "Reference Range"}
-                </p>
-                <p className="mt-1 text-sm text-[var(--color-text)]">{result.reference_range}</p>
-              </div>
+              <LaboratoryInfoRow label={t.laboratory.referenceRange} value={result.reference_range} muted />
             )}
-          </div>
+          </DashboardGrid>
         );
       case "text":
         return (
-          <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-3">
-            <p className="text-xs font-medium uppercase text-[var(--color-muted)]">
-              {t.laboratory.resultValue || "Value"}
-            </p>
-            <p className="mt-2 text-sm text-[var(--color-text)]">{result.text_value}</p>
-          </div>
+          <LaboratoryInfoRow label={t.laboratory.resultValue} value={result.text_value} />
         );
       case "blood_group":
         return (
-          <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-3">
-            <p className="text-xs font-medium uppercase text-[var(--color-muted)]">
-              {t.laboratory.bloodGroup || "Blood Group"}
-            </p>
-            <p className="mt-2 text-lg font-semibold text-[var(--color-text)]">
-              {result.blood_group_value}
-            </p>
-          </div>
+          <LaboratoryInfoRow label={t.laboratory.bloodGroup} value={result.blood_group_value} />
         );
       case "positive_negative":
         return (
-          <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-3">
-            <p className="text-xs font-medium uppercase text-[var(--color-muted)]">
-              {t.laboratory.resultValue || "Value"}
-            </p>
-            <p className="mt-2 text-lg font-semibold text-[var(--color-text)]">
-              {result.text_value}
-            </p>
-          </div>
+          <LaboratoryInfoRow label={t.laboratory.resultValue} value={result.text_value} />
         );
       case "file_only":
         return (
-          <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-3">
-            <p className="text-xs font-medium uppercase text-[var(--color-muted)]">
-              {t.laboratory.resultFile || "File"}
-            </p>
+          <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 py-3">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--color-muted)]">{t.laboratory.resultFile}</p>
             {result.result_file ? (
               <a
                 href={result.result_file}
@@ -88,52 +63,39 @@ export function LaboratoryResultDetailPanel({
                 rel="noopener noreferrer"
                 className="mt-2 inline-block text-sm font-medium text-[var(--color-primary)] hover:underline"
               >
-                {t.laboratory.downloadFile || "Download File"}
+                {t.laboratory.downloadFile}
               </a>
             ) : (
               <p className="mt-2 text-sm text-[var(--color-muted)]">
-                {t.laboratory.noFileUploaded || "No file uploaded"}
+                {t.laboratory.noFileUploaded}
               </p>
             )}
           </div>
         );
       default:
-        return (
-          <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-3">
-            <p className="text-sm text-[var(--color-muted)]">{t.laboratory.valueTypeNotSupported || "Value type not supported"}</p>
-          </div>
-        );
+        return <LaboratoryInfoRow label={t.laboratory.resultValue} value={t.laboratory.valueTypeNotSupported} muted />;
     }
   };
 
   return (
-    <div className="space-y-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
+    <Card className="space-y-5">
       <div className="flex flex-wrap items-center gap-2">
         <h2 className="text-lg font-bold text-[var(--color-text)]">
-          {t.laboratory.labResultDetail || "Lab Result"}
+          {t.laboratory.labResultDetail}
         </h2>
         <Badge tone={getLabResultStatusTone(result.status || "submitted")}>
           {result.status || "submitted"}
         </Badge>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-3">
-          <p className="text-xs font-medium uppercase text-[var(--color-muted)]">ID</p>
-          <p className="mt-1 text-sm font-mono text-[var(--color-text)]">{result.id}</p>
-        </div>
-
-        <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-3">
-          <p className="text-xs font-medium uppercase text-[var(--color-muted)]">
-            {t.laboratory.resultValueType || "Value Type"}
-          </p>
-          <p className="mt-1 text-sm text-[var(--color-text)]">{result.value_type || "—"}</p>
-        </div>
-      </div>
+      <DashboardGrid columns="two">
+        <LaboratoryInfoRow label="ID" value={result.id} mono />
+        <LaboratoryInfoRow label={t.laboratory.resultValueType} value={result.value_type || "—"} />
+      </DashboardGrid>
 
       <div className="border-t border-[var(--color-border)] pt-4">
         <p className="mb-3 text-xs font-medium uppercase text-[var(--color-muted)]">
-          {t.laboratory.currentResult || "Current Result"}
+          {t.laboratory.currentResult}
         </p>
         {renderResultValue()}
       </div>
@@ -141,32 +103,27 @@ export function LaboratoryResultDetailPanel({
       {result.laboratorian_notes && (
         <div className="border-t border-[var(--color-border)] pt-4">
           <p className="text-xs font-medium uppercase text-[var(--color-muted)]">
-            {t.laboratory.labNotes || "Lab Notes"}
+            {t.laboratory.labNotes}
           </p>
           <p className="mt-2 text-sm text-[var(--color-text)]">{result.laboratorian_notes}</p>
         </div>
       )}
 
       {result.flag && (
-        <div className="rounded-lg border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-3">
-          <p className="text-xs font-medium uppercase text-[var(--color-muted)]">
-            {t.laboratory.flag || "Flag"}
-          </p>
-          <p className="mt-1 text-sm text-[var(--color-text)]">{result.flag}</p>
-        </div>
+        <LaboratoryInfoRow label={t.laboratory.flag} value={result.flag} />
       )}
 
       <p className="text-sm text-[var(--color-muted)]">
-        {t.laboratory.doctorReviewNext || "Doctor will review and release to patient"}
+        {t.laboratory.doctorReviewNext}
       </p>
 
       {canCorrect && isApproved && (
         <Link href={`/app/lab/results/${result.id}/correct`} className="block">
           <Button variant="primary" className="w-full">
-            {t.laboratory.correctLabResult || "Correct Result"}
+            {t.laboratory.correctLabResult}
           </Button>
         </Link>
       )}
-    </div>
+    </Card>
   );
 }
