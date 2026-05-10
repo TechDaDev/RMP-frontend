@@ -3,15 +3,16 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
+import { DashboardSection } from "@/components/dashboard/DashboardSection";
+import { DashboardStateCard } from "@/components/dashboard/DashboardStateCard";
 import { LaboratoryDashboardSummary } from "@/components/laboratory/LaboratoryDashboardSummary";
 import { LaboratoryPrivacyNotice } from "@/components/laboratory/LaboratoryPrivacyNotice";
 import { LaboratoryTestCatalogPreview } from "@/components/laboratory/LaboratoryTestCatalogPreview";
 import { LaboratoryVerificationNotice } from "@/components/laboratory/LaboratoryVerificationNotice";
 import { LaboratoryWorkflowCard } from "@/components/laboratory/LaboratoryWorkflowCard";
 import { Badge } from "@/components/ui/Badge";
-import { EmptyState } from "@/components/ui/EmptyState";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { ShieldIcon } from "@/components/icons";
 import { getLabTestCatalog } from "@/lib/laboratory/laboratoryService";
 import type { LaboratorianProfileData } from "@/types/backend";
 import type { LaboratoryTestCatalogItem } from "@/types/laboratory";
@@ -75,19 +76,25 @@ export default function LaboratoryPortalPage() {
       />
 
       <LaboratoryVerificationNotice verification={verification} roleProfile={roleProfile} />
-      <LaboratoryDashboardSummary roleProfile={roleProfile} verification={verification} catalogCount={catalog.length} />
+      <DashboardSection title={t.laboratory.labIdentity} description={t.profile.verificationGuidance}>
+        <LaboratoryDashboardSummary roleProfile={roleProfile} verification={verification} catalogCount={catalog.length} />
+      </DashboardSection>
 
       {isApproved ? (
-        <div className="space-y-6">
-          <div className="grid gap-6 xl:grid-cols-2">
+        <>
+          <DashboardSection title={t.laboratory.workflowStartsWithQr} description={t.laboratory.laboratoryActionsDisabled}>
+            <DashboardGrid columns="two">
             <LaboratoryWorkflowCard />
             <LaboratoryPrivacyNotice />
-          </div>
-          <LaboratoryTestCatalogPreview items={visibleCatalog} loading={visibleCatalogLoading} error={visibleCatalogError} />
-        </div>
+            </DashboardGrid>
+          </DashboardSection>
+          <DashboardSection title={t.laboratory.testCatalogPreview} description={t.laboratory.workflowStartsWithQr}>
+            <LaboratoryTestCatalogPreview items={visibleCatalog} loading={visibleCatalogLoading} error={visibleCatalogError} />
+          </DashboardSection>
+        </>
       ) : (
-        <EmptyState
-          icon={<ShieldIcon size={20} />}
+        <DashboardStateCard
+          state="empty"
           title={t.laboratory.laboratoryVerificationPending}
           description={t.laboratory.laboratoryActionsDisabled}
         />

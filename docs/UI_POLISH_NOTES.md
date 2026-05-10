@@ -37,3 +37,37 @@
 - Introduce shared `StatCard`, `WorkflowCard`, `Alert`, `LoadingState`, and `ErrorState` primitives.
 - Standardize empty/loading/error layouts across role dashboards.
 - Continue reducing large rounded-card nesting where pages feel too heavy.
+
+## Phase 8.2 - Dashboard Layout Unification
+
+### Dashboard primitives
+
+- Added shared dashboard primitives:
+  - `DashboardSection`
+  - `DashboardGrid`
+  - `DashboardStatCard`
+  - `DashboardWorkflowCard`
+  - `DashboardStateCard`
+- Primitives are UI-only and do not fetch data, call services, or know role permissions.
+- Existing `Card`, `Button`, `Badge`, and `EmptyState` remain the underlying UI foundation.
+
+### Role dashboard alignment
+
+- Patient dashboard now groups welcome/profile, summary state, and workflows with consistent section rhythm.
+- Doctor dashboard now uses shared summary cards and section wrappers for latest pending and assigned queues.
+- Laboratory dashboard now uses shared identity stat panels, workflow panels, and catalog state wrappers.
+- Pharmacist dashboard now uses shared identity stat panels and workflow card styling.
+
+### Visual rules established
+
+- Dashboard pages use `space-y-6` and `DashboardSection` for major content groups.
+- Stat cards share consistent icon sizing, value typography, and responsive grid behavior.
+- Workflow cards share consistent title, description, status, and action placement.
+- Loading/error/empty states use one dashboard wrapper where practical.
+- No API, auth, permission, route, or workflow behavior changed.
+
+### Remaining Phase 8.3 candidates
+
+- Polish patient-specific detail/list pages.
+- Continue standardizing consultation, prescription, lab order, and history list states.
+- Review nested domain cards on non-dashboard pages for spacing and mobile density.

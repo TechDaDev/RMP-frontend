@@ -1,8 +1,8 @@
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
+import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
+import { DashboardStateCard } from "@/components/dashboard/DashboardStateCard";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
-import { EmptyState } from "@/components/ui/EmptyState";
-import { FileTextIcon } from "@/components/icons";
 import type { LaboratoryTestCatalogItem } from "@/types/laboratory";
 
 interface LaboratoryTestCatalogPreviewProps {
@@ -16,7 +16,7 @@ export function LaboratoryTestCatalogPreview({ items, loading = false, error = n
   const visibleItems = items.slice(0, 4);
 
   return (
-    <Card className="rounded-[2rem]">
+    <Card>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="text-lg font-bold text-[var(--color-text)]">{t.laboratory.testCatalogPreview}</h2>
@@ -32,19 +32,19 @@ export function LaboratoryTestCatalogPreview({ items, loading = false, error = n
           ))}
         </div>
       ) : error ? (
-        <div className="mt-5 rounded-2xl border border-[color:color-mix(in_srgb,var(--color-primary)_20%,var(--color-border))] bg-[color:color-mix(in_srgb,var(--color-primary)_6%,var(--color-surface))] p-4 text-sm leading-7 text-[var(--color-muted)]">
-          {error}
+        <div className="mt-5">
+          <DashboardStateCard state="error" description={error} />
         </div>
       ) : visibleItems.length === 0 ? (
         <div className="mt-5">
-          <EmptyState
-            icon={<FileTextIcon size={20} />}
+          <DashboardStateCard
+            state="empty"
             title={t.laboratory.noLabTestsAvailable}
             description={t.laboratory.labPrivacyNotice}
           />
         </div>
       ) : (
-        <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <DashboardGrid columns="four" className="mt-5">
           {visibleItems.map((item) => (
             <div key={item.id} className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-4">
               <div className="flex items-start justify-between gap-3">
@@ -63,7 +63,7 @@ export function LaboratoryTestCatalogPreview({ items, loading = false, error = n
               </div>
             </div>
           ))}
-        </div>
+        </DashboardGrid>
       )}
     </Card>
   );

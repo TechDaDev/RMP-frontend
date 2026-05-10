@@ -3,13 +3,15 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
+import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
+import { DashboardSection } from "@/components/dashboard/DashboardSection";
+import { DashboardStateCard } from "@/components/dashboard/DashboardStateCard";
 import { FileTextIcon, LabIcon, MessageIcon, PrescriptionIcon } from "@/components/icons";
 import { PatientSummaryCards } from "@/components/patient/PatientSummaryCards";
 import { PatientWorkflowCard } from "@/components/patient/PatientWorkflowCard";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { EmptyState } from "@/components/ui/EmptyState";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { ProfilePromptCard } from "@/components/profile/ProfilePromptCard";
 import { getPatientDashboardSummary } from "@/lib/patient/patientService";
@@ -116,7 +118,7 @@ export default function PatientPortalPage() {
         description={t.patient.dashboardSubtitle}
       />
 
-      <Card className="rounded-[2rem]">
+      <Card>
         <h2 className="text-lg font-bold text-[var(--color-text)]">{t.patient.welcomeTitle}</h2>
         <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">{t.patient.welcomeDescription}</p>
         {user ? (
@@ -126,29 +128,28 @@ export default function PatientPortalPage() {
 
       <ProfilePromptCard />
 
-      {loading ? (
-        <Card className="rounded-[2rem]">
-          <p className="text-sm text-[var(--color-muted)]">{t.patient.loading}</p>
-        </Card>
-      ) : error || !summary ? (
-        <Card className="space-y-4 rounded-[2rem]">
-          <EmptyState title={t.patient.dashboardErrorTitle} description={error ?? t.patient.noDataDescription} />
-          <Button variant="secondary" onClick={() => void handleRetry()}>{t.patient.retry}</Button>
-        </Card>
-      ) : (
-        <PatientSummaryCards summary={summary} />
-      )}
+      <DashboardSection title={t.patient.dashboardTitle} description={t.patient.dashboardSubtitle}>
+        {loading ? (
+          <DashboardStateCard state="loading" description={t.patient.loading} />
+        ) : error || !summary ? (
+          <DashboardStateCard
+            state="error"
+            title={t.patient.dashboardErrorTitle}
+            description={error ?? t.patient.noDataDescription}
+            action={<Button variant="secondary" onClick={() => void handleRetry()}>{t.patient.retry}</Button>}
+          />
+        ) : (
+          <PatientSummaryCards summary={summary} />
+        )}
+      </DashboardSection>
 
-      <Card className="rounded-[2rem]">
-        <h2 className="text-lg font-bold text-[var(--color-text)]">{t.patient.quickActionsTitle}</h2>
-        <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">{t.patient.quickActionsSubtitle}</p>
-      </Card>
-
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {workflows.map((workflow) => (
-          <PatientWorkflowCard key={workflow.href} {...workflow} />
-        ))}
-      </div>
+      <DashboardSection title={t.patient.quickActionsTitle} description={t.patient.quickActionsSubtitle}>
+        <DashboardGrid columns="three">
+          {workflows.map((workflow) => (
+            <PatientWorkflowCard key={workflow.href} {...workflow} />
+          ))}
+        </DashboardGrid>
+      </DashboardSection>
     </div>
   );
 }

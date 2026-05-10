@@ -4,13 +4,14 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
+import { DashboardSection } from "@/components/dashboard/DashboardSection";
+import { DashboardStateCard } from "@/components/dashboard/DashboardStateCard";
 import { DoctorConsultationList } from "@/components/doctor/DoctorConsultationList";
 import { DoctorDashboardSummary } from "@/components/doctor/DoctorDashboardSummary";
 import { DoctorVerificationNotice } from "@/components/doctor/DoctorVerificationNotice";
 import { Badge } from "@/components/ui/Badge";
 import { Button, buttonClassName } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { EmptyState } from "@/components/ui/EmptyState";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { ApiError } from "@/lib/api/errors";
 import {
@@ -136,44 +137,45 @@ export default function DoctorPortalPage() {
       />
 
       {doctorSpecialty ? (
-        <Card className="rounded-[2rem]">
+        <Card>
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">{t.doctor.doctorSpecialty}</p>
           <p className="mt-2 text-sm font-semibold text-[var(--color-text)]">{t.patient.specialtyLabels[doctorSpecialty] ?? doctorSpecialty}</p>
         </Card>
       ) : null}
 
-      <DoctorDashboardSummary
-        pendingCount={pending.length}
-        assignedCount={assigned.length}
-        pendingLabel={t.doctor.pendingConsultations}
-        assignedLabel={t.doctor.assignedConsultations}
-      />
-
-      <div className="flex flex-wrap gap-2">
-        <Link href="/app/doctor/consultations/pending" className={buttonClassName({ variant: "secondary" })}>
-          {t.doctor.pendingConsultations}
-        </Link>
-        <Link href="/app/doctor/consultations/assigned" className={buttonClassName({ variant: "secondary" })}>
-          {t.doctor.assignedConsultations}
-        </Link>
-      </div>
+      <DashboardSection
+        title={t.doctor.doctorDashboard}
+        description={t.doctor.doctorDashboardSubtitle}
+        actions={
+          <>
+            <Link href="/app/doctor/consultations/pending" className={buttonClassName({ variant: "secondary" })}>
+              {t.doctor.pendingConsultations}
+            </Link>
+            <Link href="/app/doctor/consultations/assigned" className={buttonClassName({ variant: "secondary" })}>
+              {t.doctor.assignedConsultations}
+            </Link>
+          </>
+        }
+      >
+        <DoctorDashboardSummary
+          pendingCount={pending.length}
+          assignedCount={assigned.length}
+          pendingLabel={t.doctor.pendingConsultations}
+          assignedLabel={t.doctor.assignedConsultations}
+        />
+      </DashboardSection>
 
       {successMessage ? (
-        <Card className="rounded-[2rem] border-green-300 bg-green-50 dark:border-green-800 dark:bg-green-950">
-          <p className="text-sm font-semibold text-green-800 dark:text-green-300">{successMessage}</p>
-        </Card>
+        <DashboardStateCard state="success" description={successMessage} />
       ) : null}
 
       {loading ? (
-        <Card className="rounded-[2rem]">
-          <p className="text-sm text-[var(--color-muted)]">{t.patient.loading}</p>
-        </Card>
+        <DashboardStateCard state="loading" description={t.patient.loading} />
       ) : error ? (
-        <EmptyState title={t.patient.noDataTitle} description={error} />
+        <DashboardStateCard state="error" title={t.patient.noDataTitle} description={error} />
       ) : (
         <>
-          <div className="space-y-3">
-            <h2 className="text-lg font-bold text-[var(--color-text)]">{t.doctor.latestPending}</h2>
+          <DashboardSection title={t.doctor.latestPending}>
             <DoctorConsultationList
               consultations={latestPending}
               emptyTitle={t.doctor.noPendingConsultations}
@@ -183,17 +185,16 @@ export default function DoctorPortalPage() {
               acceptingId={acceptingId}
               onAccept={(id) => void handleAccept(id)}
             />
-          </div>
+          </DashboardSection>
 
-          <div className="space-y-3">
-            <h2 className="text-lg font-bold text-[var(--color-text)]">{t.doctor.latestAssigned}</h2>
+          <DashboardSection title={t.doctor.latestAssigned}>
             <DoctorConsultationList
               consultations={latestAssigned}
               emptyTitle={t.doctor.noAssignedConsultations}
               emptyDescription={t.doctor.noAssignedConsultations}
               isApproved={isApproved}
             />
-          </div>
+          </DashboardSection>
         </>
       )}
     </div>

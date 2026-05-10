@@ -387,6 +387,15 @@ Expected output: QA report + fixes + final commit for pharmacist portal.
 - No API, auth, permission, route guard, backend contract, or workflow behavior changes were made.
 - QA covered role portal navigation, RTL/LTR language switching, theme switching, mobile drawer behavior, and build validation.
 
+### Phase 8.2 — Dashboard Layout Unification
+
+- Shared dashboard layout primitives were added for sections, grids, stat cards, workflow cards, and loading/error/empty state cards.
+- Patient, doctor, laboratory, and pharmacist dashboard structures now follow the same section rhythm and card hierarchy.
+- Summary/identity cards and workflow cards were visually aligned while preserving all existing data, links, disabled states, and role gates.
+- Loading/error/empty dashboard wrappers were standardized where practical.
+- No API, auth, permission, route guard, backend contract, or workflow behavior changes were made.
+- QA covered the four role dashboard pages across desktop, mobile, RTL/LTR language direction, theme switching, and build validation.
+
 ## Phase 9 — Admin/Staff Portal
 
 1. Knowledge base document operations.

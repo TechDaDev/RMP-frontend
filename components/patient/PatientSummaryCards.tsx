@@ -1,8 +1,9 @@
 "use client";
 
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
+import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
+import { DashboardStatCard } from "@/components/dashboard/DashboardStatCard";
 import { FileTextIcon, LabIcon, MessageIcon, PrescriptionIcon } from "@/components/icons";
-import { Card } from "@/components/ui/Card";
 import type { PatientDashboardSummary } from "@/types/patient";
 
 interface PatientSummaryCardsProps {
@@ -36,20 +37,10 @@ export function PatientSummaryCards({ summary }: PatientSummaryCardsProps) {
   ];
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+    <DashboardGrid columns="four">
       {cards.map(({ title, value, Icon }) => (
-        <Card key={title} className="rounded-[2rem]">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <p className="text-sm text-[var(--color-muted)]">{title}</p>
-              <p className="mt-3 text-3xl font-black text-[var(--color-text)]">{value}</p>
-            </div>
-            <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--color-surface-alt)] text-[var(--color-primary)]">
-              <Icon size={20} />
-            </span>
-          </div>
-        </Card>
+        <DashboardStatCard key={title} label={title} value={value} icon={<Icon size={20} />} tone="primary" />
       ))}
-    </div>
+    </DashboardGrid>
   );
 }

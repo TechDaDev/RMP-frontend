@@ -4,6 +4,8 @@ import { useMemo } from "react";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { RequireRole } from "@/components/auth/RequireRole";
+import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
+import { DashboardSection } from "@/components/dashboard/DashboardSection";
 import { PharmacistDashboardSummary } from "@/components/pharmacist/PharmacistDashboardSummary";
 import { PharmacistPrivacyNotice } from "@/components/pharmacist/PharmacistPrivacyNotice";
 import { PharmacistVerificationNotice } from "@/components/pharmacist/PharmacistVerificationNotice";
@@ -89,14 +91,17 @@ export default function PharmacistPortalPage() {
 
         <PharmacistVerificationNotice verification={verification} />
 
-        <PharmacistDashboardSummary
-          user={user}
-          userProfile={userProfile}
-          roleProfile={roleProfile}
-          verification={verification}
-        />
+        <DashboardSection title={t.pharmacist.pharmacyIdentity} description={t.pharmacist.noFakePrescriptionCounts}>
+          <PharmacistDashboardSummary
+            user={user}
+            userProfile={userProfile}
+            roleProfile={roleProfile}
+            verification={verification}
+          />
+        </DashboardSection>
 
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <DashboardSection title={t.pharmacist.workflowStartsWithQr} description={t.pharmacist.scanPrescriptionSubtitle}>
+          <DashboardGrid columns="four">
           {workflowCards.map((card) => (
             <PharmacistWorkflowCard
               key={card.title}
@@ -110,9 +115,12 @@ export default function PharmacistPortalPage() {
               disabled={card.disabled}
             />
           ))}
-        </div>
+          </DashboardGrid>
+        </DashboardSection>
 
-        <PharmacistPrivacyNotice />
+        <DashboardSection title={t.pharmacist.prescriptionSafetyNotice} description={t.pharmacist.patientPrivacyNotice}>
+          <PharmacistPrivacyNotice />
+        </DashboardSection>
       </div>
     </RequireRole>
   );

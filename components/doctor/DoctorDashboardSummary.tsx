@@ -1,6 +1,8 @@
 "use client";
 
-import { Card } from "@/components/ui/Card";
+import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
+import { DashboardStatCard } from "@/components/dashboard/DashboardStatCard";
+import { DoctorIcon, MessageIcon } from "@/components/icons";
 
 interface DoctorDashboardSummaryProps {
   pendingCount: number;
@@ -21,13 +23,9 @@ export function DoctorDashboardSummary({
   ];
 
   return (
-    <div className="grid gap-4 md:grid-cols-2">
-      {cards.map((card) => (
-        <Card key={card.label} className="rounded-[2rem]">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">{card.label}</p>
-          <p className="mt-2 text-3xl font-extrabold text-[var(--color-text)]">{card.value}</p>
-        </Card>
-      ))}
-    </div>
+    <DashboardGrid columns="two">
+      <DashboardStatCard label={cards[0].label} value={cards[0].value} icon={<MessageIcon size={20} />} tone="warning" />
+      <DashboardStatCard label={cards[1].label} value={cards[1].value} icon={<DoctorIcon size={20} />} tone="primary" />
+    </DashboardGrid>
   );
 }
