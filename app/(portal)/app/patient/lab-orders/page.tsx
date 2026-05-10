@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
+import { DashboardSection } from "@/components/dashboard/DashboardSection";
+import { DashboardStateCard } from "@/components/dashboard/DashboardStateCard";
 import { LabOrderList } from "@/components/patient/LabOrderList";
+import { PatientPageFrame } from "@/components/patient/ui/PatientPageFrame";
 import { Badge } from "@/components/ui/Badge";
-import { Card } from "@/components/ui/Card";
-import { EmptyState } from "@/components/ui/EmptyState";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { getMyLabOrders } from "@/lib/patient/patientService";
 import type { PatientLabOrderListItem } from "@/types/patient";
@@ -43,22 +44,22 @@ export default function LabOrdersPage() {
   }, [t.patient.noDataDescription]);
 
   return (
-    <div className="space-y-6">
+    <PatientPageFrame>
       <PageHeader
         badge={<Badge tone="primary">{t.patient.labOrdersTitle}</Badge>}
         title={t.patient.labOrdersTitle}
         description={t.patient.labOrdersSubtitle}
       />
 
-      {loading ? (
-        <Card className="rounded-[2rem]">
-          <p className="text-sm text-[var(--color-muted)]">{t.patient.loading}</p>
-        </Card>
-      ) : error ? (
-        <EmptyState title={t.patient.noDataTitle} description={error} />
-      ) : (
-        <LabOrderList orders={orders} />
-      )}
-    </div>
+      <DashboardSection title={t.patient.labOrdersTitle} description={t.patient.labOrdersSubtitle}>
+        {loading ? (
+          <DashboardStateCard state="loading" description={t.patient.loading} />
+        ) : error ? (
+          <DashboardStateCard state="error" title={t.patient.noDataTitle} description={error} />
+        ) : (
+          <LabOrderList orders={orders} />
+        )}
+      </DashboardSection>
+    </PatientPageFrame>
   );
 }

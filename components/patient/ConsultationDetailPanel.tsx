@@ -1,7 +1,9 @@
 "use client";
 
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
+import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
 import { ConsultationStatusBadge } from "@/components/patient/ConsultationStatusBadge";
+import { PatientInfoRow } from "@/components/patient/ui/PatientInfoRow";
 import { Card } from "@/components/ui/Card";
 import { getConsultationLifecycle } from "@/lib/patient/consultationStatus";
 import type { ConsultationDetail } from "@/types/patient";
@@ -30,9 +32,12 @@ export function ConsultationDetailPanel({ consultation }: ConsultationDetailPane
         : t.patient.statusHelpCancelled;
 
   return (
-    <Card className="space-y-5 rounded-[2rem]">
-      <div className="flex flex-wrap items-center gap-3">
+    <Card className="space-y-5">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2 className="text-lg font-bold text-[var(--color-text)]">{t.patient.consultationDetailTitle}</h2>
         <ConsultationStatusBadge status={consultation.status} />
+      </div>
+      <div className="text-sm text-[var(--color-muted)]">
         <span className="text-sm text-[var(--color-muted)]">
           {t.patient.createdAt}: {formatDate(consultation.created_at)}
         </span>
@@ -42,40 +47,18 @@ export function ConsultationDetailPanel({ consultation }: ConsultationDetailPane
         {statusHelp}
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">{t.patient.specialty}</p>
-          <p className="mt-2 text-sm font-semibold text-[var(--color-text)]">
-            {consultation.selected_specialty
-              ? t.patient.specialtyLabels[consultation.selected_specialty] ?? consultation.selected_specialty
-              : consultation.selected_specialty_other || "-"}
-          </p>
-        </div>
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">{t.patient.duration}</p>
-          <p className="mt-2 text-sm font-semibold text-[var(--color-text)]">{t.patient.durationLabels[consultation.duration] ?? consultation.duration}</p>
-        </div>
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">{t.patient.severity}</p>
-          <p className="mt-2 text-sm font-semibold text-[var(--color-text)]">{t.patient.severityLabels[consultation.severity] ?? consultation.severity}</p>
-        </div>
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">{t.patient.doctor}</p>
-          <p className="mt-2 text-sm font-semibold text-[var(--color-text)]">{consultation.doctor?.full_name || "-"}</p>
-        </div>
-      </div>
+      <DashboardGrid columns="four">
+        <PatientInfoRow label={t.patient.specialty} value={consultation.selected_specialty ? t.patient.specialtyLabels[consultation.selected_specialty] ?? consultation.selected_specialty : consultation.selected_specialty_other || "-"} />
+        <PatientInfoRow label={t.patient.duration} value={t.patient.durationLabels[consultation.duration] ?? consultation.duration} />
+        <PatientInfoRow label={t.patient.severity} value={t.patient.severityLabels[consultation.severity] ?? consultation.severity} />
+        <PatientInfoRow label={t.patient.doctor} value={consultation.doctor?.full_name || "-"} />
+      </DashboardGrid>
 
-      <div className="grid gap-4 md:grid-cols-3">
-        <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 py-3 text-sm text-[var(--color-text)]">
-          {t.patient.fever}: {consultation.has_fever ? t.common.yes : t.common.no}
-        </div>
-        <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 py-3 text-sm text-[var(--color-text)]">
-          {t.patient.pain}: {consultation.has_pain ? t.common.yes : t.common.no}
-        </div>
-        <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 py-3 text-sm text-[var(--color-text)]">
-          {t.patient.consultationRefresh}: {formatDate(consultation.updated_at)}
-        </div>
-      </div>
+      <DashboardGrid columns="three">
+        <PatientInfoRow label={t.patient.fever} value={consultation.has_fever ? t.common.yes : t.common.no} />
+        <PatientInfoRow label={t.patient.pain} value={consultation.has_pain ? t.common.yes : t.common.no} />
+        <PatientInfoRow label={t.patient.consultationRefresh} value={formatDate(consultation.updated_at)} />
+      </DashboardGrid>
 
       <div>
         <p className="text-sm font-semibold text-[var(--color-text)]">{t.patient.additionalNotes}</p>

@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
+import { DashboardSection } from "@/components/dashboard/DashboardSection";
+import { DashboardStateCard } from "@/components/dashboard/DashboardStateCard";
 import { MedicalRecordPanel } from "@/components/patient/MedicalRecordPanel";
+import { PatientPageFrame } from "@/components/patient/ui/PatientPageFrame";
 import { Badge } from "@/components/ui/Badge";
-import { Card } from "@/components/ui/Card";
-import { EmptyState } from "@/components/ui/EmptyState";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { getMyMedicalRecord } from "@/lib/patient/patientService";
 import type { PatientMedicalRecord } from "@/types/patient";
@@ -44,24 +45,24 @@ export default function MedicalRecordPage() {
 
   if (loading) {
     return (
-      <Card className="rounded-[2rem]">
-        <p className="text-sm text-[var(--color-muted)]">{t.patient.loading}</p>
-      </Card>
+      <DashboardStateCard state="loading" description={t.patient.loading} />
     );
   }
 
   if (error || !record) {
-    return <EmptyState title={t.patient.noDataTitle} description={error ?? t.patient.noDataDescription} />;
+    return <DashboardStateCard state="error" title={t.patient.noDataTitle} description={error ?? t.patient.noDataDescription} />;
   }
 
   return (
-    <div className="space-y-6">
+    <PatientPageFrame>
       <PageHeader
         badge={<Badge tone="primary">{t.patient.medicalRecordTitle}</Badge>}
         title={t.patient.medicalRecordTitle}
         description={t.patient.medicalRecordSubtitle}
       />
-      <MedicalRecordPanel record={record} />
-    </div>
+      <DashboardSection title={t.patient.medicalRecordTitle} description={t.patient.medicalRecordSubtitle}>
+        <MedicalRecordPanel record={record} />
+      </DashboardSection>
+    </PatientPageFrame>
   );
 }

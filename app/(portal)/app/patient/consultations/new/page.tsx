@@ -3,9 +3,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
+import { DashboardSection } from "@/components/dashboard/DashboardSection";
+import { DashboardStateCard } from "@/components/dashboard/DashboardStateCard";
 import { ConsultationForm } from "@/components/patient/ConsultationForm";
+import { PatientPageFrame } from "@/components/patient/ui/PatientPageFrame";
 import { Badge } from "@/components/ui/Badge";
-import { EmptyState } from "@/components/ui/EmptyState";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { ApiError } from "@/lib/api/errors";
 import {
@@ -94,28 +96,31 @@ export default function NewConsultationPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <PatientPageFrame>
       <PageHeader
         badge={<Badge tone="primary">{t.patient.consultationNewTitle}</Badge>}
         title={t.patient.consultationNewTitle}
         description={t.patient.consultationNewSubtitle}
       />
 
-      {unavailable ? (
-        <EmptyState
-          title={t.patient.consultationCreateUnavailableTitle}
-          description={t.patient.consultationCreateUnavailableDescription}
-        />
-      ) : (
-        <ConsultationForm
-          categories={categories}
-          symptoms={symptoms}
-          loadingSymptoms={loadingSymptoms}
-          submitting={submitting}
-          error={error}
-          onSubmit={handleSubmit}
-        />
-      )}
-    </div>
+      <DashboardSection title={t.patient.requestConsultation} description={t.patient.consultationNewSubtitle}>
+        {unavailable ? (
+          <DashboardStateCard
+            state="empty"
+            title={t.patient.consultationCreateUnavailableTitle}
+            description={t.patient.consultationCreateUnavailableDescription}
+          />
+        ) : (
+          <ConsultationForm
+            categories={categories}
+            symptoms={symptoms}
+            loadingSymptoms={loadingSymptoms}
+            submitting={submitting}
+            error={error}
+            onSubmit={handleSubmit}
+          />
+        )}
+      </DashboardSection>
+    </PatientPageFrame>
   );
 }

@@ -45,7 +45,7 @@ export function ConsultationLifecycleCard({ status }: ConsultationLifecycleCardP
   // For cancelled/rejected show a simple cancelled notice instead of the steps
   if (lifecycle === "cancelled") {
     return (
-      <Card className="rounded-[2rem]">
+      <Card>
         <p className="text-sm font-semibold text-[var(--color-text)]">{t.patient.lifecycleTitle}</p>
         <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-800 dark:bg-red-950 dark:text-red-200">
           {t.patient.statusHelpCancelled}
@@ -55,7 +55,7 @@ export function ConsultationLifecycleCard({ status }: ConsultationLifecycleCardP
   }
 
   return (
-    <Card className="rounded-[2rem]">
+    <Card>
       <p className="text-sm font-semibold text-[var(--color-text)]">{t.patient.lifecycleTitle}</p>
 
       <ol className="mt-4 flex flex-wrap gap-0 overflow-hidden rounded-2xl border border-[var(--color-border)]">

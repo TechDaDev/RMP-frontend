@@ -48,7 +48,7 @@ export function ConsultationMessagesPanel({
   }
 
   return (
-    <Card className="space-y-5 rounded-[2rem]">
+    <Card className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-lg font-bold text-[var(--color-text)]">{t.patient.messagesTitle}</h2>

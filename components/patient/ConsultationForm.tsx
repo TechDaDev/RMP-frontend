@@ -2,9 +2,9 @@
 
 import { useMemo, useState, type FormEvent } from "react";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
+import { DashboardStateCard } from "@/components/dashboard/DashboardStateCard";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { EmptyState } from "@/components/ui/EmptyState";
 import type {
   ConsultationCreateRequest,
   ConsultationDuration,
@@ -130,8 +130,8 @@ export function ConsultationForm({
   }
 
   return (
-    <Card className="space-y-6 rounded-[2rem]">
-      <div className="rounded-3xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-7 text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-100">
+    <Card className="space-y-6">
+      <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-7 text-amber-900 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-100">
         {t.patient.emergencyWarning}
       </div>
 
@@ -194,7 +194,7 @@ export function ConsultationForm({
           />
         </label>
 
-        <div className="space-y-4 rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-4">
+        <div className="space-y-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-4">
           <p className="text-sm font-semibold text-[var(--color-text)]">{t.patient.selectSymptoms}</p>
           <div className="grid gap-4 md:grid-cols-2">
             <label className="block space-y-2">
@@ -281,14 +281,16 @@ export function ConsultationForm({
           ) : null}
 
           {loadingSymptoms ? (
-            <p className="text-sm text-[var(--color-muted)]">{t.patient.loading}</p>
+            <DashboardStateCard state="loading" description={t.patient.loading} />
           ) : symptoms.length === 0 ? (
-            <EmptyState
+            <DashboardStateCard
+              state="empty"
               title={t.patient.noSymptomsAvailable}
               description={t.patient.consultationCreateUnavailableDescription}
             />
           ) : filteredSymptoms.length === 0 ? (
-            <EmptyState
+            <DashboardStateCard
+              state="empty"
               title={t.patient.noSymptomsMatch}
               description={t.patient.searchSymptoms}
             />

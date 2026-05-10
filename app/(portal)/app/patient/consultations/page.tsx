@@ -3,11 +3,12 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
+import { DashboardSection } from "@/components/dashboard/DashboardSection";
+import { DashboardStateCard } from "@/components/dashboard/DashboardStateCard";
 import { ConsultationList } from "@/components/patient/ConsultationList";
+import { PatientPageFrame } from "@/components/patient/ui/PatientPageFrame";
 import { Badge } from "@/components/ui/Badge";
 import { buttonClassName } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
-import { EmptyState } from "@/components/ui/EmptyState";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { getMyConsultations } from "@/lib/patient/patientService";
 import type { ConsultationListItem } from "@/types/patient";
@@ -47,7 +48,7 @@ export default function PatientConsultationsPage() {
   }, [t.patient.noDataDescription]);
 
   return (
-    <div className="space-y-6">
+    <PatientPageFrame>
       <PageHeader
         badge={<Badge tone="primary">{t.patient.consultationsTitle}</Badge>}
         title={t.patient.consultationsTitle}
@@ -59,15 +60,15 @@ export default function PatientConsultationsPage() {
         }
       />
 
-      {loading ? (
-        <Card className="rounded-[2rem]">
-          <p className="text-sm text-[var(--color-muted)]">{t.patient.loading}</p>
-        </Card>
-      ) : error ? (
-        <EmptyState title={t.patient.noDataTitle} description={error} />
-      ) : (
-        <ConsultationList consultations={consultations} />
-      )}
-    </div>
+      <DashboardSection title={t.patient.consultationsTitle} description={t.patient.consultationsSubtitle}>
+        {loading ? (
+          <DashboardStateCard state="loading" description={t.patient.loading} />
+        ) : error ? (
+          <DashboardStateCard state="error" title={t.patient.noDataTitle} description={error} />
+        ) : (
+          <ConsultationList consultations={consultations} />
+        )}
+      </DashboardSection>
+    </PatientPageFrame>
   );
 }

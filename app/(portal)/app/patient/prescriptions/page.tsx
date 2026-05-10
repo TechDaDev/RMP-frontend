@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
+import { DashboardSection } from "@/components/dashboard/DashboardSection";
+import { DashboardStateCard } from "@/components/dashboard/DashboardStateCard";
 import { PrescriptionList } from "@/components/patient/PrescriptionList";
+import { PatientPageFrame } from "@/components/patient/ui/PatientPageFrame";
 import { Badge } from "@/components/ui/Badge";
-import { Card } from "@/components/ui/Card";
-import { EmptyState } from "@/components/ui/EmptyState";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { getMyPrescriptions } from "@/lib/patient/patientService";
 import type { PatientPrescriptionListItem } from "@/types/patient";
@@ -43,22 +44,22 @@ export default function PrescriptionsPage() {
   }, [t.patient.noDataDescription]);
 
   return (
-    <div className="space-y-6">
+    <PatientPageFrame>
       <PageHeader
         badge={<Badge tone="primary">{t.patient.prescriptionsTitle}</Badge>}
         title={t.patient.prescriptionsTitle}
         description={t.patient.prescriptionsSubtitle}
       />
 
-      {loading ? (
-        <Card className="rounded-[2rem]">
-          <p className="text-sm text-[var(--color-muted)]">{t.patient.loading}</p>
-        </Card>
-      ) : error ? (
-        <EmptyState title={t.patient.noDataTitle} description={error} />
-      ) : (
-        <PrescriptionList prescriptions={prescriptions} />
-      )}
-    </div>
+      <DashboardSection title={t.patient.prescriptionsTitle} description={t.patient.prescriptionsSubtitle}>
+        {loading ? (
+          <DashboardStateCard state="loading" description={t.patient.loading} />
+        ) : error ? (
+          <DashboardStateCard state="error" title={t.patient.noDataTitle} description={error} />
+        ) : (
+          <PrescriptionList prescriptions={prescriptions} />
+        )}
+      </DashboardSection>
+    </PatientPageFrame>
   );
 }

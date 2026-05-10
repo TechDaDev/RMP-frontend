@@ -71,3 +71,27 @@
 - Polish patient-specific detail/list pages.
 - Continue standardizing consultation, prescription, lab order, and history list states.
 - Review nested domain cards on non-dashboard pages for spacing and mobile density.
+
+## Phase 8.3 - Patient Portal UI Polish
+
+### Patient page primitives
+
+- Added small patient UI helpers:
+  - `PatientPageFrame`
+  - `PatientInfoRow`
+  - `PatientListCard`
+- These helpers only standardize spacing, label/value hierarchy, and list-card action placement.
+
+### Patient page alignment
+
+- Patient list pages now share the same `PageHeader`, `DashboardSection`, state-card, and list-card rhythm.
+- Consultation, prescription, lab order, and lab result detail pages now use consistent loading/error states and top-level back actions.
+- New consultation form keeps the same symptom catalog, validation, and submit behavior while aligning warning, catalog, loading, and empty states.
+- Medical record sections now use shared info rows, section wrappers, and status badges for easier scanning.
+
+### Remaining role portal polish
+
+- Phase 8.4 Doctor Portal UI Polish
+- Phase 8.5 Laboratory Portal UI Polish
+- Phase 8.6 Pharmacist Portal UI Polish
+- Phase 8.7 Mobile + RTL Final Polish

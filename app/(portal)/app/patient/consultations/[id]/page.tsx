@@ -4,13 +4,13 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
+import { DashboardStateCard } from "@/components/dashboard/DashboardStateCard";
 import { Button, buttonClassName } from "@/components/ui/Button";
 import { ConsultationDetailPanel } from "@/components/patient/ConsultationDetailPanel";
 import { ConsultationLifecycleCard } from "@/components/patient/ConsultationLifecycleCard";
 import { ConsultationMessagesPanel } from "@/components/patient/ConsultationMessagesPanel";
+import { PatientPageFrame } from "@/components/patient/ui/PatientPageFrame";
 import { Badge } from "@/components/ui/Badge";
-import { Card } from "@/components/ui/Card";
-import { EmptyState } from "@/components/ui/EmptyState";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { ApiError } from "@/lib/api/errors";
 import { canPatientUseMessages, getConsultationLifecycle } from "@/lib/patient/consultationStatus";
@@ -182,32 +182,39 @@ export default function ConsultationDetailPage() {
 
   if (loading) {
     return (
-      <Card className="rounded-[2rem]">
-        <p className="text-sm text-[var(--color-muted)]">{t.patient.loading}</p>
-      </Card>
+      <DashboardStateCard state="loading" description={t.patient.loading} />
     );
   }
 
   if (error || !consultation) {
     return (
-      <Card className="space-y-5 rounded-[2rem]">
-        <EmptyState title={t.patient.noDataTitle} description={error ?? t.patient.noDataDescription} />
-        <div className="flex flex-wrap items-center justify-center gap-3">
+      <DashboardStateCard
+        state="error"
+        title={t.patient.noDataTitle}
+        description={error ?? t.patient.noDataDescription}
+        action={
+          <>
           <Link href="/app/patient/consultations" className={buttonClassName({ variant: "secondary" })}>
             {t.patient.backToConsultations}
           </Link>
           <Button onClick={() => void handleRefresh()}>{t.patient.retry}</Button>
-        </div>
-      </Card>
+          </>
+        }
+      />
     );
   }
 
   return (
-    <div className="space-y-6">
+    <PatientPageFrame>
       <PageHeader
         badge={<Badge tone="primary">{t.patient.consultationDetailTitle}</Badge>}
         title={t.patient.consultationDetailTitle}
         description={t.patient.consultationDetailSubtitle}
+        actions={
+          <Link href="/app/patient/consultations" className={buttonClassName({ variant: "secondary" })}>
+            {t.patient.backToConsultations}
+          </Link>
+        }
       />
 
       <ConsultationDetailPanel consultation={consultation} />
@@ -222,6 +229,6 @@ export default function ConsultationDetailPage() {
         onRefresh={() => void handleRefresh()}
         onSend={handleSend}
       />
-    </div>
+    </PatientPageFrame>
   );
 }

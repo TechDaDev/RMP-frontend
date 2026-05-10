@@ -396,6 +396,15 @@ Expected output: QA report + fixes + final commit for pharmacist portal.
 - No API, auth, permission, route guard, backend contract, or workflow behavior changes were made.
 - QA covered the four role dashboard pages across desktop, mobile, RTL/LTR language direction, theme switching, and build validation.
 
+### Phase 8.3 — Patient Portal UI Polish
+
+- Patient consultation, prescription, lab order, lab result, and medical record pages were polished with consistent list/detail/form layout patterns.
+- Patient-specific UI helpers were added for page spacing, reusable label/value rows, and list cards.
+- Loading, error, and empty states now use consistent dashboard state wrappers where practical.
+- New consultation form and medical record sections were visually tightened without changing validation, payloads, service calls, or visibility rules.
+- No API, auth, permission, route guard, backend contract, or workflow behavior changes were made.
+- QA covered patient list/detail/form pages across desktop, mobile, RTL/LTR language direction, and build validation.
+
 ## Phase 9 — Admin/Staff Portal
 
 1. Knowledge base document operations.

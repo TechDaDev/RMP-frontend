@@ -1,12 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
+import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
+import { DashboardStateCard } from "@/components/dashboard/DashboardStateCard";
 import { ConsultationStatusBadge } from "@/components/patient/ConsultationStatusBadge";
-import { ArrowIcon, MessageIcon } from "@/components/icons";
-import { buttonClassName } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
-import { EmptyState } from "@/components/ui/EmptyState";
+import { PatientInfoRow } from "@/components/patient/ui/PatientInfoRow";
+import { PatientListCard } from "@/components/patient/ui/PatientListCard";
+import { MessageIcon } from "@/components/icons";
 import type { ConsultationListItem } from "@/types/patient";
 
 function formatDate(value?: string) {
@@ -26,7 +26,8 @@ export function ConsultationList({ consultations }: ConsultationListProps) {
 
   if (consultations.length === 0) {
     return (
-      <EmptyState
+      <DashboardStateCard
+        state="empty"
         icon={<MessageIcon size={20} />}
         title={t.patient.consultationEmptyTitle}
         description={t.patient.consultationEmptyDescription}
@@ -37,55 +38,23 @@ export function ConsultationList({ consultations }: ConsultationListProps) {
   return (
     <div className="space-y-4">
       {consultations.map((consultation) => (
-        <Card key={consultation.id} className="rounded-[2rem]">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-            <div className="space-y-4">
-              <div className="flex flex-wrap items-center gap-2">
-                <ConsultationStatusBadge status={consultation.status} />
-                <span className="text-sm text-[var(--color-muted)]">
-                  {t.patient.createdAt}: {formatDate(consultation.created_at)}
-                </span>
-              </div>
-              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">{t.patient.specialty}</p>
-                  <p className="mt-2 text-sm font-semibold text-[var(--color-text)]">
-                    {consultation.selected_specialty
-                      ? t.patient.specialtyLabels[consultation.selected_specialty] ?? consultation.selected_specialty
-                      : consultation.selected_specialty_other || "-"}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">{t.patient.severity}</p>
-                  <p className="mt-2 text-sm font-semibold text-[var(--color-text)]">
-                    {t.patient.severityLabels[consultation.severity] ?? consultation.severity}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">{t.patient.duration}</p>
-                  <p className="mt-2 text-sm font-semibold text-[var(--color-text)]">
-                    {t.patient.durationLabels[consultation.duration] ?? consultation.duration}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">{t.patient.additionalNotes}</p>
-                  <p className="mt-2 line-clamp-2 text-sm text-[var(--color-text)]">
-                    {consultation.additional_notes || "-"}
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="flex w-full shrink-0 lg:w-auto">
-              <Link
-                href={`/app/patient/consultations/${consultation.id}`}
-                className={buttonClassName({ variant: "secondary", className: "w-full lg:w-auto" })}
-              >
-                {t.patient.consultationDetailTitle}
-                <ArrowIcon size={16} />
-              </Link>
-            </div>
-          </div>
-        </Card>
+        <PatientListCard
+          key={consultation.id}
+          title={consultation.selected_specialty
+            ? t.patient.specialtyLabels[consultation.selected_specialty] ?? consultation.selected_specialty
+            : consultation.selected_specialty_other || t.patient.consultationDetailTitle}
+          meta={`${t.patient.createdAt}: ${formatDate(consultation.created_at)}`}
+          badge={<ConsultationStatusBadge status={consultation.status} />}
+          href={`/app/patient/consultations/${consultation.id}`}
+          actionLabel={t.patient.consultationDetailTitle}
+        >
+          <DashboardGrid columns="four">
+            <PatientInfoRow label={t.patient.specialty} value={consultation.selected_specialty ? t.patient.specialtyLabels[consultation.selected_specialty] ?? consultation.selected_specialty : consultation.selected_specialty_other || "-"} />
+            <PatientInfoRow label={t.patient.severity} value={t.patient.severityLabels[consultation.severity] ?? consultation.severity} />
+            <PatientInfoRow label={t.patient.duration} value={t.patient.durationLabels[consultation.duration] ?? consultation.duration} />
+            <PatientInfoRow label={t.patient.additionalNotes} value={<span className="line-clamp-2">{consultation.additional_notes || "-"}</span>} muted />
+          </DashboardGrid>
+        </PatientListCard>
       ))}
     </div>
   );

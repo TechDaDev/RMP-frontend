@@ -10,6 +10,7 @@ interface DashboardStateCardProps {
   title?: string;
   description: string;
   action?: ReactNode;
+  icon?: ReactNode;
 }
 
 const stateTone = {
@@ -31,11 +32,12 @@ export function DashboardStateCard({
   title,
   description,
   action,
+  icon,
 }: DashboardStateCardProps) {
   if (state === "empty") {
     return (
       <div className="space-y-4">
-        <EmptyState icon={stateIcon.empty} title={title ?? description} description={description} />
+        <EmptyState icon={icon ?? stateIcon.empty} title={title ?? description} description={description} />
         {action ? <div className="flex flex-wrap gap-2">{action}</div> : null}
       </div>
     );
@@ -48,7 +50,7 @@ export function DashboardStateCard({
           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-[var(--color-surface-alt)] text-[var(--color-primary)]"
           aria-hidden="true"
         >
-          {stateIcon[state]}
+          {icon ?? stateIcon[state]}
         </span>
         <div className="min-w-0">
           {title ? <h3 className="text-base font-bold text-[var(--color-text)]">{title}</h3> : null}

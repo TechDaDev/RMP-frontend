@@ -4,11 +4,11 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
+import { DashboardStateCard } from "@/components/dashboard/DashboardStateCard";
 import { buttonClassName } from "@/components/ui/Button";
 import { LabOrderDetailPanel } from "@/components/patient/LabOrderDetailPanel";
+import { PatientPageFrame } from "@/components/patient/ui/PatientPageFrame";
 import { Badge } from "@/components/ui/Badge";
-import { Card } from "@/components/ui/Card";
-import { EmptyState } from "@/components/ui/EmptyState";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { getMyLabOrderDetail } from "@/lib/patient/patientService";
 import type { PatientLabOrderDetail } from "@/types/patient";
@@ -48,33 +48,38 @@ export default function LabOrderDetailPage() {
 
   if (loading) {
     return (
-      <Card className="rounded-[2rem]">
-        <p className="text-sm text-[var(--color-muted)]">{t.patient.loading}</p>
-      </Card>
+      <DashboardStateCard state="loading" description={t.patient.loading} />
     );
   }
 
   if (error || !detail) {
     return (
-      <div className="space-y-4">
-        <EmptyState title={t.patient.noDataTitle} description={error ?? t.patient.noDataDescription} />
-        <div className="flex justify-center">
+      <DashboardStateCard
+        state="error"
+        title={t.patient.noDataTitle}
+        description={error ?? t.patient.noDataDescription}
+        action={
           <Link href="/app/patient/lab-orders" className={buttonClassName({ variant: "secondary" })}>
             {t.patient.backToLabOrders}
           </Link>
-        </div>
-      </div>
+        }
+      />
     );
   }
 
   return (
-    <div className="space-y-6">
+    <PatientPageFrame>
       <PageHeader
         badge={<Badge tone="primary">{t.patient.labOrderDetailTitle}</Badge>}
         title={t.patient.labOrderDetailTitle}
         description={t.patient.labOrdersSubtitle}
+        actions={
+          <Link href="/app/patient/lab-orders" className={buttonClassName({ variant: "secondary" })}>
+            {t.patient.backToLabOrders}
+          </Link>
+        }
       />
       <LabOrderDetailPanel order={detail} />
-    </div>
+    </PatientPageFrame>
   );
 }
