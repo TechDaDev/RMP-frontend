@@ -1,6 +1,8 @@
 "use client";
 
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
+import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
+import { DoctorInfoRow } from "@/components/doctor/ui/DoctorInfoRow";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import type { DoctorConsultationDetail } from "@/types/doctor";
@@ -17,24 +19,10 @@ export function DoctorSymptomsCard({ consultation }: DoctorSymptomsCardProps) {
     <Card className="space-y-3">
       <h3 className="text-base font-semibold text-[var(--color-text)]">{t.doctor.symptomsAndRouting}</h3>
 
-      <div className="grid gap-3 md:grid-cols-2">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">{t.patient.specialty}</p>
-          <p className="mt-1 text-sm font-semibold text-[var(--color-text)]">
-            {consultation.selected_specialty
-              ? (t.patient.specialtyLabels[consultation.selected_specialty] ?? consultation.selected_specialty)
-              : "-"}
-          </p>
-        </div>
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">{t.doctor.matchingSpecialtyQueue}</p>
-          <p className="mt-1 text-sm font-semibold text-[var(--color-text)]">
-            {consultation.recommended_specialty
-              ? (t.patient.specialtyLabels[consultation.recommended_specialty] ?? consultation.recommended_specialty)
-              : "-"}
-          </p>
-        </div>
-      </div>
+      <DashboardGrid columns="two">
+        <DoctorInfoRow label={t.patient.specialty} value={consultation.selected_specialty ? (t.patient.specialtyLabels[consultation.selected_specialty] ?? consultation.selected_specialty) : "-"} />
+        <DoctorInfoRow label={t.doctor.matchingSpecialtyQueue} value={consultation.recommended_specialty ? (t.patient.specialtyLabels[consultation.recommended_specialty] ?? consultation.recommended_specialty) : "-"} />
+      </DashboardGrid>
 
       <div className="space-y-2">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">{t.patient.symptoms}</p>

@@ -4,14 +4,15 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
+import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
+import { DashboardStateCard } from "@/components/dashboard/DashboardStateCard";
 import { DoctorLabResultDetailPanel } from "@/components/doctor/DoctorLabResultDetailPanel";
 import { DoctorLabResultMedicalRecordCard } from "@/components/doctor/DoctorLabResultMedicalRecordCard";
 import { DoctorLabResultReleaseCard } from "@/components/doctor/DoctorLabResultReleaseCard";
 import { DoctorLabResultReviewCard } from "@/components/doctor/DoctorLabResultReviewCard";
+import { DoctorPageFrame } from "@/components/doctor/ui/DoctorPageFrame";
 import { Badge } from "@/components/ui/Badge";
 import { Button, buttonClassName } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
-import { EmptyState } from "@/components/ui/EmptyState";
 import { PageHeader } from "@/components/ui/PageHeader";
 import {
   getDoctorLabResultDetail,
@@ -86,27 +87,27 @@ export default function DoctorLabResultDetailPage() {
 
   if (loading) {
     return (
-      <Card className="rounded-[2rem]">
-        <p className="text-sm text-[var(--color-muted)]">{t.patient.loading}</p>
-      </Card>
+      <DashboardStateCard state="loading" description={t.patient.loading} />
     );
   }
 
   if (error || !result) {
     return (
-      <Card className="space-y-4 rounded-[2rem]">
-        <EmptyState title={t.patient.noDataTitle} description={error ?? t.doctor.resultsUnavailable} />
-        <div className="flex flex-wrap justify-center gap-2">
+      <DashboardStateCard
+        state="error"
+        title={t.patient.noDataTitle}
+        description={error ?? t.doctor.resultsUnavailable}
+        action={
           <Link href="/app/doctor" className={buttonClassName({ variant: "secondary" })}>
             {t.doctor.backToDoctorDashboard}
           </Link>
-        </div>
-      </Card>
+        }
+      />
     );
   }
 
   return (
-    <div className="space-y-6">
+    <DoctorPageFrame>
       <PageHeader
         badge={<Badge tone="primary">{t.doctor.labResultDetail}</Badge>}
         title={t.doctor.labResultDetail}
@@ -120,10 +121,10 @@ export default function DoctorLabResultDetailPage() {
 
       <DoctorLabResultDetailPanel result={result} />
 
-      <div className="grid gap-6 xl:grid-cols-2">
+      <DashboardGrid columns="two">
         <DoctorLabResultReviewCard result={result} onReview={handleReview} />
         <DoctorLabResultReleaseCard result={result} onRelease={handleRelease} />
-      </div>
+      </DashboardGrid>
 
       <DoctorLabResultMedicalRecordCard result={result} onLink={handleLink} />
 
@@ -137,6 +138,6 @@ export default function DoctorLabResultDetailPage() {
           {t.doctor.backToDoctorDashboard}
         </Link>
       </div>
-    </div>
+    </DoctorPageFrame>
   );
 }

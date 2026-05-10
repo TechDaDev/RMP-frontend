@@ -95,3 +95,26 @@
 - Phase 8.5 Laboratory Portal UI Polish
 - Phase 8.6 Pharmacist Portal UI Polish
 - Phase 8.7 Mobile + RTL Final Polish
+
+## Phase 8.4 - Doctor Portal UI Polish
+
+### Doctor page primitives
+
+- Added doctor-specific UI helpers:
+  - `DoctorPageFrame`
+  - `DoctorInfoRow`
+  - `DoctorListCard`
+- Helpers are UI-only and standardize spacing, label/value rows, and queue-card action placement.
+
+### Doctor page alignment
+
+- Pending and assigned consultation queues now share consistent section, state-card, and list-card patterns.
+- Doctor consultation workspace sections are grouped for patient context, clinical review, messages, care actions, and order/record actions.
+- Doctor prescription, lab order, lab result, and patient-record detail pages now use consistent loading/error states, back actions, badges, and label/value rows.
+- Patient-record access states now use the same page header and dashboard state wrappers as other doctor detail pages.
+
+### Remaining role portal polish
+
+- Phase 8.5 Laboratory Portal UI Polish
+- Phase 8.6 Pharmacist Portal UI Polish
+- Phase 8.7 Mobile + RTL Final Polish

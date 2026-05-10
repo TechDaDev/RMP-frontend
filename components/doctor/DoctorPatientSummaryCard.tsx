@@ -1,6 +1,8 @@
 "use client";
 
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
+import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
+import { DoctorInfoRow } from "@/components/doctor/ui/DoctorInfoRow";
 import { DoctorConsultationDetail } from "@/types/doctor";
 import { Card } from "@/components/ui/Card";
 
@@ -23,44 +25,12 @@ export default function DoctorPatientSummaryCard({
         <h3 className="text-base font-semibold text-[var(--color-text)]">
           {d.patientSummary}
         </h3>
-        <dl className="grid grid-cols-1 gap-2 sm:grid-cols-2 text-sm">
-          <div>
-            <dt className="font-medium text-[var(--color-muted)] text-xs uppercase tracking-wide">
-              {t.roles.patient}
-            </dt>
-            <dd className="text-[var(--color-text)] font-semibold">
-              {patientName || "-"}
-            </dd>
-          </div>
-          <div>
-            <dt className="font-medium text-[var(--color-muted)] text-xs uppercase tracking-wide">
-              Email
-            </dt>
-            <dd className="text-[var(--color-text)] break-all">
-              {patient?.email ?? "—"}
-            </dd>
-          </div>
-          <div>
-            <dt className="font-medium text-[var(--color-muted)] text-xs uppercase tracking-wide">
-              {t.patient.createdAt}
-            </dt>
-            <dd className="text-[var(--color-text)]">
-              {consultation.created_at
-                ? new Date(consultation.created_at).toLocaleDateString()
-                : "—"}
-            </dd>
-          </div>
-          {consultation.accepted_at && (
-            <div>
-              <dt className="font-medium text-[var(--color-muted)] text-xs uppercase tracking-wide">
-                {d.statusAccepted}
-              </dt>
-              <dd className="text-[var(--color-text)]">
-                {new Date(consultation.accepted_at).toLocaleDateString()}
-              </dd>
-            </div>
-          )}
-        </dl>
+        <DashboardGrid columns="two">
+          <DoctorInfoRow label={t.roles.patient} value={patientName || "-"} />
+          <DoctorInfoRow label={t.auth.emailLabel} value={<span className="break-all">{patient?.email ?? "—"}</span>} />
+          <DoctorInfoRow label={t.patient.createdAt} value={consultation.created_at ? new Date(consultation.created_at).toLocaleDateString() : "—"} />
+          <DoctorInfoRow label={d.statusAccepted} value={consultation.accepted_at ? new Date(consultation.accepted_at).toLocaleDateString() : "—"} />
+        </DashboardGrid>
       </div>
     </Card>
   );

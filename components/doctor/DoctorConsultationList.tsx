@@ -1,6 +1,6 @@
 "use client";
 
-import { EmptyState } from "@/components/ui/EmptyState";
+import { DashboardStateCard } from "@/components/dashboard/DashboardStateCard";
 import { DoctorConsultationCard } from "@/components/doctor/DoctorConsultationCard";
 import type { DoctorConsultationListItem } from "@/types/doctor";
 
@@ -24,7 +24,7 @@ export function DoctorConsultationList({
   onAccept,
 }: DoctorConsultationListProps) {
   if (consultations.length === 0) {
-    return <EmptyState title={emptyTitle} description={emptyDescription} />;
+    return <DashboardStateCard state="empty" title={emptyTitle} description={emptyDescription} />;
   }
 
   return (

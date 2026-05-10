@@ -1,12 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
+import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
 import { DoctorAcceptButton } from "@/components/doctor/DoctorAcceptButton";
-import { ArrowIcon } from "@/components/icons";
+import { DoctorInfoRow } from "@/components/doctor/ui/DoctorInfoRow";
+import { DoctorListCard } from "@/components/doctor/ui/DoctorListCard";
 import { Badge } from "@/components/ui/Badge";
-import { buttonClassName } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
 import {
   getDoctorConsultationStatusLabelKey,
   getDoctorConsultationStatusTone,
@@ -58,54 +57,20 @@ export function DoctorConsultationCard({
   const statusLabelKey = getDoctorConsultationStatusLabelKey(consultation.status);
 
   return (
-    <Card className="rounded-[2rem]">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-        <div className="min-w-0 flex-1 space-y-3">
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge tone={badgeToneFromStatus(consultation.status)}>
-              {t.doctor[statusLabelKey]}
-            </Badge>
-            {redFlagCount > 0 ? (
-              <Badge tone="primary">{`${redFlagCount} ${t.patient.redFlagSymptom}`}</Badge>
-            ) : null}
-          </div>
-
-          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">{t.roles.patient}</p>
-              <p className="mt-1 text-sm font-semibold text-[var(--color-text)]">
-                {consultation.patient?.full_name ?? "-"}
-              </p>
-            </div>
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">{t.patient.specialty}</p>
-              <p className="mt-1 text-sm font-semibold text-[var(--color-text)]">
-                {consultation.selected_specialty_display ?? consultation.selected_specialty ?? "-"}
-              </p>
-            </div>
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">{t.patient.severity}</p>
-              <p className="mt-1 text-sm font-semibold text-[var(--color-text)]">
-                {consultation.severity ? (t.patient.severityLabels[consultation.severity] ?? consultation.severity) : "-"}
-              </p>
-            </div>
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">{t.patient.createdAt}</p>
-              <p className="mt-1 text-sm font-semibold text-[var(--color-text)]">{formatDate(consultation.created_at)}</p>
-            </div>
-          </div>
-
-          <p className="text-sm leading-7 text-[var(--color-muted)]">
-            {symptomNames || "-"}
-          </p>
+    <DoctorListCard
+      title={consultation.patient?.full_name ?? t.roles.patient}
+      meta={`${t.patient.createdAt}: ${formatDate(consultation.created_at)}`}
+      badge={
+        <div className="flex flex-wrap gap-2">
+          <Badge tone={badgeToneFromStatus(consultation.status)}>{t.doctor[statusLabelKey]}</Badge>
+          {redFlagCount > 0 ? <Badge tone="primary">{`${redFlagCount} ${t.patient.redFlagSymptom}`}</Badge> : null}
         </div>
-
-        <div className="flex flex-wrap items-center gap-2 lg:w-auto">
-          <Link href={detailHref} className={buttonClassName({ variant: "secondary" })}>
-            {t.doctor.viewDetails}
-            <ArrowIcon size={16} />
-          </Link>
-          {showAccept && onAccept ? (
+      }
+      href={detailHref}
+      actionLabel={t.doctor.viewDetails}
+      action={
+        showAccept && onAccept ? (
+          <div className="flex w-full lg:w-auto">
             <DoctorAcceptButton
               status={consultation.status}
               isApproved={isApproved}
@@ -114,9 +79,17 @@ export function DoctorConsultationCard({
               label={t.doctor.acceptConsultation}
               loadingLabel={t.doctor.acceptingConsultation}
             />
-          ) : null}
-        </div>
-      </div>
-    </Card>
+          </div>
+        ) : null
+      }
+    >
+      <DashboardGrid columns="four">
+        <DoctorInfoRow label={t.roles.patient} value={consultation.patient?.full_name ?? "-"} />
+        <DoctorInfoRow label={t.patient.specialty} value={consultation.selected_specialty_display ?? consultation.selected_specialty ?? "-"} />
+        <DoctorInfoRow label={t.patient.severity} value={consultation.severity ? (t.patient.severityLabels[consultation.severity] ?? consultation.severity) : "-"} />
+        <DoctorInfoRow label={t.patient.createdAt} value={formatDate(consultation.created_at)} />
+      </DashboardGrid>
+      <p className="text-sm leading-7 text-[var(--color-muted)]">{symptomNames || "-"}</p>
+    </DoctorListCard>
   );
 }

@@ -1,6 +1,8 @@
 "use client";
 
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
+import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
+import { DoctorInfoRow } from "@/components/doctor/ui/DoctorInfoRow";
 import { Card } from "@/components/ui/Card";
 import type { DoctorPatientRecord } from "@/types/doctor";
 
@@ -27,20 +29,11 @@ export function DoctorPatientRecordSummaryCard({ record }: DoctorPatientRecordSu
   return (
     <Card className="space-y-4">
       <h3 className="text-base font-semibold text-[var(--color-text)]">{d.recordSummary}</h3>
-      <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <div>
-          <dt className="text-xs text-[var(--color-text-secondary)]">{d.patientSummary}</dt>
-          <dd className="text-sm font-medium text-[var(--color-text)]">{fullName}</dd>
-        </div>
-        <div>
-          <dt className="text-xs text-[var(--color-text-secondary)]">{d.bloodGroup}</dt>
-          <dd className="text-sm font-medium text-[var(--color-text)]">{bloodGroupValue}</dd>
-        </div>
-        <div>
-          <dt className="text-xs text-[var(--color-text-secondary)]">{d.bloodGroupVerification}</dt>
-          <dd className="text-sm text-[var(--color-text-secondary)]">{bgVerification}</dd>
-        </div>
-      </dl>
+      <DashboardGrid columns="three">
+        <DoctorInfoRow label={d.patientSummary} value={fullName} />
+        <DoctorInfoRow label={d.bloodGroup} value={bloodGroupValue} />
+        <DoctorInfoRow label={d.bloodGroupVerification} value={bgVerification} muted />
+      </DashboardGrid>
     </Card>
   );
 }

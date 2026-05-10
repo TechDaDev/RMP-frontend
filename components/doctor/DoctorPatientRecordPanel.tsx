@@ -1,8 +1,10 @@
 "use client";
 
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
+import { DashboardSection } from "@/components/dashboard/DashboardSection";
 import { DoctorPatientRecordEntriesSection } from "@/components/doctor/DoctorPatientRecordEntriesSection";
 import { DoctorPatientRecordSummaryCard } from "@/components/doctor/DoctorPatientRecordSummaryCard";
+import { Card } from "@/components/ui/Card";
 import type { DoctorPatientRecord } from "@/types/doctor";
 
 interface DoctorPatientRecordPanelProps {
@@ -15,14 +17,13 @@ export function DoctorPatientRecordPanel({ record }: DoctorPatientRecordPanelPro
 
   return (
     <div className="space-y-6">
-      <p className="text-xs text-[var(--color-text-secondary)] border border-[var(--color-border)] rounded px-3 py-2">
+      <Card className="text-sm leading-7 text-[var(--color-muted)]">
         {d.patientRecordReadOnlyNotice}
-      </p>
+      </Card>
       <DoctorPatientRecordSummaryCard record={record} />
-      <div>
-        <h3 className="text-base font-semibold text-[var(--color-text)] mb-3">{d.recordEntries}</h3>
+      <DashboardSection title={d.recordEntries}>
         <DoctorPatientRecordEntriesSection entries={record.entries ?? []} />
-      </div>
+      </DashboardSection>
     </div>
   );
 }

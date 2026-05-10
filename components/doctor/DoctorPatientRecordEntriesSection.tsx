@@ -1,6 +1,8 @@
 "use client";
 
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
+import { DashboardStateCard } from "@/components/dashboard/DashboardStateCard";
+import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import type { DoctorPatientRecordEntry } from "@/types/doctor";
 
@@ -27,11 +29,7 @@ export function DoctorPatientRecordEntriesSection({
   const d = t.doctor;
 
   if (!entries || entries.length === 0) {
-    return (
-      <Card>
-        <p className="text-sm text-[var(--color-text-secondary)]">{d.noRecordEntries}</p>
-      </Card>
-    );
+    return <DashboardStateCard state="empty" description={d.noRecordEntries} />;
   }
 
   // Group by category
@@ -73,17 +71,7 @@ export function DoctorPatientRecordEntriesSection({
                       <p className="text-sm font-medium text-[var(--color-text)]">
                         {entry.title ?? "-"}
                       </p>
-                      {verLabel && (
-                        <span
-                          className={`inline-flex items-center rounded px-2 py-0.5 text-xs font-medium ${
-                            isConfirmed
-                              ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300"
-                              : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300"
-                          }`}
-                        >
-                          {verLabel}
-                        </span>
-                      )}
+                      {verLabel ? <Badge tone={isConfirmed ? "success" : "warning"}>{verLabel}</Badge> : null}
                     </div>
                     {entry.value && (
                       <p className="text-sm text-[var(--color-text-secondary)]">

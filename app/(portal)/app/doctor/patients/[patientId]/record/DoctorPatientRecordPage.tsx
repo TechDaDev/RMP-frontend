@@ -4,12 +4,17 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
+import { DashboardSection } from "@/components/dashboard/DashboardSection";
+import { DashboardStateCard } from "@/components/dashboard/DashboardStateCard";
 import { DoctorPatientRecordPanel } from "@/components/doctor/DoctorPatientRecordPanel";
 import { DoctorVerificationNotice } from "@/components/doctor/DoctorVerificationNotice";
+import { DoctorPageFrame } from "@/components/doctor/ui/DoctorPageFrame";
 import { RequireRole } from "@/components/auth/RequireRole";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { getAuthorizedPatientRecord } from "@/lib/doctor/doctorService";
 import { Button, buttonClassName } from "@/components/ui/Button";
+import { Badge } from "@/components/ui/Badge";
+import { PageHeader } from "@/components/ui/PageHeader";
 import type { DoctorPatientRecord } from "@/types/doctor";
 
 interface Props {
@@ -74,16 +79,17 @@ function DoctorPatientRecordContent({ patientId }: Props) {
   }, [patientId]);
 
   return (
-    <div className="space-y-6 p-4 md:p-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold text-[var(--color-text)]">{d.patientRecordDetail}</h1>
-          <p className="text-sm text-[var(--color-text-secondary)]">{d.authorizedAccessOnly}</p>
-        </div>
-        <Button variant="ghost" onClick={handleRetry}>
-          {d.retryMessages}
-        </Button>
-      </div>
+    <DoctorPageFrame>
+      <PageHeader
+        badge={<Badge tone="primary">{t.roles.doctor}</Badge>}
+        title={d.patientRecordDetail}
+        description={d.authorizedAccessOnly}
+        actions={
+          <Button variant="secondary" onClick={handleRetry}>
+            {d.retryMessages}
+          </Button>
+        }
+      />
 
       {!isApproved && (
         <DoctorVerificationNotice
@@ -94,23 +100,21 @@ function DoctorPatientRecordContent({ patientId }: Props) {
         />
       )}
 
-      {loading && (
-        <div role="status">
-          <p className="text-sm text-[var(--color-text-secondary)]">{p.loading}</p>
-        </div>
-      )}
+      {loading ? <DashboardStateCard state="loading" description={p.loading} /> : null}
 
       {!loading && error && (
-        <div className="rounded border border-[var(--color-border)] p-4 space-y-2">
-          <h3 className="text-base font-semibold text-[var(--color-text)]">
-            {d.patientRecordAccessDenied}
-          </h3>
-          <p className="text-sm text-[var(--color-text-secondary)]">{error}</p>
-          <p className="text-xs text-[var(--color-text-secondary)]">{d.authorizedAccessOnly}</p>
-        </div>
+        <DashboardStateCard
+          state="error"
+          title={d.patientRecordAccessDenied}
+          description={`${error} ${d.authorizedAccessOnly}`}
+        />
       )}
 
-      {!loading && !error && record && <DoctorPatientRecordPanel record={record} />}
+      {!loading && !error && record ? (
+        <DashboardSection title={d.patientRecordDetail} description={d.patientRecordReadOnlyNotice}>
+          <DoctorPatientRecordPanel record={record} />
+        </DashboardSection>
+      ) : null}
 
       <div className="flex flex-wrap gap-3 pt-2">
         {consultationId && (
@@ -131,7 +135,7 @@ function DoctorPatientRecordContent({ patientId }: Props) {
           {d.backToDoctorDashboard}
         </Link>
       </div>
-    </div>
+    </DoctorPageFrame>
   );
 }
 
@@ -142,4 +146,3 @@ export function DoctorPatientRecordPage({ patientId }: Props) {
     </RequireRole>
   );
 }
-

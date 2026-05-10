@@ -3,13 +3,15 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
+import { DashboardSection } from "@/components/dashboard/DashboardSection";
+import { DashboardStateCard } from "@/components/dashboard/DashboardStateCard";
 import { DoctorConsultationList } from "@/components/doctor/DoctorConsultationList";
 import { DoctorQueueTabs } from "@/components/doctor/DoctorQueueTabs";
 import { DoctorVerificationNotice } from "@/components/doctor/DoctorVerificationNotice";
+import { DoctorPageFrame } from "@/components/doctor/ui/DoctorPageFrame";
 import { Badge } from "@/components/ui/Badge";
 import { Button, buttonClassName } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { EmptyState } from "@/components/ui/EmptyState";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { ApiError } from "@/lib/api/errors";
 import { acceptConsultation, getPendingConsultations } from "@/lib/doctor/doctorService";
@@ -90,7 +92,7 @@ export default function DoctorPendingConsultationsPage() {
   }, [loading, t.doctor.pendingConsultationsSubtitle, t.patient.loading]);
 
   return (
-    <div className="space-y-6">
+    <DoctorPageFrame>
       <PageHeader
         badge={<Badge tone="primary">{t.roles.doctor}</Badge>}
         title={t.doctor.pendingConsultations}
@@ -117,37 +119,40 @@ export default function DoctorPendingConsultationsPage() {
         disabledLabel={t.doctor.doctorNotApprovedActionDisabled}
       />
 
-      <Card className="rounded-[2rem]">
+      <Card>
         <p className="text-sm font-semibold text-[var(--color-text)]">{t.doctor.matchingSpecialtyQueue}</p>
         <p className="mt-2 text-sm text-[var(--color-muted)]">{t.doctor.pendingConsultationsSubtitle}</p>
       </Card>
 
       {successMessage ? (
-        <Card className="rounded-[2rem] border-green-300 bg-green-50 dark:border-green-800 dark:bg-green-950">
-          <p className="text-sm font-semibold text-green-800 dark:text-green-300">{successMessage}</p>
-          <Link href="/app/doctor/consultations/assigned" className={`${buttonClassName({ variant: "secondary" })} mt-3`}>
-            {t.doctor.backToAssignedConsultations}
-          </Link>
-        </Card>
+        <DashboardStateCard
+          state="success"
+          description={successMessage}
+          action={
+            <Link href="/app/doctor/consultations/assigned" className={buttonClassName({ variant: "secondary" })}>
+              {t.doctor.backToAssignedConsultations}
+            </Link>
+          }
+        />
       ) : null}
 
-      {loading ? (
-        <Card className="rounded-[2rem]">
-          <p className="text-sm text-[var(--color-muted)]">{t.patient.loading}</p>
-        </Card>
-      ) : error ? (
-        <EmptyState title={t.patient.noDataTitle} description={error} />
-      ) : (
-        <DoctorConsultationList
-          consultations={consultations}
-          emptyTitle={t.doctor.noPendingConsultations}
-          emptyDescription={t.doctor.noPendingConsultations}
-          isApproved={isApproved}
-          showAccept
-          acceptingId={acceptingId}
-          onAccept={(id) => void handleAccept(id)}
-        />
-      )}
-    </div>
+      <DashboardSection title={t.doctor.pendingConsultations} description={t.doctor.pendingConsultationsSubtitle}>
+        {loading ? (
+          <DashboardStateCard state="loading" description={t.patient.loading} />
+        ) : error ? (
+          <DashboardStateCard state="error" title={t.patient.noDataTitle} description={error} />
+        ) : (
+          <DoctorConsultationList
+            consultations={consultations}
+            emptyTitle={t.doctor.noPendingConsultations}
+            emptyDescription={t.doctor.noPendingConsultations}
+            isApproved={isApproved}
+            showAccept
+            acceptingId={acceptingId}
+            onAccept={(id) => void handleAccept(id)}
+          />
+        )}
+      </DashboardSection>
+    </DoctorPageFrame>
   );
 }

@@ -2,13 +2,15 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
+import { DashboardSection } from "@/components/dashboard/DashboardSection";
+import { DashboardStateCard } from "@/components/dashboard/DashboardStateCard";
 import { DoctorConsultationList } from "@/components/doctor/DoctorConsultationList";
 import { DoctorQueueTabs } from "@/components/doctor/DoctorQueueTabs";
 import { DoctorVerificationNotice } from "@/components/doctor/DoctorVerificationNotice";
+import { DoctorPageFrame } from "@/components/doctor/ui/DoctorPageFrame";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { EmptyState } from "@/components/ui/EmptyState";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { ApiError } from "@/lib/api/errors";
 import { getAssignedConsultations } from "@/lib/doctor/doctorService";
@@ -61,7 +63,7 @@ export default function DoctorAssignedConsultationsPage() {
   }, [consultations, filter]);
 
   return (
-    <div className="space-y-6">
+    <DoctorPageFrame>
       <PageHeader
         badge={<Badge tone="primary">{t.roles.doctor}</Badge>}
         title={t.doctor.assignedConsultations}
@@ -88,7 +90,7 @@ export default function DoctorAssignedConsultationsPage() {
         disabledLabel={t.doctor.doctorNotApprovedActionDisabled}
       />
 
-      <Card className="rounded-[2rem]">
+      <Card>
         <p className="text-sm font-semibold text-[var(--color-text)]">{t.doctor.assignedConsultations}</p>
         <div className="mt-3 flex flex-wrap gap-2">
           {FILTERS.map((item) => {
@@ -115,20 +117,20 @@ export default function DoctorAssignedConsultationsPage() {
         </div>
       </Card>
 
-      {loading ? (
-        <Card className="rounded-[2rem]">
-          <p className="text-sm text-[var(--color-muted)]">{t.patient.loading}</p>
-        </Card>
-      ) : error ? (
-        <EmptyState title={t.patient.noDataTitle} description={error} />
-      ) : (
-        <DoctorConsultationList
-          consultations={filteredConsultations}
-          emptyTitle={t.doctor.noAssignedConsultations}
-          emptyDescription={t.doctor.noAssignedConsultations}
-          isApproved={isApproved}
-        />
-      )}
-    </div>
+      <DashboardSection title={t.doctor.assignedConsultations} description={t.doctor.assignedConsultationsSubtitle}>
+        {loading ? (
+          <DashboardStateCard state="loading" description={t.patient.loading} />
+        ) : error ? (
+          <DashboardStateCard state="error" title={t.patient.noDataTitle} description={error} />
+        ) : (
+          <DoctorConsultationList
+            consultations={filteredConsultations}
+            emptyTitle={t.doctor.noAssignedConsultations}
+            emptyDescription={t.doctor.noAssignedConsultations}
+            isApproved={isApproved}
+          />
+        )}
+      </DashboardSection>
+    </DoctorPageFrame>
   );
 }

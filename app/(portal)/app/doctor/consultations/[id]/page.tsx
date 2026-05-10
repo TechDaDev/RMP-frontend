@@ -5,11 +5,11 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { DashboardStateCard } from "@/components/dashboard/DashboardStateCard";
 import { DoctorConsultationWorkspace } from "@/components/doctor/DoctorConsultationWorkspace";
+import { DoctorPageFrame } from "@/components/doctor/ui/DoctorPageFrame";
 import { Badge } from "@/components/ui/Badge";
 import { Button, buttonClassName } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
-import { EmptyState } from "@/components/ui/EmptyState";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { ApiError } from "@/lib/api/errors";
 import {
@@ -98,17 +98,18 @@ export default function DoctorConsultationDetailPage() {
 
   if (loading) {
     return (
-      <Card className="rounded-[2rem]">
-        <p className="text-sm text-[var(--color-muted)]">{t.patient.loading}</p>
-      </Card>
+      <DashboardStateCard state="loading" description={t.patient.loading} />
     );
   }
 
   if (error || !detail) {
     return (
-      <Card className="space-y-4 rounded-[2rem]">
-        <EmptyState title={t.patient.noDataTitle} description={error ?? t.patient.noDataDescription} />
-        <div className="flex flex-wrap justify-center gap-2">
+      <DashboardStateCard
+        state="error"
+        title={t.patient.noDataTitle}
+        description={error ?? t.patient.noDataDescription}
+        action={
+          <>
           <Link href="/app/doctor/consultations/pending" className={buttonClassName({ variant: "secondary" })}>
             {t.doctor.backToPendingConsultations}
           </Link>
@@ -118,13 +119,14 @@ export default function DoctorConsultationDetailPage() {
           <Link href="/app/doctor" className={buttonClassName({ variant: "secondary" })}>
             {t.doctor.backToDoctorDashboard}
           </Link>
-        </div>
-      </Card>
+          </>
+        }
+      />
     );
   }
 
   return (
-    <div className="space-y-6">
+    <DoctorPageFrame>
       <PageHeader
         badge={<Badge tone="primary">{t.doctor.consultationWorkspace}</Badge>}
         title={t.doctor.consultationWorkspace}
@@ -159,6 +161,6 @@ export default function DoctorConsultationDetailPage() {
           {t.doctor.backToDoctorDashboard}
         </Link>
       </div>
-    </div>
+    </DoctorPageFrame>
   );
 }

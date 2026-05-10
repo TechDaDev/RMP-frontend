@@ -1,6 +1,9 @@
 "use client";
 
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
+import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
+import { DoctorInfoRow } from "@/components/doctor/ui/DoctorInfoRow";
+import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import type { DoctorPrescriptionDetail } from "@/types/doctor";
 
@@ -19,45 +22,25 @@ export function DoctorPrescriptionDetailPanel({ prescription }: DoctorPrescripti
   const { t } = useAppPreferences();
 
   return (
-    <Card className="space-y-5 rounded-[2rem]">
-      <h3 className="text-base font-semibold text-[var(--color-text)]">{t.doctor.doctorOnlyPrescriptionDetails}</h3>
-
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">{t.doctor.prescriptionStatus}</p>
-          <p className="mt-2 text-sm font-semibold text-[var(--color-text)]">
-            {t.patient.statusLabels[prescription.status ?? "issued"] ?? prescription.status ?? "-"}
-          </p>
-        </div>
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">{t.doctor.patientSummary}</p>
-          <p className="mt-2 text-sm font-semibold text-[var(--color-text)]">{prescription.patient?.full_name ?? "-"}</p>
-        </div>
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">{t.patient.doctor}</p>
-          <p className="mt-2 text-sm font-semibold text-[var(--color-text)]">{prescription.doctor?.full_name ?? "-"}</p>
-        </div>
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">{t.patient.issuedAt}</p>
-          <p className="mt-2 text-sm font-semibold text-[var(--color-text)]">{formatDate(prescription.issued_at)}</p>
-        </div>
+    <Card className="space-y-5">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h3 className="text-base font-semibold text-[var(--color-text)]">{t.doctor.doctorOnlyPrescriptionDetails}</h3>
+        <Badge tone="primary">{t.patient.statusLabels[prescription.status ?? "issued"] ?? prescription.status ?? "-"}</Badge>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">{t.patient.expiresAt}</p>
-          <p className="mt-2 text-sm text-[var(--color-text)]">{formatDate(prescription.expires_at)}</p>
-        </div>
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">{t.doctor.cancelPrescription}</p>
-          <p className="mt-2 text-sm text-[var(--color-text)]">{formatDate(prescription.cancelled_at)}</p>
-        </div>
-      </div>
+      <DashboardGrid columns="four">
+        <DoctorInfoRow label={t.doctor.prescriptionStatus} value={t.patient.statusLabels[prescription.status ?? "issued"] ?? prescription.status ?? "-"} />
+        <DoctorInfoRow label={t.doctor.patientSummary} value={prescription.patient?.full_name ?? "-"} />
+        <DoctorInfoRow label={t.patient.doctor} value={prescription.doctor?.full_name ?? "-"} />
+        <DoctorInfoRow label={t.patient.issuedAt} value={formatDate(prescription.issued_at)} />
+      </DashboardGrid>
 
-      <div>
-        <p className="text-sm font-semibold text-[var(--color-text)]">{t.patient.qrToken}</p>
-        <p className="mt-2 break-all text-sm text-[var(--color-muted)]">{prescription.qr_token || "-"}</p>
-      </div>
+      <DashboardGrid columns="two">
+        <DoctorInfoRow label={t.patient.expiresAt} value={formatDate(prescription.expires_at)} />
+        <DoctorInfoRow label={t.doctor.cancelPrescription} value={formatDate(prescription.cancelled_at)} muted />
+      </DashboardGrid>
+
+      <DoctorInfoRow label={t.patient.qrToken} value={<span className="break-all">{prescription.qr_token || "-"}</span>} muted />
 
       <div className="space-y-3">
         <h4 className="text-sm font-semibold text-[var(--color-text)]">{t.doctor.prescriptionItems}</h4>
@@ -65,46 +48,18 @@ export function DoctorPrescriptionDetailPanel({ prescription }: DoctorPrescripti
           <div className="space-y-3">
             {prescription.items.map((item, index) => (
               <div key={item.id ?? `${item.medication_name}-${index}`} className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-4">
-                <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-                  <div>
-                    <p className="text-xs text-[var(--color-muted)]">{t.doctor.medicationName}</p>
-                    <p className="text-sm font-semibold text-[var(--color-text)]">{item.medication_name || "-"}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-[var(--color-muted)]">{t.doctor.dosage}</p>
-                    <p className="text-sm text-[var(--color-text)]">{item.dosage || "-"}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-[var(--color-muted)]">{t.doctor.frequency}</p>
-                    <p className="text-sm text-[var(--color-text)]">{item.frequency || "-"}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-[var(--color-muted)]">{t.doctor.duration}</p>
-                    <p className="text-sm text-[var(--color-text)]">{item.duration || "-"}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-[var(--color-muted)]">{t.doctor.quantity}</p>
-                    <p className="text-sm text-[var(--color-text)]">{item.quantity || "-"}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-[var(--color-muted)]">{t.doctor.prescriptionStatus}</p>
-                    <p className="text-sm text-[var(--color-text)]">{item.status || "-"}</p>
-                  </div>
-                </div>
-                <div className="mt-3 grid gap-3 md:grid-cols-2">
-                  <div>
-                    <p className="text-xs text-[var(--color-muted)]">{t.doctor.instructions}</p>
-                    <p className="text-sm text-[var(--color-text)]">{item.instructions || "-"}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-[var(--color-muted)]">{t.doctor.route}</p>
-                    <p className="text-sm text-[var(--color-text)]">
-                      {item.route
-                        ? ((t.doctor[`route${item.route.charAt(0).toUpperCase()}${item.route.slice(1)}` as keyof typeof t.doctor] as string) ?? item.route)
-                        : "-"}
-                    </p>
-                  </div>
-                </div>
+                <DashboardGrid columns="three">
+                  <DoctorInfoRow label={t.doctor.medicationName} value={item.medication_name || "-"} />
+                  <DoctorInfoRow label={t.doctor.dosage} value={item.dosage || "-"} muted />
+                  <DoctorInfoRow label={t.doctor.frequency} value={item.frequency || "-"} muted />
+                  <DoctorInfoRow label={t.doctor.duration} value={item.duration || "-"} muted />
+                  <DoctorInfoRow label={t.doctor.quantity} value={item.quantity || "-"} muted />
+                  <DoctorInfoRow label={t.doctor.prescriptionStatus} value={item.status || "-"} muted />
+                </DashboardGrid>
+                <DashboardGrid columns="two" className="mt-3">
+                  <DoctorInfoRow label={t.doctor.instructions} value={item.instructions || "-"} muted />
+                  <DoctorInfoRow label={t.doctor.route} value={item.route ? ((t.doctor[`route${item.route.charAt(0).toUpperCase()}${item.route.slice(1)}` as keyof typeof t.doctor] as string) ?? item.route) : "-"} muted />
+                </DashboardGrid>
               </div>
             ))}
           </div>

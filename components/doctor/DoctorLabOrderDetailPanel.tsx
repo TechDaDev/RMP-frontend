@@ -2,6 +2,9 @@
 
 import Link from "next/link";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
+import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
+import { DoctorInfoRow } from "@/components/doctor/ui/DoctorInfoRow";
+import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import type { DoctorLabOrderDetail } from "@/types/doctor";
 
@@ -24,45 +27,25 @@ export function DoctorLabOrderDetailPanel({ labOrder }: DoctorLabOrderDetailPane
       .filter((value): value is string => Boolean(value)) ?? [];
 
   return (
-    <Card className="space-y-5 rounded-[2rem]">
-      <h3 className="text-base font-semibold text-[var(--color-text)]">{t.doctor.doctorOnlyLabOrderDetails}</h3>
-
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">{t.doctor.labOrderStatus}</p>
-          <p className="mt-2 text-sm font-semibold text-[var(--color-text)]">
-            {t.patient.statusLabels[labOrder.status ?? "issued"] ?? labOrder.status ?? "-"}
-          </p>
-        </div>
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">{t.doctor.patientSummary}</p>
-          <p className="mt-2 text-sm font-semibold text-[var(--color-text)]">{labOrder.patient?.full_name ?? "-"}</p>
-        </div>
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">{t.patient.doctor}</p>
-          <p className="mt-2 text-sm font-semibold text-[var(--color-text)]">{labOrder.doctor?.full_name ?? "-"}</p>
-        </div>
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">{t.patient.issuedAt}</p>
-          <p className="mt-2 text-sm font-semibold text-[var(--color-text)]">{formatDate(labOrder.created_at)}</p>
-        </div>
+    <Card className="space-y-5">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h3 className="text-base font-semibold text-[var(--color-text)]">{t.doctor.doctorOnlyLabOrderDetails}</h3>
+        <Badge tone="primary">{t.patient.statusLabels[labOrder.status ?? "issued"] ?? labOrder.status ?? "-"}</Badge>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">{t.patient.expiresAt}</p>
-          <p className="mt-2 text-sm text-[var(--color-text)]">{formatDate(labOrder.expires_at)}</p>
-        </div>
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">{t.doctor.cancelLabOrder}</p>
-          <p className="mt-2 text-sm text-[var(--color-text)]">{formatDate(labOrder.cancelled_at)}</p>
-        </div>
-      </div>
+      <DashboardGrid columns="four">
+        <DoctorInfoRow label={t.doctor.labOrderStatus} value={t.patient.statusLabels[labOrder.status ?? "issued"] ?? labOrder.status ?? "-"} />
+        <DoctorInfoRow label={t.doctor.patientSummary} value={labOrder.patient?.full_name ?? "-"} />
+        <DoctorInfoRow label={t.patient.doctor} value={labOrder.doctor?.full_name ?? "-"} />
+        <DoctorInfoRow label={t.patient.issuedAt} value={formatDate(labOrder.created_at)} />
+      </DashboardGrid>
 
-      <div>
-        <p className="text-sm font-semibold text-[var(--color-text)]">{t.patient.qrToken}</p>
-        <p className="mt-2 break-all text-sm text-[var(--color-muted)]">{labOrder.qr_token || "-"}</p>
-      </div>
+      <DashboardGrid columns="two">
+        <DoctorInfoRow label={t.patient.expiresAt} value={formatDate(labOrder.expires_at)} muted />
+        <DoctorInfoRow label={t.doctor.cancelLabOrder} value={formatDate(labOrder.cancelled_at)} muted />
+      </DashboardGrid>
+
+      <DoctorInfoRow label={t.patient.qrToken} value={<span className="break-all">{labOrder.qr_token || "-"}</span>} muted />
 
       <div className="space-y-3">
         <h4 className="text-sm font-semibold text-[var(--color-text)]">{t.doctor.labOrderItems}</h4>
@@ -73,38 +56,17 @@ export function DoctorLabOrderDetailPanel({ labOrder }: DoctorLabOrderDetailPane
                 key={item.id ?? `${item.test_name}-${index}`}
                 className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-4"
               >
-                <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-                  <div>
-                    <p className="text-xs text-[var(--color-muted)]">{t.doctor.testName}</p>
-                    <p className="text-sm font-semibold text-[var(--color-text)]">{item.test_name || "-"}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-[var(--color-muted)]">{t.doctor.testCategory}</p>
-                    <p className="text-sm text-[var(--color-text)]">{item.category || "-"}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-[var(--color-muted)]">{t.doctor.testCode}</p>
-                    <p className="text-sm text-[var(--color-text)]">{item.test || "-"}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-[var(--color-muted)]">{t.doctor.sampleType}</p>
-                    <p className="text-sm text-[var(--color-text)]">{item.sample_type || "-"}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-[var(--color-muted)]">{t.doctor.labOrderStatus}</p>
-                    <p className="text-sm text-[var(--color-text)]">
-                      {t.patient.statusLabels[item.status ?? "pending"] ?? item.status ?? "-"}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-[var(--color-muted)]">{t.doctor.labOrderStatus}</p>
-                    <p className="text-sm text-[var(--color-text)]">{formatDate(item.completed_at)}</p>
-                  </div>
-                </div>
+                <DashboardGrid columns="three">
+                  <DoctorInfoRow label={t.doctor.testName} value={item.test_name || "-"} />
+                  <DoctorInfoRow label={t.doctor.testCategory} value={item.category || "-"} muted />
+                  <DoctorInfoRow label={t.doctor.testCode} value={item.test || "-"} muted />
+                  <DoctorInfoRow label={t.doctor.sampleType} value={item.sample_type || "-"} muted />
+                  <DoctorInfoRow label={t.doctor.labOrderStatus} value={t.patient.statusLabels[item.status ?? "pending"] ?? item.status ?? "-"} muted />
+                  <DoctorInfoRow label={t.doctor.labOrderStatus} value={formatDate(item.completed_at)} muted />
+                </DashboardGrid>
 
                 <div className="mt-3">
-                  <p className="text-xs text-[var(--color-muted)]">{t.doctor.testInstructions}</p>
-                  <p className="text-sm text-[var(--color-text)]">{item.instructions || "-"}</p>
+                  <DoctorInfoRow label={t.doctor.testInstructions} value={item.instructions || "-"} muted />
                 </div>
               </div>
             ))}
