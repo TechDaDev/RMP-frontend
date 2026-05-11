@@ -9,6 +9,12 @@ import type {
   AdminRagAnalyticsSummary,
   AdminRagFeedbackItem,
   AdminRagFeedbackReviewRequest,
+  AdminVerificationApproveRequest,
+  AdminVerificationDetail,
+  AdminVerificationListParams,
+  AdminVerificationListResponse,
+  AdminVerificationRejectRequest,
+  AdminVerificationSuspendRequest,
 } from "@/types/admin";
 
 type ListLike<T> = T[] | PaginatedResponse<T>;
@@ -158,6 +164,78 @@ export async function exportAdminRagDatasetJson(): Promise<AdminDatasetExportJso
     {
       auth: true,
       body: { format: "json" },
+    },
+  );
+
+  return unwrapData(response);
+}
+
+// Admin Verification Review Methods
+
+export async function getAdminVerifications(
+  params?: AdminVerificationListParams,
+): Promise<AdminVerificationListResponse> {
+  const response = await apiRequest<
+    AdminVerificationListResponse | ApiEnvelope<AdminVerificationListResponse>
+  >(appendQuery(API_ENDPOINTS.admin.verifications, params as Record<string, string | number | boolean | undefined>), { auth: true });
+
+  return unwrapData(response);
+}
+
+export async function getAdminVerificationDetail(
+  role: string,
+  id: string,
+): Promise<AdminVerificationDetail> {
+  const response = await apiRequest<AdminVerificationDetail | ApiEnvelope<AdminVerificationDetail>>(
+    API_ENDPOINTS.admin.verificationDetail(role, id),
+    { auth: true },
+  );
+
+  return unwrapData(response);
+}
+
+export async function approveAdminVerification(
+  role: string,
+  id: string,
+  payload: AdminVerificationApproveRequest,
+): Promise<AdminVerificationDetail> {
+  const response = await apiRequest<AdminVerificationDetail | ApiEnvelope<AdminVerificationDetail>>(
+    API_ENDPOINTS.admin.verificationApprove(role, id),
+    {
+      auth: true,
+      body: payload,
+    },
+  );
+
+  return unwrapData(response);
+}
+
+export async function rejectAdminVerification(
+  role: string,
+  id: string,
+  payload: AdminVerificationRejectRequest,
+): Promise<AdminVerificationDetail> {
+  const response = await apiRequest<AdminVerificationDetail | ApiEnvelope<AdminVerificationDetail>>(
+    API_ENDPOINTS.admin.verificationReject(role, id),
+    {
+      auth: true,
+      body: payload,
+    },
+  );
+
+  return unwrapData(response);
+}
+
+export async function suspendAdminVerification(
+  role: string,
+  id: string,
+  payload: AdminVerificationSuspendRequest,
+): Promise<AdminVerificationDetail> {
+  const response = await apiRequest<AdminVerificationDetail | ApiEnvelope<AdminVerificationDetail>>(
+    API_ENDPOINTS.admin.verificationSuspend(role, id),
+    {
+      auth: true,
+      body: payload,
     },
   );
 

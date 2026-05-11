@@ -232,6 +232,47 @@ export interface Translations {
     escalateReview: string;
     approve: string;
     reject: string;
+    verificationReviewTitle: string;
+    verificationReviewDescription: string;
+    verificationQueue: string;
+    verificationQueueDescription: string;
+    verificationRequests: string;
+    verificationDetail: string;
+    verificationDetailDescription: string;
+    verificationSummary: string;
+    verificationRole: string;
+    verificationStatus: string;
+    verificationUser: string;
+    verificationProfile: string;
+    verificationMetadata: string;
+    verificationActions: string;
+    filterByRole: string;
+    filterByStatus: string;
+    searchVerifications: string;
+    allRoles: string;
+    allStatuses: string;
+    doctorRole: string;
+    pharmacistRole: string;
+    laboratorianRole: string;
+    pendingStatus: string;
+    approvedStatus: string;
+    rejectedStatus: string;
+    suspendedStatus: string;
+    approveVerification: string;
+    rejectVerification: string;
+    suspendVerification: string;
+    rejectionReason: string;
+    suspensionReason: string;
+    decisionReasonRequired: string;
+    verificationDecisionSucceeded: string;
+    verificationDecisionFailed: string;
+    noVerificationRequests: string;
+    backToVerificationQueue: string;
+    noMoreActionsAvailable: string;
+    safeAdminReviewNotice: string;
+    patientsExcludedFromVerification: string;
+    noMedicalDataShown: string;
+    selfReviewBlocked: string;
   };
   patient: {
     dashboardTitle: string;
@@ -962,6 +1003,7 @@ export interface Translations {
     noFileSelected: string;
     activeAccount: string;
     inactiveAccount: string;
+    workplace: string;
   };
   common: {
     backToHome: string;
@@ -977,6 +1019,7 @@ export interface Translations {
     loading: string;
     error: string;
     retry: string;
+    success: string;
   };
   lang: {
     ar: string;

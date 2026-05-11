@@ -205,6 +205,15 @@ export default function AdminPortalPage() {
             href="/app/admin/rag-feedback"
           />
           <DashboardWorkflowCard
+            title={t.admin.verificationReviewTitle}
+            description={t.admin.verificationReviewDescription}
+            icon={<ShieldIcon size={18} />}
+            status={t.common.liveBadge}
+            statusTone="primary"
+            actionLabel={t.admin.viewRagFeedback}
+            href="/app/admin/verifications"
+          />
+          <DashboardWorkflowCard
             title={t.admin.datasetExportTitle}
             description={t.admin.datasetExportDescription}
             icon={<PulseIcon size={18} />}

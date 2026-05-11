@@ -99,3 +99,70 @@ export interface AdminDatasetExportJsonResponse {
   record_count?: number;
   data?: Array<Record<string, unknown>>;
 }
+
+// Admin Verification Review API Types
+
+export type AdminVerificationRole = "doctor" | "pharmacist" | "laboratorian";
+export type AdminVerificationStatus = "pending" | "approved" | "rejected" | "suspended";
+
+export interface AdminVerificationUserSummary {
+  id: string;
+  email?: string;
+  full_name?: string;
+  is_active?: boolean;
+  date_joined?: string | null;
+}
+
+export interface AdminVerificationProfileSummary {
+  license_number?: string | null;
+  specialty?: string | null;
+  workplace_name?: string | null;
+  address?: string | null;
+  years_of_experience?: number | null;
+  phone_number?: string | null;
+  pharmacy_name?: string | null;
+  laboratory_name?: string | null;
+}
+
+export interface AdminVerificationListItem {
+  id: string;
+  role: AdminVerificationRole;
+  status: AdminVerificationStatus;
+  user?: AdminVerificationUserSummary;
+  profile?: AdminVerificationProfileSummary;
+  submitted_at?: string | null;
+  updated_at?: string | null;
+}
+
+export interface AdminVerificationDetail extends AdminVerificationListItem {
+  verification_notes?: string | null;
+  verified_at?: string | null;
+  verified_by?: AdminVerificationUserSummary | null;
+}
+
+export interface AdminVerificationListResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: AdminVerificationListItem[];
+}
+
+export interface AdminVerificationListParams {
+  role?: AdminVerificationRole;
+  status?: AdminVerificationStatus;
+  search?: string;
+  limit?: number;
+  offset?: number;
+}
+
+export interface AdminVerificationApproveRequest {
+  note?: string;
+}
+
+export interface AdminVerificationRejectRequest {
+  reason: string;
+}
+
+export interface AdminVerificationSuspendRequest {
+  reason: string;
+}

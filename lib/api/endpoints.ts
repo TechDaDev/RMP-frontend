@@ -172,6 +172,11 @@ export const API_ENDPOINTS = {
     ragFeedbackReview: (id: string) => `/api/rag/admin/feedback/${id}/review/`,
     ragAnalyticsSummary: "/api/rag/admin/analytics/summary/",
     ragDatasetExport: "/api/rag/admin/exports/dataset/",
+    verifications: "/api/admin/verifications/",
+    verificationDetail: (role: string, id: string) => `/api/admin/verifications/${role}/${id}/`,
+    verificationApprove: (role: string, id: string) => `/api/admin/verifications/${role}/${id}/approve/`,
+    verificationReject: (role: string, id: string) => `/api/admin/verifications/${role}/${id}/reject/`,
+    verificationSuspend: (role: string, id: string) => `/api/admin/verifications/${role}/${id}/suspend/`,
   },
   websocket: {
     user: "/ws/user/",
