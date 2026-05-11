@@ -14,11 +14,11 @@ interface SecuritySectionProps {
 }
 
 const securityIcons: ReactNode[] = [
-  <LockIcon key="lock" size={20} />,
-  <ShieldIcon key="shield" size={20} />,
-  <FileTextIcon key="file" size={20} />,
-  <FileTextIcon key="file2" size={20} />,
-  <MessageIcon key="msg" size={20} />,
+  <LockIcon key="lock" size={28} />,
+  <ShieldIcon key="shield" size={28} />,
+  <FileTextIcon key="file" size={28} />,
+  <FileTextIcon key="file2" size={28} />,
+  <MessageIcon key="msg" size={28} />,
 ];
 
 export function SecuritySection({ t }: SecuritySectionProps) {

@@ -16,12 +16,12 @@ interface FeaturesSectionProps {
 }
 
 const featureIcons: ReactNode[] = [
-  <MessageIcon key="msg" size={20} />,
-  <PrescriptionIcon key="rx" size={20} />,
-  <LabIcon key="lab" size={20} />,
-  <FileTextIcon key="file" size={20} />,
-  <LockIcon key="lock" size={20} />,
-  <CheckCircleIcon key="check" size={20} />,
+  <MessageIcon key="msg" size={28} />,
+  <PrescriptionIcon key="rx" size={28} />,
+  <LabIcon key="lab" size={28} />,
+  <FileTextIcon key="file" size={28} />,
+  <LockIcon key="lock" size={28} />,
+  <CheckCircleIcon key="check" size={28} />,
 ];
 
 export function FeaturesSection({ t }: FeaturesSectionProps) {

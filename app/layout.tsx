@@ -82,6 +82,7 @@ export default function RootLayout({
       lang="ar"
       dir="rtl"
       suppressHydrationWarning
+      data-scroll-behavior="smooth"
       className={`${inter.variable} ${notoSansArabic.variable} h-full antialiased`}
     >
       <head>

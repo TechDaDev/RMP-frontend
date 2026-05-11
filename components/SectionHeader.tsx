@@ -10,7 +10,7 @@ interface SectionHeaderProps {
 export function SectionHeader({
   title,
   subtitle,
-  align = "start",
+  align = "center",
   action,
 }: SectionHeaderProps) {
   return (

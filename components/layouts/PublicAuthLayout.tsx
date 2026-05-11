@@ -38,7 +38,7 @@ export function PublicAuthLayout({ title, subtitle, children }: PublicAuthLayout
           </div>
         </header>
 
-        <div className="grid flex-1 items-center gap-6 lg:grid-cols-[0.95fr,1.05fr]">
+        <div className="mx-auto grid w-full max-w-5xl flex-1 items-center gap-6 lg:grid-cols-[0.92fr,1fr]">
           <Card className="hidden min-h-[32rem] overflow-hidden border-none bg-[linear-gradient(155deg,color-mix(in_srgb,var(--color-primary)_10%,var(--color-surface)),color-mix(in_srgb,var(--color-accent)_8%,var(--color-surface)))] p-8 lg:flex lg:flex-col lg:justify-between">
             <div className="space-y-4">
               <Badge tone="primary">{t.ui.phaseBadge}</Badge>
@@ -65,7 +65,7 @@ export function PublicAuthLayout({ title, subtitle, children }: PublicAuthLayout
             </div>
           </Card>
 
-          <Card className="mx-auto w-full max-w-xl rounded-[2rem] p-6 sm:p-8">{children}</Card>
+          <Card className="mx-auto w-full max-w-lg rounded-[2rem] p-6 sm:p-8">{children}</Card>
         </div>
       </div>
     </main>

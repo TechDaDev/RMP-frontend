@@ -14,10 +14,10 @@ interface TrustSectionProps {
 }
 
 const trustIcons: ReactNode[] = [
-  <LockIcon key="lock" size={20} />,
-  <ShieldIcon key="shield" size={20} />,
-  <MessageIcon key="msg" size={20} />,
-  <PulseIcon key="pulse" size={20} />,
+  <LockIcon key="lock" size={28} />,
+  <ShieldIcon key="shield" size={28} />,
+  <MessageIcon key="msg" size={28} />,
+  <PulseIcon key="pulse" size={28} />,
 ];
 
 export function TrustSection({ t }: TrustSectionProps) {

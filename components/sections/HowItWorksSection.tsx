@@ -13,10 +13,10 @@ interface HowItWorksSectionProps {
 }
 
 const stepIcons: ReactNode[] = [
-  <PatientIcon key="patient" size={18} />,
-  <DoctorIcon key="doctor" size={18} />,
-  <LabIcon key="lab" size={18} />,
-  <CheckCircleIcon key="check" size={18} />,
+  <PatientIcon key="patient" size={24} />,
+  <DoctorIcon key="doctor" size={24} />,
+  <LabIcon key="lab" size={24} />,
+  <CheckCircleIcon key="check" size={24} />,
 ];
 
 export function HowItWorksSection({ t }: HowItWorksSectionProps) {

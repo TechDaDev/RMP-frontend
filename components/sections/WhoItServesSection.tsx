@@ -14,10 +14,10 @@ interface WhoItServesSectionProps {
 }
 
 const audienceIcons: ReactNode[] = [
-  <PatientIcon key="patient" size={20} />,
-  <DoctorIcon key="doctor" size={20} />,
-  <PharmacyIcon key="pharmacy" size={20} />,
-  <LabIcon key="lab" size={20} />,
+  <PatientIcon key="patient" size={28} />,
+  <DoctorIcon key="doctor" size={28} />,
+  <PharmacyIcon key="pharmacy" size={28} />,
+  <LabIcon key="lab" size={28} />,
 ];
 
 export function WhoItServesSection({ t }: WhoItServesSectionProps) {
