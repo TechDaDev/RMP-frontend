@@ -221,6 +221,13 @@ Get the full profile of the current user.
 - **Allowed roles**: All
 - **Purpose**: Returns user profile, role-specific profile, completion status, and verification status
 
+Returned shape includes:
+- Shared `user_profile` for all user types
+- Role-specific profile (`patient_profile`, `doctor_profile`, `pharmacist_profile`, or `laboratorian_profile`)
+
+Shared `UserProfile` fields:
+- `phone_number`, `profile_image`, `gender`, `date_of_birth`, `governorate`, `district`, `address`, `national_id`
+
 ---
 
 ### `PUT/PATCH /api/profiles/me/user-profile/`
@@ -239,6 +246,11 @@ Update patient-specific profile fields.
 - **Auth required**: Yes
 - **Allowed roles**: Patient
 
+Patient profile fields:
+- `social_security_id`
+- `emergency_contact_name`
+- `emergency_contact_phone`
+
 ---
 
 ### `PUT/PATCH /api/profiles/me/doctor/`
@@ -247,6 +259,21 @@ Update doctor profile (specialty, license, bio, etc.).
 
 - **Auth required**: Yes
 - **Allowed roles**: Doctor
+
+Doctor profile fields:
+- `medical_license_number`
+- `medical_license_image`
+- `specialty`
+- `specialty_other`
+- `subspecialty`
+- `professional_title`
+- `years_of_experience`
+- `bio`
+- `work_address`
+- `verification_status` *(read-only)*
+- `verified_at` *(read-only)*
+- `verified_by` *(read-only)*
+- `verification_notes` *(read-only)*
 
 ---
 
@@ -257,6 +284,19 @@ Update pharmacist profile (license, pharmacy info).
 - **Auth required**: Yes
 - **Allowed roles**: Pharmacist
 
+Pharmacist profile fields:
+- `pharmacist_license_number`
+- `pharmacist_license_image`
+- `pharmacy_name`
+- `pharmacy_license_number`
+- `pharmacy_license_image`
+- `pharmacy_address`
+- `working_hours`
+- `verification_status` *(read-only)*
+- `verified_at` *(read-only)*
+- `verified_by` *(read-only)*
+- `verification_notes` *(read-only)*
+
 ---
 
 ### `PUT/PATCH /api/profiles/me/laboratorian/`
@@ -265,6 +305,20 @@ Update laboratorian profile (license, lab info).
 
 - **Auth required**: Yes
 - **Allowed roles**: Laboratorian
+
+Laboratorian profile fields:
+- `laboratorian_license_number`
+- `laboratorian_license_image`
+- `laboratory_name`
+- `laboratory_license_number`
+- `laboratory_license_image`
+- `laboratory_address`
+- `specialization`
+- `working_hours`
+- `verification_status` *(read-only)*
+- `verified_at` *(read-only)*
+- `verified_by` *(read-only)*
+- `verification_notes` *(read-only)*
 
 ---
 
