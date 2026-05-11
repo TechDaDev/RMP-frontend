@@ -49,12 +49,12 @@ export function ConsultationMessagesPanel({
 
   return (
     <Card className="space-y-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 className="text-lg font-bold text-[var(--color-text)]">{t.patient.messagesTitle}</h2>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
+          <h2 className="break-words text-lg font-bold text-[var(--color-text)]">{t.patient.messagesTitle}</h2>
           <p className="mt-2 text-sm text-[var(--color-muted)]">{t.patient.messagesSubtitle}</p>
         </div>
-        <Button variant="secondary" onClick={onRefresh}>{t.patient.messagesRefresh}</Button>
+        <Button variant="secondary" className="w-full sm:w-auto" onClick={onRefresh}>{t.patient.messagesRefresh}</Button>
       </div>
 
       {messages.length > 0 ? (
@@ -62,10 +62,10 @@ export function ConsultationMessagesPanel({
           {messages.map((message) => (
             <div key={message.id} className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 py-3">
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <p className="text-sm font-semibold text-[var(--color-text)]">{message.sender?.full_name || t.portal.demoUser}</p>
+                <p className="break-words text-sm font-semibold text-[var(--color-text)]">{message.sender?.full_name || t.portal.demoUser}</p>
                 <p className="text-xs text-[var(--color-muted)]">{formatDate(message.created_at)}</p>
               </div>
-              <p className="mt-3 text-sm leading-7 text-[var(--color-text)]">{message.body}</p>
+              <p className="mt-3 break-words text-sm leading-7 text-[var(--color-text)]">{message.body}</p>
             </div>
           ))}
         </div>
@@ -92,7 +92,7 @@ export function ConsultationMessagesPanel({
             placeholder={t.patient.messagePlaceholder}
             disabled={sending}
           />
-          <Button type="submit" disabled={sending || body.trim().length === 0}>
+          <Button type="submit" className="w-full sm:w-auto" disabled={sending || body.trim().length === 0}>
             {sending ? t.patient.sendingMessage : t.patient.sendMessage}
           </Button>
         </form>

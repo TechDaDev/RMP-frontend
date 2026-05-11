@@ -161,3 +161,43 @@
 ### Remaining role portal polish
 
 - Phase 8.7 Mobile + RTL Final Polish
+
+## Phase 8.7 - Mobile + RTL Final Polish
+
+### Focus areas
+
+- Finalized small-screen behavior at 360, 390, 430, and 768 widths across shared primitives and role pages.
+- Finalized RTL/LTR safety for Arabic/Kurdish (RTL) and English (LTR) in action rows, badges, and dense forms.
+- Finalized dark/light contrast sanity in status/notice surfaces and role action controls.
+
+### Shared polish updates
+
+- `PageHeader` now has denser mobile padding, safer title wrapping, and action-row wrapping.
+- `Button` class baseline now supports long-label wrapping and min-width clipping safety in constrained cards.
+- `Badge` now supports max-width + word wrapping for long localized status labels.
+- Verification/status notices in `PortalShell` now use safer text wrapping for long copy.
+
+### Role page updates
+
+- Patient:
+  - `ConsultationLifecycleCard` stepper now uses a mobile-safe grid (2x2 on small screens, 4 columns on larger widths).
+  - `ConsultationMessagesPanel` header and message content now wrap safely; refresh/send actions are mobile-friendly.
+- Doctor:
+  - `DoctorWorkspaceActions` now uses a responsive button grid with full-width touch targets on mobile.
+  - `DoctorResponseForm`, `DoctorMessagesPanel`, and `DoctorLabResultReviewCard` submit actions now scale cleanly on mobile.
+  - `DoctorPrescriptionForm` and `DoctorLabOrderForm` action rows now collapse into a clear mobile grid.
+- Laboratory:
+  - Existing polished layout patterns remained valid; no additional logic-level UI changes required in final pass.
+- Pharmacist:
+  - `PharmacistDispensingForm` fixed one remaining LTR-only spacing token (`ml-1` -> `ms-1`).
+  - Selected-item status toggles now use a responsive grid for reliable small-screen wrapping.
+- Profile:
+  - Header/name/email wrapping improved.
+  - User and role profile submit actions now use mobile-safe full-width behavior.
+
+### Guardrails confirmed
+
+- No API calls changed.
+- No auth/authorization logic changed.
+- No route permission or workflow behavior changed.
+- No private/internal field exposure introduced.

@@ -101,8 +101,8 @@ export function UserProfileForm() {
 
   return (
     <Card className="rounded-[2rem]">
-      <div className="flex items-center justify-between gap-3">
-        <h3 className="text-lg font-bold text-[var(--color-text)]">{t.profile.personalInformation}</h3>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h3 className="break-words text-lg font-bold text-[var(--color-text)]">{t.profile.personalInformation}</h3>
         <ProfileSaveStatus
           saving={saving}
           successMessage={successMessage}
@@ -214,7 +214,7 @@ export function UserProfileForm() {
           ) : null}
         </label>
 
-        <Button type="submit" disabled={saving}>
+        <Button type="submit" className="w-full sm:w-auto" disabled={saving}>
           {saving ? t.profile.saving : t.profile.saveChanges}
         </Button>
       </form>

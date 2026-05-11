@@ -81,21 +81,21 @@ export function PortalShell({ children }: PortalShellProps) {
           />
 
           {verification?.required && verification.is_approved === true ? (
-            <div role="status" className="rounded-2xl border border-green-200 bg-green-50 px-4 py-2.5 text-sm font-medium text-green-700 dark:border-green-800 dark:bg-green-950 dark:text-green-300">
+            <div role="status" className="rounded-2xl border border-green-200 bg-green-50 px-4 py-2.5 text-sm font-medium text-green-700 break-words dark:border-green-800 dark:bg-green-950 dark:text-green-300">
               <Badge tone="success" className="me-2">✓</Badge>
               {t.auth.verificationApprovedBadge}
             </div>
           ) : verification?.required && !verification.is_approved ? (
             verification.status === "pending" ? (
-              <div role="status" className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm font-medium text-amber-800 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200">
+              <div role="status" className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm font-medium text-amber-800 break-words dark:border-amber-800 dark:bg-amber-950 dark:text-amber-200">
                 <span className="font-bold">{t.auth.verificationPendingTitle}:</span> {t.auth.verificationPendingDesc}
               </div>
             ) : verification.status === "rejected" ? (
-              <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-medium text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300">
+              <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-medium text-red-700 break-words dark:border-red-800 dark:bg-red-950 dark:text-red-300">
                 <span className="font-bold">{t.auth.verificationRejectedTitle}:</span> {t.auth.verificationRejectedDesc}
               </div>
             ) : verification.status === "suspended" ? (
-              <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-medium text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300">
+              <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-medium text-red-700 break-words dark:border-red-800 dark:bg-red-950 dark:text-red-300">
                 <span className="font-bold">{t.auth.verificationSuspendedTitle}:</span> {t.auth.verificationSuspendedDesc}
               </div>
             ) : null

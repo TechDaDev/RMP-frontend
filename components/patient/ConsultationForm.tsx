@@ -343,7 +343,7 @@ export function ConsultationForm({
         {selectionError ? <p className="text-sm font-medium text-red-600 dark:text-red-300">{selectionError}</p> : null}
         {error ? <p className="text-sm font-medium text-red-600 dark:text-red-300">{error}</p> : null}
 
-        <Button type="submit" disabled={submitting || loadingSymptoms || symptoms.length === 0 || selectedSymptoms.length === 0}>
+        <Button type="submit" className="w-full sm:w-auto" disabled={submitting || loadingSymptoms || symptoms.length === 0 || selectedSymptoms.length === 0}>
           {submitting ? t.patient.submittingRequest : t.patient.submitRequest}
         </Button>
       </form>

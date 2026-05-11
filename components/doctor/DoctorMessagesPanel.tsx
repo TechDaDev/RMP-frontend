@@ -132,7 +132,7 @@ export function DoctorMessagesPanel({
           disabled={!canWrite || sending}
         />
         {sendError ? <p className="text-sm text-red-600 dark:text-red-300">{sendError}</p> : null}
-        <Button type="submit" disabled={!canWrite || sending || body.trim().length === 0}>
+        <Button type="submit" className="w-full sm:w-auto" disabled={!canWrite || sending || body.trim().length === 0}>
           {sending ? t.doctor.sendingDoctorResponse : t.doctor.sendMessage}
         </Button>
       </form>

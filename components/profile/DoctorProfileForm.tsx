@@ -185,7 +185,7 @@ export function DoctorProfileForm({ profile }: DoctorProfileFormProps) {
           ) : null}
         </label>
 
-        <Button type="submit" disabled={saving}>
+        <Button type="submit" className="w-full sm:w-auto" disabled={saving}>
           {saving ? t.profile.saving : t.profile.saveChanges}
         </Button>
       </form>

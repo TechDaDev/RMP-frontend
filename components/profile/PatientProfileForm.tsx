@@ -101,7 +101,7 @@ export function PatientProfileForm({ profile }: PatientProfileFormProps) {
           errorText={fieldErrors.emergency_contact_phone?.[0]}
         />
 
-        <Button type="submit" disabled={saving}>
+        <Button type="submit" className="w-full sm:w-auto" disabled={saving}>
           {saving ? t.profile.saving : t.profile.saveChanges}
         </Button>
       </form>

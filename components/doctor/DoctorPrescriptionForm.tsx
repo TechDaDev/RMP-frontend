@@ -165,11 +165,11 @@ export function DoctorPrescriptionForm({ onSubmit }: DoctorPrescriptionFormProps
           />
         ))}
 
-        <div className="flex flex-wrap gap-2">
-          <Button type="button" variant="secondary" onClick={addItem}>
+        <div className="grid gap-2 sm:grid-cols-2">
+          <Button type="button" variant="secondary" className="w-full" onClick={addItem}>
             {t.doctor.addMedication}
           </Button>
-          <Button type="submit" disabled={submitting}>
+          <Button type="submit" className="w-full" disabled={submitting}>
             {submitting ? t.doctor.submittingPrescription : t.doctor.submitPrescription}
           </Button>
         </div>

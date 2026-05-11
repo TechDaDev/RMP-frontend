@@ -58,7 +58,7 @@ export function ConsultationLifecycleCard({ status }: ConsultationLifecycleCardP
     <Card>
       <p className="text-sm font-semibold text-[var(--color-text)]">{t.patient.lifecycleTitle}</p>
 
-      <ol className="mt-4 flex flex-wrap gap-0 overflow-hidden rounded-2xl border border-[var(--color-border)]">
+      <ol className="mt-4 grid grid-cols-2 gap-0 overflow-hidden rounded-2xl border border-[var(--color-border)] sm:grid-cols-4">
         {STEPS.map((step, index) => {
           const isDone = step.lifecycles.includes(lifecycle) && step.key !== "submitted_marker"
             ? STEPS.findIndex((s) => s.key === lifecycle) > index
@@ -74,7 +74,7 @@ export function ConsultationLifecycleCard({ status }: ConsultationLifecycleCardP
               key={step.key}
               className={[
                 "flex flex-1 flex-col items-center justify-center gap-1 px-3 py-3 text-center text-xs font-semibold transition",
-                "min-w-[4.5rem] border-e border-[var(--color-border)] last:border-e-0",
+                "min-w-0 border border-transparent border-[var(--color-border)] sm:border-e sm:border-y-0 sm:border-s-0 last:sm:border-e-0",
                 isCurrent
                   ? "bg-[color:color-mix(in_srgb,var(--color-primary)_15%,var(--color-surface))] text-[var(--color-primary)]"
                   : isReached || isDone
@@ -94,7 +94,7 @@ export function ConsultationLifecycleCard({ status }: ConsultationLifecycleCardP
               >
                 {isCurrent ? "●" : isReached || isDone ? "✓" : String(index + 1)}
               </span>
-              {step.label(t.patient)}
+              <span className="break-words leading-5">{step.label(t.patient)}</span>
             </li>
           );
         })}

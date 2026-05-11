@@ -431,6 +431,19 @@ Expected output: QA report + fixes + final commit for pharmacist portal.
 - No API, auth, permission, prescription scan, dispensing, history, backend contract, or workflow behavior changes were made.
 - QA covered pharmacist dashboard, scan, and history pages across desktop, mobile, RTL/LTR language direction, and build validation.
 
+### Phase 8.7 — Mobile + RTL Final Polish
+
+- Executed final mobile/RTL polish pass for shared primitives, PortalShell surfaces, role workflows, and profile forms.
+- Addressed final high-impact wrapping and overflow issues:
+   - patient lifecycle stepper mobile compression,
+   - patient/doctor messaging headers and submit actions,
+   - doctor workspace and order/prescription action rows,
+   - pharmacist dispensing status toggle wrapping,
+   - profile header/text and submit action responsiveness.
+- Replaced remaining non-logical spacing utility (`ml-1`) with logical equivalent (`ms-1`) in pharmacist workflow.
+- Preserved all existing APIs, auth behavior, route permissions, and workflow logic.
+- Added dedicated QA report: `docs/MOBILE_RTL_FINAL_QA.md`.
+
 ## Phase 9 — Admin/Staff Portal
 
 1. Knowledge base document operations.

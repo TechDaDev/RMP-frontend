@@ -18,7 +18,7 @@ export function ProfileHeaderCard() {
   return (
     <Card className="rounded-[2rem]">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
+        <div className="flex min-w-0 items-center gap-3">
           {profileImage ? (
             <span
               aria-hidden="true"
@@ -30,9 +30,9 @@ export function ProfileHeaderCard() {
               <UserIcon size={22} />
             </span>
           )}
-          <div>
-            <h2 className="text-xl font-bold text-[var(--color-text)]">{fullName}</h2>
-            <p className="text-sm text-[var(--color-muted)]" dir="ltr">{user.email}</p>
+          <div className="min-w-0">
+            <h2 className="break-words text-xl font-bold text-[var(--color-text)]">{fullName}</h2>
+            <p className="truncate text-sm text-[var(--color-muted)]" dir="ltr">{user.email}</p>
           </div>
         </div>
 

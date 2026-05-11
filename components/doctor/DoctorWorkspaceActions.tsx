@@ -26,40 +26,40 @@ export function DoctorWorkspaceActions({ consultationId, status, isApproved, pat
   return (
     <Card className="space-y-3">
       <h3 className="text-base font-semibold text-[var(--color-text)]">{t.doctor.workspaceActions}</h3>
-      <div className="flex flex-wrap gap-2">
+      <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
         {canCreatePrescription ? (
           <Link
             href={`/app/doctor/consultations/${consultationId}/prescriptions/new`}
-            className={buttonClassName({ variant: "secondary" })}
+            className={buttonClassName({ variant: "secondary", className: "w-full" })}
           >
             {t.doctor.createPrescription}
           </Link>
         ) : (
-          <Button variant="secondary" disabled>
+          <Button variant="secondary" className="w-full" disabled>
             {!isApproved ? t.doctor.verifiedDoctorRequired : t.doctor.prescriptionRequiresAcceptedConsultation}
           </Button>
         )}
         {canCreateLabOrder ? (
           <Link
             href={`/app/doctor/consultations/${consultationId}/lab-orders/new`}
-            className={buttonClassName({ variant: "secondary" })}
+            className={buttonClassName({ variant: "secondary", className: "w-full" })}
           >
             {t.doctor.createLabOrder}
           </Link>
         ) : (
-          <Button variant="secondary" disabled>
+          <Button variant="secondary" className="w-full" disabled>
             {!isApproved ? t.doctor.verifiedDoctorRequired : t.doctor.labOrderRequiresAcceptedConsultation}
           </Button>
         )}
         {canViewRecord ? (
           <Link
             href={`/app/doctor/patients/${patientId}/record?consultationId=${consultationId}`}
-            className={buttonClassName({ variant: "secondary" })}
+            className={buttonClassName({ variant: "secondary", className: "w-full" })}
           >
             {t.doctor.viewPatientRecord}
           </Link>
         ) : (
-          <Button variant="secondary" disabled>
+          <Button variant="secondary" className="w-full" disabled>
             {!isApproved ? t.doctor.verifiedDoctorRequired : t.doctor.patientRecordRequiresRelationship}
           </Button>
         )}

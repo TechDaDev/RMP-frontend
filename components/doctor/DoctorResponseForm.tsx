@@ -99,7 +99,7 @@ export function DoctorResponseForm({
         {success ? <p className="text-sm text-green-700 dark:text-green-300">{success}</p> : null}
         {error ? <p className="text-sm text-red-700 dark:text-red-300">{error}</p> : null}
 
-        <Button type="submit" disabled={!canSubmit || submitting || responseText.trim().length === 0}>
+        <Button type="submit" className="w-full sm:w-auto" disabled={!canSubmit || submitting || responseText.trim().length === 0}>
           {submitting ? t.doctor.sendingDoctorResponse : t.doctor.sendDoctorResponse}
         </Button>
       </form>

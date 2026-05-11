@@ -67,7 +67,7 @@ export function DoctorLabResultReviewCard({ result, onReview }: DoctorLabResultR
         {error ? <p className="text-sm text-red-700 dark:text-red-300">{error}</p> : null}
         {success ? <p className="text-sm text-green-700 dark:text-green-300">{success}</p> : null}
 
-        <Button type="submit" disabled={!canReview || submitting}>
+        <Button type="submit" className="w-full sm:w-auto" disabled={!canReview || submitting}>
           {submitting ? t.doctor.submittingReview : t.doctor.submitReview}
         </Button>
       </form>

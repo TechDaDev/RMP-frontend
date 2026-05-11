@@ -177,7 +177,7 @@ export function PharmacistDispensingForm({
                   <span className="block font-semibold text-[var(--color-text)]">
                     {item.medication_name || "-"}
                     {item.strength ? (
-                      <span className="ml-1 text-sm font-normal text-[var(--color-muted)]">
+                      <span className="ms-1 text-sm font-normal text-[var(--color-muted)]">
                         {item.strength}
                       </span>
                     ) : null}
@@ -192,12 +192,12 @@ export function PharmacistDispensingForm({
 
               {sel.selected ? (
                 <div className="mt-3 space-y-3 ps-7">
-                  <div className="flex gap-2">
+                  <div className="grid gap-2 sm:grid-cols-2">
                     <button
                       type="button"
                       onClick={() => setItemStatus(item.id, "dispensed")}
                       className={[
-                        "rounded-xl border px-3 py-1.5 text-xs font-medium transition",
+                        "min-w-0 rounded-xl border px-3 py-1.5 text-xs font-medium transition",
                         sel.status === "dispensed"
                           ? "border-[var(--color-primary)] bg-[var(--color-primary)] text-white"
                           : "border-[var(--color-border)] text-[var(--color-muted)] hover:border-[var(--color-primary)]",
@@ -209,7 +209,7 @@ export function PharmacistDispensingForm({
                       type="button"
                       onClick={() => setItemStatus(item.id, "unavailable")}
                       className={[
-                        "rounded-xl border px-3 py-1.5 text-xs font-medium transition",
+                        "min-w-0 rounded-xl border px-3 py-1.5 text-xs font-medium transition",
                         sel.status === "unavailable"
                           ? "border-orange-500 bg-orange-500 text-white"
                           : "border-[var(--color-border)] text-[var(--color-muted)] hover:border-orange-500",

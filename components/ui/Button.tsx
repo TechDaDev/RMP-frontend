@@ -22,7 +22,7 @@ export function buttonClassName({
   fullWidth = false,
   className,
 }: ButtonClassNameOptions = {}) {
-  const base = "inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]";
+  const base = "inline-flex min-h-11 min-w-0 items-center justify-center gap-2 rounded-2xl px-4 py-2.5 text-center text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] whitespace-normal break-words";
   const styles = {
     primary:
       "bg-[linear-gradient(135deg,var(--color-primary),var(--color-secondary))] text-white shadow-[var(--card-shadow)] hover:-translate-y-0.5 hover:opacity-95",
