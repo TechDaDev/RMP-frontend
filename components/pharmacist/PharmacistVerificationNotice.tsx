@@ -4,6 +4,13 @@ import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import type { ProfileVerification } from "@/types/backend";
 
+/**
+ * Displays the verification status for a pharmacist account.
+ * 
+ * Verification gating applies equally to doctor, pharmacist, and laboratorian roles.
+ * Pharmacists cannot perform QR scanning or prescription dispensing until approved by staff.
+ * See test_users.md for profile field mappings and verification read-only fields.
+ */
 interface PharmacistVerificationNoticeProps {
   verification: ProfileVerification | null;
 }

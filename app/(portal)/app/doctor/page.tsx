@@ -21,6 +21,18 @@ import {
 } from "@/lib/doctor/doctorService";
 import type { DoctorConsultationListItem } from "@/types/doctor";
 
+/**
+ * Doctor dashboard page.
+ * 
+ * Verification Gate: Doctors must have is_approved = true to:
+ * - View pending and assigned consultations
+ * - Accept, message, respond to consultations
+ * - Create prescriptions and lab orders
+ * - Access patient records
+ * 
+ * This gating pattern applies equally to pharmacists and laboratorians.
+ * See FRONTEND_INTEGRATION_GUIDE.md and test_users.md for verification requirements.
+ */
 export default function DoctorPortalPage() {
   const { t } = useAppPreferences();
   const { profile, verification } = useAuth();

@@ -10,6 +10,15 @@ import { ApiError } from "@/lib/api/errors";
 import { updateUserProfile } from "@/lib/profile/profileService";
 import { ProfileSaveStatus } from "@/components/profile/ProfileSaveStatus";
 
+/**
+ * Shared user profile form for all user types.
+ * Updates the common UserProfile with fields required by all roles:
+ * - phone_number, gender, date_of_birth, governorate, district, address, national_id
+ * 
+ * Note: Role-specific profile fields are handled by separate forms
+ * (DoctorProfileForm, PharmacistProfileForm, LaboratorianProfileForm, PatientProfileForm)
+ * See test_users.md for complete field mappings per role.
+ */
 interface UserProfileFormState {
   phone_number: string;
   gender: string;

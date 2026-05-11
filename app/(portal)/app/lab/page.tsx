@@ -18,6 +18,18 @@ import { getLabTestCatalog } from "@/lib/laboratory/laboratoryService";
 import type { LaboratorianProfileData } from "@/types/backend";
 import type { LaboratoryTestCatalogItem } from "@/types/laboratory";
 
+/**
+ * Laboratory dashboard page.
+ * 
+ * Verification Gate: Laboratorians must have is_approved = true to:
+ * - Scan QR codes on lab orders
+ * - Create and correct lab results
+ * - View the lab test catalog
+ * 
+ * This gating pattern applies equally to doctors and pharmacists.
+ * Profile fields: laboratorian_license_number, laboratory_name, laboratory_address, specialization, etc.
+ * Read-only verification fields: verification_status, verified_at, verified_by, verification_notes
+ */
 export default function LaboratoryPortalPage() {
   const { t } = useAppPreferences();
   const { profile, verification } = useAuth();

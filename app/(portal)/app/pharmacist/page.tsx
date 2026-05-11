@@ -17,6 +17,17 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { canPharmacistScan } from "@/lib/pharmacist/pharmacistStatus";
 import type { PharmacistProfileData, UserProfileData } from "@/types/backend";
 
+/**
+ * Pharmacist dashboard page.
+ * 
+ * Verification Gate: Pharmacists must have is_approved = true to:
+ * - Scan QR codes on prescriptions
+ * - View prescription details and dispensing history
+ * 
+ * This gating pattern applies equally to doctors and laboratorians.
+ * Profile fields: pharmacist_license_number, pharmacy_name, pharmacy_address, working_hours, etc.
+ * Read-only verification fields: verification_status, verified_at, verified_by, verification_notes
+ */
 export default function PharmacistPortalPage() {
   const { t } = useAppPreferences();
   const { user, profile, verification } = useAuth();

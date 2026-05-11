@@ -3,6 +3,17 @@
 import { Card } from "@/components/ui/Card";
 import type { ProfileVerification } from "@/types/backend";
 
+/**
+ * Displays the verification status for a doctor account.
+ * 
+ * Note: Verification gating (checking `is_approved`) applies equally to all three professional roles:
+ * - Doctor (`verification_status` required for consultations, prescriptions, lab orders)
+ * - Pharmacist (`verification_status` required for prescription scanning)
+ * - Laboratorian (`verification_status` required for lab order scanning and result creation)
+ * 
+ * See FRONTEND_INTEGRATION_GUIDE.md: "For professional roles (doctor, pharmacist, laboratorian),
+ * also check verification_status from GET /api/profiles/me/."
+ */
 interface DoctorVerificationNoticeProps {
   verification: ProfileVerification | null;
   requiredLabel: string;

@@ -4,6 +4,13 @@ import { Card } from "@/components/ui/Card";
 import { ShieldIcon } from "@/components/icons";
 import type { LaboratorianProfileData, ProfileVerification } from "@/types/backend";
 
+/**
+ * Displays the verification status for a laboratorian account.
+ * 
+ * Verification gating applies equally to doctor, pharmacist, and laboratorian roles.
+ * Laboratorians cannot perform lab order scanning or result creation until approved by staff.
+ * Verification fields (verified_at, verified_by, verification_notes) are read-only.
+ */
 interface LaboratoryVerificationNoticeProps {
   verification: ProfileVerification | null;
   roleProfile: LaboratorianProfileData | null;

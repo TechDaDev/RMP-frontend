@@ -12,6 +12,18 @@ import type {
   PharmacistProfileData,
 } from "@/types/backend";
 
+/**
+ * Renders the appropriate role-specific profile form based on user type.
+ * 
+ * Field Summary (see test_users.md for complete details):
+ * - Doctor: medical_license_number, specialty, professional_title, years_of_experience, bio, work_address, etc.
+ * - Pharmacist: pharmacist_license_number, pharmacy_name, pharmacy_license_number, pharmacy_address, working_hours, etc.
+ * - Laboratorian: laboratorian_license_number, laboratory_name, laboratory_address, specialization, working_hours, etc.
+ * - Patient: social_security_id, emergency_contact_name, emergency_contact_phone
+ * 
+ * All professional roles include read-only verification fields:
+ * - verification_status, verified_at, verified_by, verification_notes
+ */
 export function RoleProfileForm() {
   const { user, profile } = useAuth();
 
