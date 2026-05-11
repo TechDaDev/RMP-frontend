@@ -22,6 +22,8 @@ export function Logo({ locale }: LogoProps) {
         alt={brandAlt[locale]}
         width={867}
         height={348}
+        loading="eager"
+        fetchPriority="high"
         className="h-10 w-auto max-w-[11rem] shrink-0 object-contain"
       />
     </div>
