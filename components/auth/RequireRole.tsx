@@ -11,6 +11,7 @@ const roleRouteMap: Record<string, string> = {
   doctor: "/app/doctor",
   pharmacist: "/app/pharmacist",
   laboratorian: "/app/lab",
+  admin: "/app/admin",
 };
 
 interface RequireRoleProps {

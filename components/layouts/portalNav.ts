@@ -57,7 +57,9 @@ export function getPortalNavItems(userType: string | undefined | null, t: Transl
       ];
     case "admin":
       return [
-        { href: "/app/admin", label: t.dashboards.adminTitle || t.roles.admin, icon: GridIcon, exact: true },
+        { href: "/app/admin", label: t.admin.dashboardTitle, icon: GridIcon, exact: true },
+        { href: "/app/admin/knowledge-base", label: t.admin.knowledgeBaseTitle, icon: FileTextIcon },
+        { href: "/app/admin/rag-feedback", label: t.admin.ragFeedbackTitle, icon: ShieldIcon },
         { href: "/app/profile", label: t.portal.profile, icon: UserIcon, exact: true },
       ];
     default:

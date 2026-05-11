@@ -162,7 +162,34 @@
 
 - Phase 8.7 Mobile + RTL Final Polish
 
-## Phase 8.7 - Mobile + RTL Final Polish
+## Phase 9 — Admin / Staff Portal UI
+
+### Scope
+
+Admin portal UI implemented under `/app/admin` with documented staff/admin backend endpoints only (Knowledge Base + RAG Admin).
+
+### UI approach
+
+- All admin pages use the same Phase 8 shared primitives: `PageHeader`, `DashboardSection`, `DashboardGrid`, `DashboardStatCard`, `DashboardWorkflowCard`, `DashboardStateCard`, `Card`, `Badge`, `Button`.
+- No new design primitives introduced; admin pages inherit RTL/LTR, theme, and mobile layout patterns from Phase 8.
+
+### Admin pages
+
+- `/app/admin` — dashboard with live stat cards and workflow actions.
+- `/app/admin/knowledge-base` — document list with status badges and detail links.
+- `/app/admin/knowledge-base/[id]` — document detail with inline workflow action panel.
+- `/app/admin/rag-feedback` — RAG feedback moderation list with review action panel.
+
+### Guardrails confirmed
+
+- No private clinical fields, credentials, or patient-identifying data surfaced.
+- No new auth flows, API client modifications, or route permission model changes.
+- No unsupported backend endpoints called.
+
+### Validation
+
+- TypeScript ✅ | ESLint ✅ | Build ✅ (all admin routes in build manifest)
+
 
 ### Focus areas
 

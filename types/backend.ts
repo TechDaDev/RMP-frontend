@@ -2,7 +2,8 @@ export type BackendUserType =
   | "patient"
   | "doctor"
   | "pharmacist"
-  | "laboratorian";
+  | "laboratorian"
+  | "admin";
 
 export type VerificationStatus =
   | "not_required"

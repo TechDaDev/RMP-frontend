@@ -119,6 +119,24 @@ Implementation notes:
 - Added disabled placeholders for prescription and lab-order actions for later phases.
 - No reject action, no WebSocket, and no RAG integration in this phase.
 
+## Phase 9 — Admin / Staff Portal ✅ COMPLETE
+
+1. Audited backend against ENDPOINT_INVENTORY + openapi schema — no generic admin CRUD APIs for users/verification exist. ✅
+2. Chosen implementation path: documented staff/admin endpoints only (Knowledge Base + RAG Admin). ✅
+3. Implemented admin route guard layout using `RequireRole role="admin"`. ✅
+4. Implemented admin dashboard: live stats from `GET /api/rag/admin/analytics/summary/`, document count, pending feedback count, dataset export action. ✅
+5. Implemented knowledge documents list: `GET /api/knowledge-base/documents/`. ✅
+6. Implemented knowledge document detail with workflow actions: process / approve / reject / archive / embed / chunks. ✅
+7. Implemented RAG feedback review list with review status actions: reviewed / dismissed / escalated. ✅
+8. Added `types/admin.ts` and `lib/admin/adminService.ts` with contract-accurate models and service methods. ✅
+9. Added `admin` endpoint group to `lib/api/endpoints.ts`. ✅
+10. Updated portal navigation for admin role. ✅
+11. Added admin i18n keys across Arabic, Kurdish, English. ✅
+12. Added `common.retry` translation key across all locales and i18n type contract. ✅
+13. Validation: TypeScript ✅ | ESLint ✅ | Build ✅ (admin routes: `/app/admin`, `/app/admin/knowledge-base`, `/app/admin/knowledge-base/[id]`, `/app/admin/rag-feedback`).
+
+See `docs/ADMIN_STAFF_PORTAL_IMPLEMENTATION_NOTES.md` for full contract audit, scope, and QA details.
+
 ## Phase 5.3 — Prescriptions From Consultation
 
 1. Implement create-prescription screen from consultation context.
