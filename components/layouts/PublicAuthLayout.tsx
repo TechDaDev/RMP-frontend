@@ -21,7 +21,7 @@ export function PublicAuthLayout({ title, subtitle, children }: PublicAuthLayout
   const { locale, theme, t, setLocale, toggleTheme } = useAppPreferences();
 
   return (
-    <main className="relative flex min-h-screen overflow-hidden py-4 sm:py-6">
+    <main className="page-enter relative flex min-h-screen overflow-hidden py-4 sm:py-6">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,color-mix(in_srgb,var(--color-primary)_14%,transparent),transparent_34%),radial-gradient(circle_at_bottom_right,color-mix(in_srgb,var(--color-accent)_14%,transparent),transparent_32%)]" aria-hidden="true" />
 
       <div className="container-grid relative z-10 flex flex-1 flex-col gap-6">

@@ -14,6 +14,7 @@ import {
   TrustSection,
   WhoItServesSection,
 } from "@/components/sections";
+import { Reveal } from "@/components/ui/Reveal";
 
 export default function Home() {
   return <LandingPage />;
@@ -33,15 +34,33 @@ function LandingPage() {
       />
 
       <main>
-        <Hero t={t} locale={locale} />
-        <TrustSection t={t} />
-        <FeaturesSection t={t} />
-        <WhoItServesSection t={t} />
-        <SecuritySection t={t} />
-        <HowItWorksSection t={t} />
-        <PlatformPreviewSection t={t} locale={locale} />
-        <FAQSection t={t} />
-        <FinalCTASection t={t} />
+        <Reveal delay={0}>
+          <Hero t={t} locale={locale} />
+        </Reveal>
+        <Reveal delay={60}>
+          <TrustSection t={t} />
+        </Reveal>
+        <Reveal delay={100}>
+          <FeaturesSection t={t} />
+        </Reveal>
+        <Reveal delay={140}>
+          <WhoItServesSection t={t} />
+        </Reveal>
+        <Reveal delay={180}>
+          <SecuritySection t={t} />
+        </Reveal>
+        <Reveal delay={220}>
+          <HowItWorksSection t={t} />
+        </Reveal>
+        <Reveal delay={260}>
+          <PlatformPreviewSection t={t} locale={locale} />
+        </Reveal>
+        <Reveal delay={300}>
+          <FAQSection t={t} />
+        </Reveal>
+        <Reveal delay={340}>
+          <FinalCTASection t={t} />
+        </Reveal>
       </main>
 
       <Footer locale={locale} t={t} onLocaleChange={setLocale} />

@@ -149,7 +149,7 @@ export function Hero({ t, locale }: HeroProps) {
 
         {/* Visual mockup */}
         <div
-          className="relative rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--card-shadow-lg)] overflow-hidden"
+          className="hero-float relative overflow-hidden rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] shadow-[var(--card-shadow-lg)]"
           aria-label={t.ui.heroFlowLabel}
         >
           {/* Gradient overlay */}
