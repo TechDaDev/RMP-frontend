@@ -21,17 +21,17 @@ const roleRouteMap: Record<string, string> = {
 
 export default function PortalEntryPage() {
   const { locale, t } = useAppPreferences();
-  const { user } = useAuth();
+  const { effectiveRole } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (user) {
-      const route = roleRouteMap[user.user_type];
+    if (effectiveRole) {
+      const route = roleRouteMap[effectiveRole];
       if (route) {
         router.replace(route);
       }
     }
-  }, [user, router]);
+  }, [effectiveRole, router]);
 
   // Show role cards as fallback (staff / admin or unknown role)
   return (

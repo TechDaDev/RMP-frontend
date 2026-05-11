@@ -1,6 +1,7 @@
 import { apiRequest } from "@/lib/api/client";
 import { API_ENDPOINTS } from "@/lib/api/endpoints";
 import { setTokens, clearTokens } from "@/lib/auth/tokenStorage";
+import { ApiError } from "@/lib/api/errors";
 import type {
   BackendUser,
   LoginRequest,
@@ -111,6 +112,23 @@ export async function getCurrentProfileService(): Promise<ProfilesMeResponse> {
     return resp.data;
   }
   return resp;
+}
+
+/**
+ * Admin capability is not exposed in the auth payload for the current backend.
+ * Probe a documented admin endpoint and treat a successful response as proof of
+ * admin access. A 403 means the user is authenticated but not an admin.
+ */
+export async function hasAdminAccessService(): Promise<boolean> {
+  try {
+    await apiRequest(`${API_ENDPOINTS.admin.verifications}?limit=1`, { auth: true });
+    return true;
+  } catch (err) {
+    if (err instanceof ApiError && (err.status === 403 || err.status === 404)) {
+      return false;
+    }
+    throw err;
+  }
 }
 
 /**

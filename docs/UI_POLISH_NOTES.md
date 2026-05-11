@@ -186,6 +186,36 @@ Admin portal UI implemented under `/app/admin` with documented staff/admin backe
 - No new auth flows, API client modifications, or route permission model changes.
 - No unsupported backend endpoints called.
 
+## Phase 9B — Admin Verification Review UI Stabilization
+
+### Scope and dependency
+
+- Implemented and stabilized verification UI on top of backend Phase 9A verification endpoints.
+- Routes covered:
+  - `/app/admin/verifications`
+  - `/app/admin/verifications/[role]/[id]`
+
+### UX polish and behavior closure
+
+- Verification queue filters (role/status/search) are mobile-safe and localized.
+- Verification detail action forms are mobile-safe and keep required-reason validation for reject/suspend.
+- Mobile portal drawer behavior remains consistent in admin pages at 390px.
+- No horizontal overflow observed during final closure pass.
+
+### Locale and theme closure
+
+- Re-checked locale/direction behavior:
+  - Arabic RTL
+  - Kurdish RTL
+  - English LTR
+- Re-checked light and dark theme rendering on admin verification routes.
+
+### Guard stabilization note
+
+- Issue found: admin-capable account can be returned without explicit staff/superuser flags in `/api/accounts/me/`, causing role-only routing mismatches.
+- Fix applied: frontend derives effective admin access from documented admin endpoint capability check.
+- Backend improvement requested: expose `is_staff`/`is_superuser` in `/api/accounts/me/` to avoid capability probing.
+
 ### Validation
 
 - TypeScript ✅ | ESLint ✅ | Build ✅ (all admin routes in build manifest)

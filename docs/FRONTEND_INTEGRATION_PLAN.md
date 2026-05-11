@@ -137,6 +137,32 @@ Implementation notes:
 
 See `docs/ADMIN_STAFF_PORTAL_IMPLEMENTATION_NOTES.md` for full contract audit, scope, and QA details.
 
+## Phase 9B — Admin Verification Review UI ✅ COMPLETE
+
+1. Implemented verification queue route `/app/admin/verifications` against backend Phase 9A endpoints only. ✅
+2. Implemented verification detail route `/app/admin/verifications/[role]/[id]` with approve/reject/suspend UI actions. ✅
+3. Added verification endpoint wiring in frontend admin service:
+   - `GET /api/admin/verifications/`
+   - `GET /api/admin/verifications/{role}/{id}/`
+   - `POST /api/admin/verifications/{role}/{id}/approve/`
+   - `POST /api/admin/verifications/{role}/{id}/reject/`
+   - `POST /api/admin/verifications/{role}/{id}/suspend/`
+4. Preserved privacy contract: no credentials, tokens, OTPs, QR tokens, or private clinical data are surfaced in verification UI. ✅
+5. Admin access stabilization fix applied:
+   - backend `/api/accounts/me/` does not expose `is_staff`/`is_superuser`.
+   - frontend currently derives effective admin access via successful documented admin endpoint capability check.
+6. Final UI QA closure completed:
+   - mobile at `390px` across `/app/admin`, `/app/admin/verifications`, `/app/admin/verifications/[role]/[id]`
+   - filters and detail form validation checks
+   - Arabic RTL, Kurdish RTL, English LTR re-check
+   - light/dark theme re-check
+   - no horizontal overflow observed in closure pass
+
+Notes:
+- No backend/API contract changes were introduced.
+- No existing patient/doctor/laboratory/pharmacist workflows were changed.
+- Backend improvement requested: expose `is_staff`/`is_superuser` in `/api/accounts/me/`.
+
 ## Phase 5.3 — Prescriptions From Consultation
 
 1. Implement create-prescription screen from consultation context.

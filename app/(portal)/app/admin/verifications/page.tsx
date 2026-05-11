@@ -15,6 +15,10 @@ import type { AdminVerificationListItem, AdminVerificationRole, AdminVerificatio
 const VERIFICATION_ROLES: AdminVerificationRole[] = ["doctor", "pharmacist", "laboratorian"];
 const VERIFICATION_STATUSES: AdminVerificationStatus[] = ["pending", "approved", "rejected", "suspended"];
 
+function getRoleLabel(role: AdminVerificationRole, labels: typeof import("@/lib/i18n").translations.en.roles) {
+  return role === "laboratorian" ? labels.laboratory : labels[role];
+}
+
 export default function AdminVerificationsPage() {
   const { t } = useAppPreferences();
   const [loading, setLoading] = useState(true);
@@ -35,7 +39,7 @@ export default function AdminVerificationsPage() {
       try {
         const result = await getAdminVerifications({
           role: roleFilter || undefined,
-          status: statusFilter || "pending",
+          status: statusFilter || undefined,
           search: searchQuery || undefined,
           limit: 20,
           offset: (page - 1) * 20,
@@ -88,8 +92,8 @@ export default function AdminVerificationsPage() {
   return (
     <>
       <PageHeader
-        title={t.admin.verificationQueueDescription}
-        description={t.admin.verificationQueue}
+        title={t.admin.verificationQueue}
+        description={t.admin.verificationQueueDescription}
         actions={<Button variant="secondary" onClick={() => window.location.reload()}>{t.common.retry}</Button>}
       />
 
@@ -112,7 +116,7 @@ export default function AdminVerificationsPage() {
                   <option value="">{t.admin.allRoles}</option>
                   {VERIFICATION_ROLES.map((role) => (
                     <option key={role} value={role}>
-                      {t.roles[role as keyof typeof t.roles] || role}
+                      {getRoleLabel(role, t.roles)}
                     </option>
                   ))}
                 </select>
@@ -154,7 +158,7 @@ export default function AdminVerificationsPage() {
 
               <div className="flex items-end">
                 <Button type="submit" variant="primary" className="w-full">
-                  {t.admin.filterByStatus}
+                  {t.admin.searchVerifications}
                 </Button>
               </div>
             </div>
@@ -210,7 +214,7 @@ export default function AdminVerificationsPage() {
                       </div>
                       <div className="flex flex-wrap gap-2">
                         <Badge color={roleColor(verification.role)}>
-                          {t.roles[verification.role as keyof typeof t.roles] || verification.role}
+                          {getRoleLabel(verification.role, t.roles)}
                         </Badge>
                         <Badge color={statusColor(verification.status)}>
                           {t.admin[`${verification.status}Status` as keyof typeof t.admin] ||

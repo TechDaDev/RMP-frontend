@@ -23,6 +23,10 @@ import type {
   AdminVerificationSuspendRequest,
 } from "@/types/admin";
 
+function getRoleLabel(role: AdminVerificationRole, labels: typeof import("@/lib/i18n").translations.en.roles) {
+  return role === "laboratorian" ? labels.laboratory : labels[role];
+}
+
 export default function AdminVerificationDetailPage({
   params: paramsPromise,
 }: {
@@ -224,7 +228,7 @@ export default function AdminVerificationDetailPage({
       <PageHeader
         title={verification.user?.full_name || verification.user?.email || "-"}
         description={t.admin.verificationDetailDescription}
-        actions={<Button variant="secondary" onClick={() => router.back()}>{t.common.backToHome}</Button>}
+        actions={<Button variant="secondary" onClick={() => router.push("/app/admin/verifications")}>{t.admin.backToVerificationQueue}</Button>}
       />
 
       {actionSuccess && (
@@ -240,9 +244,9 @@ export default function AdminVerificationDetailPage({
           <div className="space-y-4">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
-                <label className="text-sm text-muted-foreground">{t.roles.doctor}</label>
+                <label className="text-sm text-muted-foreground">{t.admin.verificationRole}</label>
                 <Badge color={roleColor(verification.role)} className="mt-2">
-                  {t.roles[verification.role as keyof typeof t.roles] || verification.role}
+                  {getRoleLabel(verification.role, t.roles)}
                 </Badge>
               </div>
               <div>
@@ -347,11 +351,11 @@ export default function AdminVerificationDetailPage({
               <h3 className="font-semibold text-foreground">{t.admin.approveVerification}</h3>
               <form onSubmit={handleApprove} className="space-y-4">
                 <div>
-                  <label className="block text-sm text-muted-foreground mb-2">{t.admin.approvalReason}</label>
+                  <label className="block text-sm text-muted-foreground mb-2">{t.admin.approveVerification}</label>
                   <textarea
                     value={approveNote}
                     onChange={(e) => setApproveNote(e.target.value)}
-                    placeholder={t.admin.approvalReason}
+                    placeholder={t.admin.approveVerification}
                     rows={3}
                     className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                   />

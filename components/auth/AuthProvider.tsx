@@ -11,6 +11,7 @@ import {
   type ReactNode,
 } from "react";
 import {
+  hasAdminAccessService,
   loginService,
   logoutService,
   getCurrentProfileService,
@@ -30,6 +31,7 @@ interface AuthState {
   profile: ProfilesMeResponse | null;
   completion: ProfileCompletion | null;
   verification: ProfileVerification | null;
+  adminAccess: boolean;
   /** true while the initial token check is running */
   loading: boolean;
 }
@@ -42,6 +44,7 @@ interface AuthContextValue extends AuthState {
   refreshProfile: () => Promise<void>;
   updateProfileStateAfterSave: (updatedProfile: ProfilesMeResponse) => void;
   isAuthenticated: boolean;
+  effectiveRole: string | null;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -52,17 +55,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     profile: null,
     completion: null,
     verification: null,
+    adminAccess: false,
     loading: true,
   });
 
   const loadProfile = useCallback(async () => {
     try {
-      const profile = await getCurrentProfileService();
+      const [profile, adminAccess] = await Promise.all([
+        getCurrentProfileService(),
+        hasAdminAccessService(),
+      ]);
+
       setState({
         user: profile.user,
         profile,
         completion: profile.completion,
         verification: profile.verification,
+        adminAccess,
         loading: false,
       });
     } catch (err) {
@@ -76,6 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         profile: null,
         completion: null,
         verification: null,
+        adminAccess: false,
         loading: false,
       });
     }
@@ -121,6 +131,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       profile: null,
       completion: null,
       verification: null,
+      adminAccess: false,
       loading: false,
     });
   }, []);
@@ -134,6 +145,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       refreshProfile: loadProfile,
       updateProfileStateAfterSave,
       isAuthenticated: state.user !== null,
+      effectiveRole: state.adminAccess ? "admin" : state.user?.user_type ?? null,
     }),
     [state, login, logout, loadProfile, updateProfileStateAfterSave],
   );

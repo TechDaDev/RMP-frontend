@@ -30,22 +30,22 @@ interface RequireRoleProps {
  * loading is false).
  */
 export function RequireRole({ role, children }: RequireRoleProps) {
-  const { user, loading } = useAuth();
+  const { effectiveRole, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && user && user.user_type !== role) {
-      const correctRoute = roleRouteMap[user.user_type] ?? "/app";
+    if (!loading && effectiveRole && effectiveRole !== role) {
+      const correctRoute = roleRouteMap[effectiveRole] ?? "/app";
       router.replace(correctRoute);
     }
-  }, [loading, user, role, router]);
+  }, [effectiveRole, loading, role, router]);
 
   if (loading) {
     return <AppLoading />;
   }
 
   // While redirect is pending or user is null (handled by RequireAuth above)
-  if (!user || user.user_type !== role) {
+  if (!effectiveRole || effectiveRole !== role) {
     return null;
   }
 

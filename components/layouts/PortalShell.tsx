@@ -30,11 +30,11 @@ export function PortalShell({ children }: PortalShellProps) {
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const { locale, theme, t, setLocale, toggleTheme } = useAppPreferences();
-  const { user, logout, verification } = useAuth();
+  const { user, logout, verification, effectiveRole } = useAuth();
   const activeRole = activeRoleFromPath(pathname);
   const currentRoleLabel = activeRole ? roleMetadata[activeRole].labels[locale] : t.portal.chooseRole;
 
-  const navItems = useMemo(() => getPortalNavItems(user?.user_type, t), [t, user?.user_type]);
+  const navItems = useMemo(() => getPortalNavItems(effectiveRole, t), [effectiveRole, t]);
   const activeHref = useMemo(() => getActivePortalNavHref(pathname, navItems), [navItems, pathname]);
 
   const closeMenu = useCallback(() => {

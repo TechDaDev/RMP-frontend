@@ -21,6 +21,11 @@ Implemented against documented staff/admin endpoints only:
 - `POST /api/rag/admin/feedback/{id}/review/`
 - `GET /api/rag/admin/analytics/summary/`
 - `POST /api/rag/admin/exports/dataset/`
+- `GET /api/admin/verifications/`
+- `GET /api/admin/verifications/{role}/{id}/`
+- `POST /api/admin/verifications/{role}/{id}/approve/`
+- `POST /api/admin/verifications/{role}/{id}/reject/`
+- `POST /api/admin/verifications/{role}/{id}/suspend/`
 
 ## 2) Implemented Scope
 
@@ -31,6 +36,8 @@ Implemented:
 - Knowledge documents list route.
 - Knowledge document detail route with documented workflow actions.
 - RAG feedback review route with documented review status actions.
+- Verification review queue route with role/status/search filtering.
+- Verification detail route with approve/reject/suspend action forms.
 - Dataset export action (JSON) from admin dashboard.
 - Admin route guard layout.
 - Admin navigation entries for implemented routes.
@@ -52,6 +59,8 @@ The dashboard explicitly surfaces this contract boundary in UI copy.
 - `/app/admin/knowledge-base`
 - `/app/admin/knowledge-base/[id]`
 - `/app/admin/rag-feedback`
+- `/app/admin/verifications`
+- `/app/admin/verifications/[role]/[id]`
 
 ## 5) Services / Types Added
 
@@ -67,6 +76,10 @@ Updated:
 - Added admin route layout guard via `RequireRole role="admin"`.
 - Updated role redirects to include `/app/admin` where applicable.
 - Existing non-admin route guards remain unchanged.
+- Runtime issue found and fixed in Phase 9B stabilization:
+	- backend `/api/accounts/me/` currently returns `user_type` only and does not expose `is_staff`/`is_superuser`.
+	- in current test data, admin-capable account can be returned as `user_type: "doctor"`, which misroutes admin pages.
+	- frontend now derives effective admin access from a successful call to a documented admin endpoint (`GET /api/admin/verifications/?limit=1`) and uses that capability to route/guard admin pages.
 
 ## 7) Privacy Rules Applied
 
@@ -81,15 +94,29 @@ Functional sanity:
 - Knowledge detail actions call only documented action endpoints.
 - RAG feedback review calls documented review endpoint with supported statuses.
 - Dataset export calls documented export endpoint with JSON format.
+- Verification queue/detail call only documented Phase 9A verification endpoints.
+- Reject/suspend forms enforce required reason before submission.
 
 UI sanity:
 - Uses established Phase 8 primitives (`PageHeader`, `DashboardSection`, `DashboardGrid`, `DashboardStatCard`, `DashboardWorkflowCard`, `DashboardStateCard`, `Card`, `Badge`, `Button`).
 - Mobile-safe action layouts and wrapping maintained.
 - RTL/LTR and theme behavior preserved via shared shell + i18n/theme providers.
+- Final mobile QA executed at `390px` for:
+	- `/app/admin`
+	- `/app/admin/verifications`
+	- `/app/admin/verifications/[role]/[id]`
+	- filters, detail action forms, and mobile drawer behavior
+	- no horizontal overflow observed during the QA pass
+- Locale/direction QA re-checked:
+	- Arabic (RTL)
+	- Kurdish (RTL)
+	- English (LTR)
+- Theme QA re-checked in light/dark modes.
 
 ## 9) Remaining Limitations
 
-- If runtime account model does not expose a login-capable `admin` role in current environment, role-gated routes remain inaccessible to non-admin users by design.
+- Frontend currently infers admin access by probing a documented admin endpoint because `/api/accounts/me/` does not expose `is_staff` or `is_superuser`.
+- Backend improvement requested: include explicit staff/superuser flags in `/api/accounts/me/` (and profile payload parity) so frontend can use direct role claims instead of capability probing.
 - Knowledge base upload route is supported by backend but was not added in this phase to avoid introducing new file-upload UX surface and to keep scope aligned with requested implementation level.
 
 ## 10) Recommended Next Steps
