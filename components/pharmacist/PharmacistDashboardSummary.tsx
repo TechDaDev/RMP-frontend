@@ -5,6 +5,7 @@ import { DashboardStatCard } from "@/components/dashboard/DashboardStatCard";
 import { GridIcon, PharmacyIcon, ShieldIcon, UserIcon } from "@/components/icons";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
+import { localizeGovernorate } from "@/lib/locations/governorates";
 import type { BackendUser, PharmacistProfileData, ProfileVerification, UserProfileData } from "@/types/backend";
 
 interface PharmacistDashboardSummaryProps {
@@ -26,7 +27,7 @@ export function PharmacistDashboardSummary({
   roleProfile,
   verification,
 }: PharmacistDashboardSummaryProps) {
-  const { t } = useAppPreferences();
+  const { t, locale } = useAppPreferences();
   const isApproved = verification?.is_approved === true;
 
   const pharmacistName = useMemo(() => {
@@ -38,7 +39,7 @@ export function PharmacistDashboardSummary({
   }, [user?.first_name, user?.full_name, user?.last_name]);
 
   const location = useMemo(() => {
-    const governorate = normalize(userProfile?.governorate);
+    const governorate = normalize(localizeGovernorate(userProfile?.governorate, locale));
     const district = normalize(userProfile?.district);
 
     if (governorate === "—" && district === "—") {
@@ -50,7 +51,7 @@ export function PharmacistDashboardSummary({
     }
 
     return governorate !== "—" ? governorate : district;
-  }, [userProfile?.district, userProfile?.governorate]);
+  }, [locale, userProfile?.district, userProfile?.governorate]);
 
   const verificationLabel = isApproved
     ? t.profile.verificationApproved

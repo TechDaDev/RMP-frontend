@@ -19,6 +19,7 @@ import {
   getAdminRagAnalyticsSummary,
   getAdminRagFeedback,
 } from "@/lib/admin/adminService";
+import { localizeGovernorate } from "@/lib/locations/governorates";
 import type { AdminRagAnalyticsSummary } from "@/types/admin";
 import type { UserProfileData } from "@/types/backend";
 
@@ -31,7 +32,7 @@ function formatDate(value?: string | null) {
 }
 
 export default function AdminPortalPage() {
-  const { t } = useAppPreferences();
+  const { t, locale } = useAppPreferences();
   const { user, profile } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -123,7 +124,12 @@ export default function AdminPortalPage() {
 
           <DashboardGrid columns="three">
             <DashboardStatCard label={t.profile.phone} value={userProfile?.phone_number || "-"} tone="neutral" surface="panel" />
-            <DashboardStatCard label={t.profile.governorate} value={userProfile?.governorate || "-"} tone="neutral" surface="panel" />
+            <DashboardStatCard
+              label={t.profile.governorate}
+              value={localizeGovernorate(userProfile?.governorate, locale) || "-"}
+              tone="neutral"
+              surface="panel"
+            />
             <DashboardStatCard label={t.patient.updatedAt} value={formatDate(userProfile?.updated_at)} tone="neutral" surface="panel" />
           </DashboardGrid>
         </Card>

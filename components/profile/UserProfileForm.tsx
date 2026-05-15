@@ -1,12 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { ApiError } from "@/lib/api/errors";
+import {
+  getGovernorateDropdownOptions,
+  resolveGovernorateCode,
+} from "@/lib/locations/governorates";
 import { updateUserProfile } from "@/lib/profile/profileService";
 import { ProfileSaveStatus } from "@/components/profile/ProfileSaveStatus";
 
@@ -42,13 +46,18 @@ const initialState: UserProfileFormState = {
 };
 
 export function UserProfileForm() {
-  const { t } = useAppPreferences();
+  const { t, locale } = useAppPreferences();
   const { profile, refreshProfile } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [form, setForm] = useState<UserProfileFormState>(initialState);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const [saving, setSaving] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const governorateOptions = useMemo(
+    () => getGovernorateDropdownOptions(locale),
+    [locale],
+  );
 
   useEffect(() => {
     const userProfile = profile?.user_profile;
@@ -61,7 +70,7 @@ export function UserProfileForm() {
       phone_number: userProfile.phone_number ?? "",
       gender: userProfile.gender ?? "",
       date_of_birth: userProfile.date_of_birth ?? "",
-      governorate: userProfile.governorate ?? "",
+      governorate: resolveGovernorateCode(userProfile.governorate ?? "") ?? userProfile.governorate ?? "",
       district: userProfile.district ?? "",
       address: userProfile.address ?? "",
       national_id: userProfile.national_id ?? "",
@@ -156,14 +165,32 @@ export function UserProfileForm() {
             dir="ltr"
             errorText={fieldErrors.date_of_birth?.[0]}
           />
-          <Input
-            id="profile-governorate"
-            name="governorate"
-            label={t.profile.governorate}
-            value={form.governorate}
-            onChange={(event) => setForm((prev) => ({ ...prev, governorate: event.target.value }))}
-            errorText={fieldErrors.governorate?.[0]}
-          />
+          <label className="block space-y-2" htmlFor="profile-governorate-select">
+            <span className="text-sm font-semibold text-[var(--color-text)]">{t.profile.governorate}</span>
+            <select
+              id="profile-governorate-select"
+              name="governorate"
+              className="min-h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm text-[var(--color-text)] outline-none transition focus:border-[var(--color-primary)]"
+              value={form.governorate}
+              onChange={(event) => setForm((prev) => ({ ...prev, governorate: event.target.value }))}
+            >
+              <option value="">-</option>
+              {governorateOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+              {form.governorate &&
+              !governorateOptions.some((option) => option.value === form.governorate) ? (
+                <option value={form.governorate}>{form.governorate}</option>
+              ) : null}
+            </select>
+            {fieldErrors.governorate?.[0] ? (
+              <span className="block text-xs font-medium text-red-600 dark:text-red-300">
+                {fieldErrors.governorate[0]}
+              </span>
+            ) : null}
+          </label>
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
@@ -203,6 +230,7 @@ export function UserProfileForm() {
           <span className="text-sm font-semibold text-[var(--color-text)]">{t.profile.profileImage}</span>
           <input
             id="profile-image"
+            ref={fileInputRef}
             type="file"
             accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
             onChange={(event) =>
@@ -211,8 +239,27 @@ export function UserProfileForm() {
                 profile_image: event.target.files?.[0] ?? null,
               }))
             }
-            className="block w-full text-sm text-[var(--color-text)]"
+            className="sr-only"
           />
+          <div className="flex flex-wrap items-center gap-3">
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => fileInputRef.current?.click()}
+            >
+              {t.profile.uploadFile}
+            </Button>
+            {profile?.user_profile?.profile_image ? (
+              <a
+                href={profile.user_profile.profile_image}
+                target="_blank"
+                rel="noreferrer"
+                className="text-sm font-medium text-[var(--color-primary)] underline"
+              >
+                {t.profile.profileImage}
+              </a>
+            ) : null}
+          </div>
           <p className="text-xs text-[var(--color-muted)]">
             {form.profile_image
               ? `${t.profile.selectedFile}: ${form.profile_image.name}`

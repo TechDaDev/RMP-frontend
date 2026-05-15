@@ -61,10 +61,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loadProfile = useCallback(async () => {
     try {
-      const [profile, adminAccess] = await Promise.all([
-        getCurrentProfileService(),
-        hasAdminAccessService(),
-      ]);
+      const profile = await getCurrentProfileService();
+      let adminAccess = false;
+
+      try {
+        adminAccess = await hasAdminAccessService();
+      } catch (err) {
+        // Do not drop authenticated session if admin-capability probe fails
+        // due to transient/network/server errors.
+        if (err instanceof ApiError && err.status === 401) {
+          throw err;
+        }
+        adminAccess = false;
+      }
 
       setState({
         user: profile.user,
@@ -79,15 +88,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // subsequent page loads don't re-attempt and get stuck.
       if (err instanceof ApiError && err.status === 401) {
         clearTokens();
+        setState({
+          user: null,
+          profile: null,
+          completion: null,
+          verification: null,
+          adminAccess: false,
+          loading: false,
+        });
+        return;
       }
-      setState({
-        user: null,
-        profile: null,
-        completion: null,
-        verification: null,
-        adminAccess: false,
-        loading: false,
-      });
+
+      // Keep current session state on temporary profile-load errors.
+      setState((prev) => ({ ...prev, loading: false }));
     }
   }, []);
 
