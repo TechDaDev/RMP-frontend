@@ -66,7 +66,7 @@ export function PortalShell({ children }: PortalShellProps) {
     <div className="min-h-screen overflow-x-hidden bg-transparent">
       <div className="container-grid flex min-h-screen gap-5 py-3 md:py-5">
         <aside className="hidden w-72 shrink-0 lg:block xl:w-76">
-          <div className="sticky top-5 max-h-[calc(100vh-2.5rem)] overflow-hidden rounded-3xl border border-[var(--color-border)] bg-[color:color-mix(in_srgb,var(--color-surface)_94%,transparent)] p-4 shadow-[var(--card-shadow)] backdrop-blur">
+          <div className="sticky top-5 max-h-[calc(100vh-2.5rem)] overflow-visible rounded-3xl border border-[var(--color-border)] bg-[color:color-mix(in_srgb,var(--color-surface)_94%,transparent)] p-4 shadow-[var(--card-shadow)] backdrop-blur">
             {sidebar}
           </div>
         </aside>

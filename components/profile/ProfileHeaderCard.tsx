@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/Card";
 
 export function ProfileHeaderCard() {
   const { t } = useAppPreferences();
-  const { user, profile, verification } = useAuth();
+  const { user, profile, verification, effectiveRole } = useAuth();
 
   if (!user) {
     return null;
@@ -40,7 +40,11 @@ export function ProfileHeaderCard() {
           <Badge tone={user.is_active ? "success" : "primary"}>
             {user.is_active ? t.profile.activeAccount : t.profile.inactiveAccount}
           </Badge>
-          <Badge tone="primary">{t.roles[user.user_type === "laboratorian" ? "laboratory" : user.user_type]}</Badge>
+          <Badge tone="primary">
+            {effectiveRole === "admin"
+              ? t.roles.admin
+              : t.roles[user.user_type === "laboratorian" ? "laboratory" : user.user_type]}
+          </Badge>
           {verification?.required ? (
             <Badge tone={verification.is_approved ? "success" : "primary"}>
               {verification.is_approved ? t.auth.verificationApprovedBadge : t.profile.verificationPending}

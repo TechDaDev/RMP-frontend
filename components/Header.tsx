@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useAuth } from "@/components/auth/AuthProvider";
 import { CloseIcon, MenuIcon } from "@/components/icons";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { Logo } from "@/components/Logo";
@@ -24,7 +25,20 @@ export function Header({
   onLocaleChange,
 }: HeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { isAuthenticated, effectiveRole } = useAuth();
   const mobileMenuId = "mobile-primary-nav";
+  const dashboardHref =
+    effectiveRole === "admin"
+      ? "/app/admin"
+      : effectiveRole === "doctor"
+        ? "/app/doctor"
+        : effectiveRole === "pharmacist"
+          ? "/app/pharmacist"
+          : effectiveRole === "laboratorian"
+            ? "/app/lab"
+            : effectiveRole === "patient"
+              ? "/app/patient"
+              : "/app";
 
   const links = [
     { id: "home", label: t.nav.home },
@@ -57,9 +71,15 @@ export function Header({
         <div className="hidden items-center gap-2 lg:flex">
           <LanguageSwitcher locale={locale} onChange={onLocaleChange} t={t} compact ariaLabel={t.ui.languageSwitcherLabel} />
           <ThemeToggle theme={theme} onToggle={onThemeToggle} t={t} compact ariaLabel={t.ui.themeToggleLabel} />
-          <a href="/login" className="btn-primary px-5 py-2 text-sm">
-            {t.nav.cta}
-          </a>
+          {isAuthenticated ? (
+            <a href={dashboardHref} className="btn-primary px-5 py-2 text-sm">
+              {t.portal.dashboard}
+            </a>
+          ) : (
+            <a href="/login" className="btn-primary px-5 py-2 text-sm">
+              {t.nav.cta}
+            </a>
+          )}
         </div>
 
         <button
@@ -109,9 +129,15 @@ export function Header({
               compact
               ariaLabel={t.ui.themeToggleLabel}
             />
-            <a href="/login" className="btn-primary w-full sm:w-auto" onClick={() => setMenuOpen(false)}>
-              {t.nav.cta}
-            </a>
+            {isAuthenticated ? (
+              <a href={dashboardHref} className="btn-primary w-full sm:w-auto" onClick={() => setMenuOpen(false)}>
+                {t.portal.dashboard}
+              </a>
+            ) : (
+              <a href="/login" className="btn-primary w-full sm:w-auto" onClick={() => setMenuOpen(false)}>
+                {t.nav.cta}
+              </a>
+            )}
           </div>
         </div>
       ) : null}

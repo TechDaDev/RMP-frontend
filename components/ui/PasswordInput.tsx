@@ -42,13 +42,13 @@ export function PasswordInput({
           required={required}
           autoComplete={autoComplete}
           dir="ltr"
-          className="min-h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 pe-12 text-sm text-[var(--color-text)] outline-none transition placeholder:text-[var(--color-muted)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[color:color-mix(in_srgb,var(--color-primary)_18%,transparent)]"
+          className="min-h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 pr-12 text-sm text-[var(--color-text)] outline-none transition placeholder:text-[var(--color-muted)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[color:color-mix(in_srgb,var(--color-primary)_18%,transparent)]"
         />
         <button
           type="button"
           tabIndex={-1}
           aria-label={show ? t.auth.hidePassword : t.auth.showPassword}
-          className="absolute inset-y-0 end-0 flex w-11 items-center justify-center text-[var(--color-muted)] transition hover:text-[var(--color-text)]"
+          className="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-[var(--color-muted)] transition hover:text-[var(--color-text)]"
           onClick={() => setShow((v) => !v)}
         >
           {show ? <EyeOffIcon size={16} /> : <EyeIcon size={16} />}

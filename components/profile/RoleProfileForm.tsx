@@ -25,9 +25,15 @@ import type {
  * - verification_status, verified_at, verified_by, verification_notes
  */
 export function RoleProfileForm() {
-  const { user, profile } = useAuth();
+  const { user, profile, effectiveRole } = useAuth();
 
   if (!user || !profile) {
+    return null;
+  }
+
+  // Backend seeds admin with user_type="doctor" for model compatibility.
+  // When effective role is admin, do not render doctor role-editing form.
+  if (effectiveRole === "admin") {
     return null;
   }
 
