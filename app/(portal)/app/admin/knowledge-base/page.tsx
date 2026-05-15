@@ -32,7 +32,7 @@ export default function AdminKnowledgeBasePage() {
   const [form, setForm] = useState({
     title: "",
     document_type: "medical_book",
-    language: "ar",
+    language: "arabic",
     audience: "doctor",
     specialty: "",
     file: null as File | null,
@@ -72,7 +72,7 @@ export default function AdminKnowledgeBasePage() {
         title: form.title.trim(),
         document_type: form.document_type,
         language: form.language,
-        audience: form.audience.trim(),
+        audience: form.audience,
         specialty: form.specialty,
         file: form.file,
       });
@@ -142,20 +142,28 @@ export default function AdminKnowledgeBasePage() {
                 value={form.language}
                 onChange={(event) => setForm((prev) => ({ ...prev, language: event.target.value }))}
               >
-                <option value="ar">Arabic</option>
-                <option value="en">English</option>
-                <option value="ku">Kurdish</option>
+                <option value="arabic">Arabic</option>
+                <option value="english">English</option>
+                <option value="kurdish">Kurdish</option>
+                <option value="mixed">Mixed</option>
+                <option value="other">Other</option>
               </select>
             </label>
 
             <label className="space-y-1 text-sm font-medium text-[var(--color-text)]">
               Audience
-              <input
+              <select
                 className="min-h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm text-[var(--color-text)]"
                 value={form.audience}
                 onChange={(event) => setForm((prev) => ({ ...prev, audience: event.target.value }))}
-                required
-              />
+              >
+                <option value="doctor">Doctor</option>
+                <option value="pharmacist">Pharmacist</option>
+                <option value="laboratorian">Laboratorian</option>
+                <option value="patient">Patient</option>
+                <option value="admin">Admin</option>
+                <option value="mixed">Mixed</option>
+              </select>
             </label>
 
             <label className="space-y-1 text-sm font-medium text-[var(--color-text)] md:col-span-2">
