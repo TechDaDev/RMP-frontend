@@ -11,7 +11,15 @@ import { Card } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { createAdminKnowledgeDocument, getAdminKnowledgeDocuments } from "@/lib/admin/adminService";
 import { ApiError } from "@/lib/api/errors";
-import type { AdminKnowledgeDocument } from "@/types/admin";
+import type {
+  AdminKnowledgeAudience,
+  AdminKnowledgeDocument,
+  AdminKnowledgeDocumentType,
+  AdminKnowledgeLanguage,
+} from "@/types/admin";
+
+const MAX_KNOWLEDGE_FILE_BYTES = 20 * 1024 * 1024;
+const ALLOWED_KNOWLEDGE_EXTENSIONS = [".pdf", ".docx", ".txt"];
 
 function formatDate(value?: string) {
   if (!value) {
@@ -21,6 +29,34 @@ function formatDate(value?: string) {
   return new Date(value).toLocaleString();
 }
 
+function getFileExtension(fileName: string): string {
+  const dotIndex = fileName.lastIndexOf(".");
+  if (dotIndex === -1) {
+    return "";
+  }
+
+  return fileName.slice(dotIndex).toLowerCase();
+}
+
+function flattenFieldErrors(fieldErrors?: Record<string, string[]>): string[] {
+  if (!fieldErrors) {
+    return [];
+  }
+
+  const lines: string[] = [];
+  for (const [field, messages] of Object.entries(fieldErrors)) {
+    for (const message of messages) {
+      if (field === "non_field_errors") {
+        lines.push(message);
+      } else {
+        lines.push(`${field}: ${message}`);
+      }
+    }
+  }
+
+  return lines;
+}
+
 export default function AdminKnowledgeBasePage() {
   const { t } = useAppPreferences();
   const [documents, setDocuments] = useState<AdminKnowledgeDocument[]>([]);
@@ -28,8 +64,16 @@ export default function AdminKnowledgeBasePage() {
   const [error, setError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [uploadFieldErrors, setUploadFieldErrors] = useState<string[]>([]);
   const [uploadSuccess, setUploadSuccess] = useState<string | null>(null);
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<{
+    title: string;
+    document_type: AdminKnowledgeDocumentType;
+    language: AdminKnowledgeLanguage;
+    audience: AdminKnowledgeAudience;
+    specialty: string;
+    file: File | null;
+  }>({
     title: "",
     document_type: "medical_book",
     language: "arabic",
@@ -65,7 +109,21 @@ export default function AdminKnowledgeBasePage() {
 
     setUploading(true);
     setUploadError(null);
+    setUploadFieldErrors([]);
     setUploadSuccess(null);
+
+    const extension = getFileExtension(form.file.name);
+    if (!ALLOWED_KNOWLEDGE_EXTENSIONS.includes(extension)) {
+      setUploadError("Invalid file type. Please upload a PDF, DOCX, or TXT document.");
+      setUploading(false);
+      return;
+    }
+
+    if (form.file.size > MAX_KNOWLEDGE_FILE_BYTES) {
+      setUploadError("File is too large. Maximum allowed size is 20 MB.");
+      setUploading(false);
+      return;
+    }
 
     try {
       await createAdminKnowledgeDocument({
@@ -88,6 +146,7 @@ export default function AdminKnowledgeBasePage() {
     } catch (err) {
       if (err instanceof ApiError) {
         setUploadError(err.message || t.admin.decisionFailed);
+        setUploadFieldErrors(flattenFieldErrors(err.fieldErrors));
       } else {
         setUploadError(t.admin.decisionFailed);
       }
@@ -123,7 +182,7 @@ export default function AdminKnowledgeBasePage() {
               <select
                 className="min-h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm text-[var(--color-text)]"
                 value={form.document_type}
-                onChange={(event) => setForm((prev) => ({ ...prev, document_type: event.target.value }))}
+                onChange={(event) => setForm((prev) => ({ ...prev, document_type: event.target.value as AdminKnowledgeDocumentType }))}
               >
                 <option value="medical_book">medical_book</option>
                 <option value="laboratory_book">laboratory_book</option>
@@ -140,7 +199,7 @@ export default function AdminKnowledgeBasePage() {
               <select
                 className="min-h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm text-[var(--color-text)]"
                 value={form.language}
-                onChange={(event) => setForm((prev) => ({ ...prev, language: event.target.value }))}
+                onChange={(event) => setForm((prev) => ({ ...prev, language: event.target.value as AdminKnowledgeLanguage }))}
               >
                 <option value="arabic">Arabic</option>
                 <option value="english">English</option>
@@ -155,7 +214,7 @@ export default function AdminKnowledgeBasePage() {
               <select
                 className="min-h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm text-[var(--color-text)]"
                 value={form.audience}
-                onChange={(event) => setForm((prev) => ({ ...prev, audience: event.target.value }))}
+                onChange={(event) => setForm((prev) => ({ ...prev, audience: event.target.value as AdminKnowledgeAudience }))}
               >
                 <option value="doctor">Doctor</option>
                 <option value="pharmacist">Pharmacist</option>
@@ -187,6 +246,13 @@ export default function AdminKnowledgeBasePage() {
             </label>
 
             {uploadError ? <p className="md:col-span-2 text-sm font-medium text-red-600 dark:text-red-300">{uploadError}</p> : null}
+            {uploadFieldErrors.length > 0 ? (
+              <ul className="md:col-span-2 list-disc space-y-1 ps-5 text-sm text-red-600 dark:text-red-300">
+                {uploadFieldErrors.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            ) : null}
             {uploadSuccess ? <p className="md:col-span-2 text-sm font-medium text-green-700 dark:text-green-300">{uploadSuccess}</p> : null}
 
             <div className="md:col-span-2">

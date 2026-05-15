@@ -2,6 +2,7 @@ import { apiRequest } from "@/lib/api/client";
 import { API_ENDPOINTS } from "@/lib/api/endpoints";
 import type { ApiEnvelope, PaginatedResponse } from "@/types/api";
 import type {
+  AdminKnowledgeCreateRequest,
   AdminDatasetExportJsonResponse,
   AdminKnowledgeChunk,
   AdminKnowledgeDocument,
@@ -80,14 +81,7 @@ export async function getAdminKnowledgeDocuments(params?: {
   return normalizeList(unwrapData(response));
 }
 
-export async function createAdminKnowledgeDocument(payload: {
-  title: string;
-  document_type: string;
-  language: string;
-  audience: string;
-  file: File;
-  specialty?: string;
-}): Promise<AdminKnowledgeDocument> {
+export async function createAdminKnowledgeDocument(payload: AdminKnowledgeCreateRequest): Promise<AdminKnowledgeDocument> {
   const formData = new FormData();
   formData.append("title", payload.title);
   formData.append("document_type", payload.document_type);

@@ -16,6 +16,39 @@ export interface AdminKnowledgeDocument {
   updated_at?: string;
 }
 
+export type AdminKnowledgeDocumentType =
+  | "medical_book"
+  | "laboratory_book"
+  | "clinical_guideline"
+  | "drug_reference"
+  | "patient_education"
+  | "platform_policy"
+  | "other";
+
+export type AdminKnowledgeLanguage =
+  | "english"
+  | "arabic"
+  | "kurdish"
+  | "mixed"
+  | "other";
+
+export type AdminKnowledgeAudience =
+  | "doctor"
+  | "pharmacist"
+  | "laboratorian"
+  | "patient"
+  | "admin"
+  | "mixed";
+
+export interface AdminKnowledgeCreateRequest {
+  title: string;
+  document_type: AdminKnowledgeDocumentType;
+  language: AdminKnowledgeLanguage;
+  audience: AdminKnowledgeAudience;
+  file: File;
+  specialty?: string;
+}
+
 export interface AdminKnowledgeProcessingLog {
   id?: string;
   action?: string;
