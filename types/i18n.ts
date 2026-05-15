@@ -174,6 +174,21 @@ export interface Translations {
   admin: {
     dashboardTitle: string;
     dashboardSubtitle: string;
+    staffProfileTitle: string;
+    staffProfileDescription: string;
+    staffRoleLabel: string;
+    staffDepartmentLabel: string;
+    staffHiredLabel: string;
+    staffLastActiveLabel: string;
+    staffTrainingLabel: string;
+    staffTrainingCompleted: string;
+    staffTrainingPending: string;
+    staffProfileMissing: string;
+    adminFeaturesTitle: string;
+    adminFeatureVerifications: string;
+    adminFeatureKnowledgeBase: string;
+    adminFeatureAnalyticsExport: string;
+    adminFeatureAuditLogs: string;
     adminIdentity: string;
     adminIdentityDescription: string;
     platformStats: string;

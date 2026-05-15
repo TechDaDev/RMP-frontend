@@ -3,6 +3,7 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import { UserIcon } from "@/components/icons";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
+import { mediaUrl } from "@/lib/api/config";
 
 export function ProfileHeaderCard() {
   const { t } = useAppPreferences();
@@ -14,6 +15,7 @@ export function ProfileHeaderCard() {
 
   const fullName = user.full_name ?? `${user.first_name} ${user.last_name}`.trim();
   const profileImage = profile?.user_profile?.profile_image;
+  const resolvedProfileImage = profileImage ? mediaUrl(profileImage) : null;
 
   return (
     <Card className="rounded-[2rem]">
@@ -23,7 +25,7 @@ export function ProfileHeaderCard() {
             <span
               aria-hidden="true"
               className="h-14 w-14 rounded-2xl bg-cover bg-center"
-              style={{ backgroundImage: `url(${profileImage})` }}
+              style={{ backgroundImage: `url(${resolvedProfileImage})` }}
             />
           ) : (
             <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--color-surface-alt)] text-[var(--color-primary)]">

@@ -20,6 +20,7 @@ export interface BackendUser {
   first_name: string;
   last_name: string;
   full_name?: string;
+  profile_image?: string | null;
   user_type: BackendUserType;
   is_active: boolean;
   date_joined?: string;

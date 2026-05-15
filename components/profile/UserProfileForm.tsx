@@ -6,6 +6,7 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
+import { mediaUrl } from "@/lib/api/config";
 import { ApiError } from "@/lib/api/errors";
 import {
   getGovernorateDropdownOptions,
@@ -87,6 +88,12 @@ export function UserProfileForm() {
     setErrorMessage(null);
     setSuccessMessage(null);
 
+    if (!profile?.user_profile) {
+      setErrorMessage(t.profile.failedToSave);
+      setSaving(false);
+      return;
+    }
+
     try {
       await updateUserProfile({
         phone_number: form.phone_number,
@@ -105,6 +112,8 @@ export function UserProfileForm() {
       if (err instanceof ApiError) {
         if (err.status === 0) {
           setErrorMessage(t.auth.networkError);
+        } else if (err.status === 404) {
+          setErrorMessage("This account does not have an editable shared profile.");
         } else {
           setFieldErrors(err.fieldErrors ?? {});
           setErrorMessage(err.message || t.profile.failedToSave);
@@ -115,6 +124,19 @@ export function UserProfileForm() {
     } finally {
       setSaving(false);
     }
+  }
+
+  if (!profile?.user_profile) {
+    return (
+      <Card className="rounded-[2rem]">
+        <div className="space-y-2">
+          <h3 className="break-words text-lg font-bold text-[var(--color-text)]">{t.profile.personalInformation}</h3>
+          <p className="text-sm text-[var(--color-muted)]">
+            This account does not have a shared editable profile.
+          </p>
+        </div>
+      </Card>
+    );
   }
 
   return (
@@ -251,10 +273,10 @@ export function UserProfileForm() {
             </Button>
             {profile?.user_profile?.profile_image ? (
               <a
-                href={profile.user_profile.profile_image}
+                href={mediaUrl(profile.user_profile.profile_image)}
                 target="_blank"
                 rel="noreferrer"
-                className="text-sm font-medium text-[var(--color-primary)] underline"
+                className="rounded-full border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-3 py-1.5 text-sm font-medium text-[var(--color-primary)] transition hover:-translate-y-0.5 hover:border-[var(--color-primary)]"
               >
                 {t.profile.profileImage}
               </a>

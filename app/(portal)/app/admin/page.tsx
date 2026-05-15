@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { PermissionGuard } from "@/components/auth/PermissionGuard";
 import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
 import { DashboardSection } from "@/components/dashboard/DashboardSection";
 import { DashboardStatCard } from "@/components/dashboard/DashboardStatCard";
@@ -10,8 +11,7 @@ import { DashboardStateCard } from "@/components/dashboard/DashboardStateCard";
 import { DashboardWorkflowCard } from "@/components/dashboard/DashboardWorkflowCard";
 import { FileTextIcon, GridIcon, PulseIcon, ShieldIcon } from "@/components/icons";
 import { Badge } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
+import { Button, buttonClassName } from "@/components/ui/Button";
 import { PageHeader } from "@/components/ui/PageHeader";
 import {
   exportAdminRagDatasetJson,
@@ -19,21 +19,45 @@ import {
   getAdminRagAnalyticsSummary,
   getAdminRagFeedback,
 } from "@/lib/admin/adminService";
-import { localizeGovernorate } from "@/lib/locations/governorates";
 import type { AdminRagAnalyticsSummary } from "@/types/admin";
-import type { UserProfileData } from "@/types/backend";
 
-function formatDate(value?: string | null) {
+function resolveLocaleTag(locale: string) {
+  if (locale === "ar") return "ar-IQ";
+  if (locale === "ku") return "ku";
+  return "en-US";
+}
+
+function formatDate(value?: string | null, localeTag = "en-US") {
   if (!value) {
     return "-";
   }
 
-  return new Date(value).toLocaleString();
+  return new Date(value).toLocaleString(localeTag);
+}
+
+function formatDateOnly(value?: string | null, localeTag = "en-US") {
+  if (!value) {
+    return "-";
+  }
+
+  return new Date(value).toLocaleDateString(localeTag, {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
 }
 
 export default function AdminPortalPage() {
   const { t, locale } = useAppPreferences();
   const { user, profile } = useAuth();
+  const localeTag = resolveLocaleTag(locale);
+  const roleProfile = profile?.role_profile as {
+    role_display?: string;
+    department?: string;
+    hire_date?: string;
+    last_active?: string;
+    has_completed_training?: boolean;
+  } | null;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [analytics, setAnalytics] = useState<AdminRagAnalyticsSummary | null>(null);
@@ -41,8 +65,6 @@ export default function AdminPortalPage() {
   const [pendingFeedbackCount, setPendingFeedbackCount] = useState(0);
   const [exporting, setExporting] = useState(false);
   const [exportMessage, setExportMessage] = useState<string | null>(null);
-
-  const userProfile = useMemo<UserProfileData | null>(() => profile?.user_profile ?? null, [profile?.user_profile]);
 
   useEffect(() => {
     let cancelled = false;
@@ -110,29 +132,38 @@ export default function AdminPortalPage() {
         actions={<Badge tone="success">{t.common.liveBadge}</Badge>}
       />
 
-      <DashboardSection title={t.admin.adminIdentity} description={t.admin.adminIdentityDescription}>
-        <Card className="space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="min-w-0">
-              <p className="break-words text-base font-bold text-[var(--color-text)]">{user?.full_name || user?.email || "-"}</p>
-              <p className="text-sm text-[var(--color-muted)]" dir="ltr">{user?.email || "-"}</p>
+      {/* Staff profile display */}
+      <DashboardSection title={t.admin.staffProfileTitle} description={t.admin.staffProfileDescription}>
+        {roleProfile ? (
+          <div className="rounded-3xl border border-[var(--color-border)] bg-[linear-gradient(155deg,color-mix(in_srgb,var(--color-primary)_8%,var(--color-surface))_0%,var(--color-surface)_48%,color-mix(in_srgb,var(--color-secondary)_8%,var(--color-surface))_100%)] p-5 shadow-[var(--card-shadow)] md:p-6">
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+              <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--color-muted)]">{t.admin.staffRoleLabel}</p>
+                <p className="mt-1 text-sm font-semibold text-[var(--color-text)]">{roleProfile.role_display || "-"}</p>
+              </div>
+              <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--color-muted)]">{t.admin.staffDepartmentLabel}</p>
+                <p className="mt-1 text-sm font-semibold text-[var(--color-text)]">{roleProfile.department || "-"}</p>
+              </div>
+              <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--color-muted)]">{t.admin.staffHiredLabel}</p>
+                <p className="mt-1 text-sm font-semibold text-[var(--color-text)]">{formatDateOnly(roleProfile.hire_date, localeTag)}</p>
+              </div>
+              <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--color-muted)]">{t.admin.staffLastActiveLabel}</p>
+                <p className="mt-1 text-sm font-semibold text-[var(--color-text)]">{formatDate(roleProfile.last_active, localeTag)}</p>
+              </div>
+              <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--color-muted)]">{t.admin.staffTrainingLabel}</p>
+                <p className="mt-1 text-sm font-semibold text-[var(--color-text)]">
+                  {roleProfile.has_completed_training ? t.admin.staffTrainingCompleted : t.admin.staffTrainingPending}
+                </p>
+              </div>
             </div>
-            <Badge tone={user?.is_active ? "success" : "warning"}>
-              {user?.is_active ? t.profile.activeAccount : t.profile.inactiveAccount}
-            </Badge>
           </div>
-
-          <DashboardGrid columns="three">
-            <DashboardStatCard label={t.profile.phone} value={userProfile?.phone_number || "-"} tone="neutral" surface="panel" />
-            <DashboardStatCard
-              label={t.profile.governorate}
-              value={localizeGovernorate(userProfile?.governorate, locale) || "-"}
-              tone="neutral"
-              surface="panel"
-            />
-            <DashboardStatCard label={t.patient.updatedAt} value={formatDate(userProfile?.updated_at)} tone="neutral" surface="panel" />
-          </DashboardGrid>
-        </Card>
+        ) : (
+          <DashboardStateCard state="empty" title={t.admin.staffProfileTitle} description={t.admin.staffProfileMissing} />
+        )}
       </DashboardSection>
 
       <DashboardSection
@@ -190,6 +221,24 @@ export default function AdminPortalPage() {
         {exportMessage ? <p className="text-sm text-[var(--color-muted)]">{exportMessage}</p> : null}
       </DashboardSection>
 
+      {/* Permission-gated admin features */}
+      <DashboardSection title={t.admin.adminFeaturesTitle}>
+        <div className="flex flex-wrap gap-4">
+          <PermissionGuard permission="can_approve_professionals">
+            <a href="/app/admin/verifications" className={buttonClassName({ variant: "primary" })}>{t.admin.adminFeatureVerifications}</a>
+          </PermissionGuard>
+          <PermissionGuard permission="can_manage_knowledge_base">
+            <a href="/app/admin/knowledge-base" className={buttonClassName({ variant: "primary" })}>{t.admin.adminFeatureKnowledgeBase}</a>
+          </PermissionGuard>
+          <PermissionGuard permission="can_export_datasets">
+            <a href="/app/admin/analytics" className={buttonClassName({ variant: "primary" })}>{t.admin.adminFeatureAnalyticsExport}</a>
+          </PermissionGuard>
+          <PermissionGuard permission="can_view_audit_logs">
+            <a href="/app/admin/audit-logs" className={buttonClassName({ variant: "primary" })}>{t.admin.adminFeatureAuditLogs}</a>
+          </PermissionGuard>
+        </div>
+      </DashboardSection>
+
       <DashboardSection title={t.admin.supportedWorkflows} description={t.admin.supportedWorkflowsDescription}>
         <DashboardGrid columns="three">
           <DashboardWorkflowCard
@@ -216,7 +265,7 @@ export default function AdminPortalPage() {
             icon={<ShieldIcon size={18} />}
             status={t.common.liveBadge}
             statusTone="primary"
-            actionLabel={t.admin.viewRagFeedback}
+            actionLabel={t.admin.adminFeatureVerifications}
             href="/app/admin/verifications"
           />
           <DashboardWorkflowCard

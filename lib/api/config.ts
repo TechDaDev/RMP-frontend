@@ -11,3 +11,18 @@ export const API_BASE_URL =
 export function apiUrl(path: string): string {
   return `${API_BASE_URL}${path}`;
 }
+
+/**
+ * Build a full URL for backend-served media paths such as "/media/...".
+ */
+export function mediaUrl(path: string): string {
+  if (!path) {
+    return path;
+  }
+
+  if (/^https?:\/\//i.test(path)) {
+    return path;
+  }
+
+  return `${API_BASE_URL}${path}`;
+}

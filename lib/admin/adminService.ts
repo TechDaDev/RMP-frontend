@@ -80,6 +80,36 @@ export async function getAdminKnowledgeDocuments(params?: {
   return normalizeList(unwrapData(response));
 }
 
+export async function createAdminKnowledgeDocument(payload: {
+  title: string;
+  document_type: string;
+  language: string;
+  audience: string;
+  file: File;
+  specialty?: string;
+}): Promise<AdminKnowledgeDocument> {
+  const formData = new FormData();
+  formData.append("title", payload.title);
+  formData.append("document_type", payload.document_type);
+  formData.append("language", payload.language);
+  formData.append("audience", payload.audience);
+  formData.append("file", payload.file);
+
+  if (payload.specialty && payload.specialty.trim()) {
+    formData.append("specialty", payload.specialty.trim());
+  }
+
+  const response = await apiRequest<AdminKnowledgeDocument | ApiEnvelope<AdminKnowledgeDocument>>(
+    API_ENDPOINTS.admin.knowledgeDocuments,
+    {
+      auth: true,
+      body: formData,
+    },
+  );
+
+  return unwrapData(response);
+}
+
 export async function getAdminKnowledgeDocumentDetail(documentId: string): Promise<AdminKnowledgeDocumentDetail> {
   const response = await apiRequest<AdminKnowledgeDocumentDetail | ApiEnvelope<AdminKnowledgeDocumentDetail>>(
     API_ENDPOINTS.admin.knowledgeDocumentDetail(documentId),

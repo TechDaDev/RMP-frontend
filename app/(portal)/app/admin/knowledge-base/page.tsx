@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { DashboardSection } from "@/components/dashboard/DashboardSection";
 import { DashboardStateCard } from "@/components/dashboard/DashboardStateCard";
@@ -9,7 +9,8 @@ import { Badge } from "@/components/ui/Badge";
 import { Button, buttonClassName } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { getAdminKnowledgeDocuments } from "@/lib/admin/adminService";
+import { createAdminKnowledgeDocument, getAdminKnowledgeDocuments } from "@/lib/admin/adminService";
+import { ApiError } from "@/lib/api/errors";
 import type { AdminKnowledgeDocument } from "@/types/admin";
 
 function formatDate(value?: string) {
@@ -25,36 +26,75 @@ export default function AdminKnowledgeBasePage() {
   const [documents, setDocuments] = useState<AdminKnowledgeDocument[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [uploadSuccess, setUploadSuccess] = useState<string | null>(null);
+  const [form, setForm] = useState({
+    title: "",
+    document_type: "medical_book",
+    language: "ar",
+    audience: "doctor",
+    specialty: "",
+    file: null as File | null,
+  });
+
+  const loadDocuments = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await getAdminKnowledgeDocuments();
+      setDocuments(response);
+    } catch {
+      setError(t.admin.loadFailedDescription);
+    } finally {
+      setLoading(false);
+    }
+  }, [t.admin.loadFailedDescription]);
 
   useEffect(() => {
-    let cancelled = false;
+    void loadDocuments();
+  }, [loadDocuments]);
 
-    async function loadDocuments() {
-      setLoading(true);
-      setError(null);
+  async function handleUpload(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
 
-      try {
-        const response = await getAdminKnowledgeDocuments();
-        if (!cancelled) {
-          setDocuments(response);
-        }
-      } catch {
-        if (!cancelled) {
-          setError(t.admin.loadFailedDescription);
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
+    if (!form.file || uploading) {
+      return;
     }
 
-    void loadDocuments();
+    setUploading(true);
+    setUploadError(null);
+    setUploadSuccess(null);
 
-    return () => {
-      cancelled = true;
-    };
-  }, [t.admin.loadFailedDescription]);
+    try {
+      await createAdminKnowledgeDocument({
+        title: form.title.trim(),
+        document_type: form.document_type,
+        language: form.language,
+        audience: form.audience.trim(),
+        specialty: form.specialty,
+        file: form.file,
+      });
+
+      setUploadSuccess("Document uploaded successfully.");
+      setForm((prev) => ({
+        ...prev,
+        title: "",
+        specialty: "",
+        file: null,
+      }));
+      void loadDocuments();
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setUploadError(err.message || t.admin.decisionFailed);
+      } else {
+        setUploadError(t.admin.decisionFailed);
+      }
+    } finally {
+      setUploading(false);
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -64,6 +104,91 @@ export default function AdminKnowledgeBasePage() {
         description={t.admin.knowledgeBaseDescription}
         actions={<Link href="/app/admin" className={buttonClassName({ variant: "secondary", className: "w-full sm:w-auto" })}>{t.portal.dashboard}</Link>}
       />
+
+      <DashboardSection title="Upload Document" description="Add a new document to the Knowledge Base.">
+        <Card>
+          <form className="grid gap-4 md:grid-cols-2" onSubmit={handleUpload}>
+            <label className="space-y-1 text-sm font-medium text-[var(--color-text)]">
+              Title
+              <input
+                className="min-h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm text-[var(--color-text)]"
+                value={form.title}
+                onChange={(event) => setForm((prev) => ({ ...prev, title: event.target.value }))}
+                required
+              />
+            </label>
+
+            <label className="space-y-1 text-sm font-medium text-[var(--color-text)]">
+              Document Type
+              <select
+                className="min-h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm text-[var(--color-text)]"
+                value={form.document_type}
+                onChange={(event) => setForm((prev) => ({ ...prev, document_type: event.target.value }))}
+              >
+                <option value="medical_book">medical_book</option>
+                <option value="laboratory_book">laboratory_book</option>
+                <option value="clinical_guideline">clinical_guideline</option>
+                <option value="drug_reference">drug_reference</option>
+                <option value="patient_education">patient_education</option>
+                <option value="platform_policy">platform_policy</option>
+                <option value="other">other</option>
+              </select>
+            </label>
+
+            <label className="space-y-1 text-sm font-medium text-[var(--color-text)]">
+              Language
+              <select
+                className="min-h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm text-[var(--color-text)]"
+                value={form.language}
+                onChange={(event) => setForm((prev) => ({ ...prev, language: event.target.value }))}
+              >
+                <option value="ar">Arabic</option>
+                <option value="en">English</option>
+                <option value="ku">Kurdish</option>
+              </select>
+            </label>
+
+            <label className="space-y-1 text-sm font-medium text-[var(--color-text)]">
+              Audience
+              <input
+                className="min-h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm text-[var(--color-text)]"
+                value={form.audience}
+                onChange={(event) => setForm((prev) => ({ ...prev, audience: event.target.value }))}
+                required
+              />
+            </label>
+
+            <label className="space-y-1 text-sm font-medium text-[var(--color-text)] md:col-span-2">
+              Specialty (optional)
+              <input
+                className="min-h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm text-[var(--color-text)]"
+                value={form.specialty}
+                onChange={(event) => setForm((prev) => ({ ...prev, specialty: event.target.value }))}
+              />
+            </label>
+
+            <label className="space-y-1 text-sm font-medium text-[var(--color-text)] md:col-span-2">
+              File (PDF, DOCX, TXT)
+              <input
+                type="file"
+                accept=".pdf,.docx,.txt"
+                className="min-h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-2 text-sm text-[var(--color-text)]"
+                onChange={(event) => setForm((prev) => ({ ...prev, file: event.target.files?.[0] ?? null }))}
+                required
+              />
+            </label>
+
+            {uploadError ? <p className="md:col-span-2 text-sm font-medium text-red-600 dark:text-red-300">{uploadError}</p> : null}
+            {uploadSuccess ? <p className="md:col-span-2 text-sm font-medium text-green-700 dark:text-green-300">{uploadSuccess}</p> : null}
+
+            <div className="md:col-span-2">
+              <Button type="submit" disabled={uploading || !form.file || !form.title.trim()}>
+                {uploading ? "Uploading..." : "Upload Document"}
+              </Button>
+            </div>
+          </form>
+        </Card>
+      </DashboardSection>
 
       <DashboardSection title={t.admin.totalKnowledgeDocuments} description={t.admin.totalKnowledgeDocumentsDescription}>
         {loading ? (
