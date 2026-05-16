@@ -21,12 +21,19 @@ import {
 } from "@/lib/admin/adminService";
 import type { AdminKnowledgeChunk, AdminKnowledgeDocumentDetail } from "@/types/admin";
 
+const PROCESSING_POLL_INTERVAL_MS = 2500;
+const PROCESSING_POLL_ATTEMPTS = 12;
+
 function formatDate(value?: string | null) {
   if (!value) {
     return "-";
   }
 
   return new Date(value).toLocaleString();
+}
+
+function isProcessedStatus(value?: string | null): boolean {
+  return value === "chunked" || value === "extracted";
 }
 
 export default function AdminKnowledgeDocumentDetailPage() {
@@ -40,6 +47,34 @@ export default function AdminKnowledgeDocumentDetailPage() {
   const [actionMessage, setActionMessage] = useState<string | null>(null);
   const [rejectReason, setRejectReason] = useState("");
   const [busyAction, setBusyAction] = useState<string | null>(null);
+
+  async function reloadDocumentState(documentId: string) {
+    const [documentDetail, documentChunks] = await Promise.all([
+      getAdminKnowledgeDocumentDetail(documentId),
+      getAdminKnowledgeDocumentChunks(documentId, { limit: 5 }),
+    ]);
+
+    setDetail(documentDetail);
+    setChunks(documentChunks);
+
+    return documentDetail;
+  }
+
+  async function waitForProcessingToFinish(documentId: string) {
+    for (let attempt = 0; attempt < PROCESSING_POLL_ATTEMPTS; attempt += 1) {
+      const documentDetail = await getAdminKnowledgeDocumentDetail(documentId);
+
+      if (isProcessedStatus(documentDetail.processing_status)) {
+        return documentDetail;
+      }
+
+      if (attempt < PROCESSING_POLL_ATTEMPTS - 1) {
+        await new Promise((resolve) => setTimeout(resolve, PROCESSING_POLL_INTERVAL_MS));
+      }
+    }
+
+    return getAdminKnowledgeDocumentDetail(documentId);
+  }
 
   useEffect(() => {
     if (!id) {
@@ -93,12 +128,7 @@ export default function AdminKnowledgeDocumentDetailPage() {
     try {
       await task();
       setActionMessage(t.admin.decisionSucceeded);
-      const [documentDetail, documentChunks] = await Promise.all([
-        getAdminKnowledgeDocumentDetail(id),
-        getAdminKnowledgeDocumentChunks(id, { limit: 5 }),
-      ]);
-      setDetail(documentDetail);
-      setChunks(documentChunks);
+      await reloadDocumentState(id);
     } catch {
       setActionMessage(t.admin.decisionFailed);
     } finally {
@@ -143,8 +173,32 @@ export default function AdminKnowledgeDocumentDetailPage() {
             </div>
 
             <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
-              <Button variant="secondary" className="w-full" disabled={busyAction !== null} onClick={() => void runAction("process", () => processAdminKnowledgeDocument(id))}>{t.admin.processDocument}</Button>
-              <Button variant="secondary" className="w-full" disabled={busyAction !== null} onClick={() => void runAction("approve", () => approveAdminKnowledgeDocument(id))}>{t.admin.approve}</Button>
+              <Button
+                variant="secondary"
+                className="w-full"
+                disabled={busyAction !== null}
+                onClick={() =>
+                  void runAction("process", async () => {
+                    await processAdminKnowledgeDocument(id);
+                    setActionMessage("Processing document. Waiting for chunking to complete...");
+                    const processedDetail = await waitForProcessingToFinish(id);
+
+                    if (isProcessedStatus(processedDetail.processing_status)) {
+                      await reloadDocumentState(id);
+                    }
+                  })
+                }
+              >
+                {t.admin.processDocument}
+              </Button>
+              <Button
+                variant="secondary"
+                className="w-full"
+                disabled={busyAction !== null || !isProcessedStatus(detail?.processing_status)}
+                onClick={() => void runAction("approve", () => approveAdminKnowledgeDocument(id))}
+              >
+                {t.admin.approve}
+              </Button>
               <Button variant="secondary" className="w-full" disabled={busyAction !== null} onClick={() => void runAction("embed", () => embedAdminKnowledgeDocument(id))}>{t.admin.embedDocument}</Button>
               <Button variant="secondary" className="w-full" disabled={busyAction !== null} onClick={() => void runAction("archive", () => archiveAdminKnowledgeDocument(id))}>{t.admin.archiveDocument}</Button>
               <Button
