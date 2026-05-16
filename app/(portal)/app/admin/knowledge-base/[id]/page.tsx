@@ -42,6 +42,7 @@ export default function AdminKnowledgeDocumentDetailPage() {
   const id = useMemo(() => String(params?.id ?? ""), [params?.id]);
   const [detail, setDetail] = useState<AdminKnowledgeDocumentDetail | null>(null);
   const [chunks, setChunks] = useState<AdminKnowledgeChunk[]>([]);
+  const [showAllChunks, setShowAllChunks] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
@@ -135,6 +136,9 @@ export default function AdminKnowledgeDocumentDetailPage() {
       setBusyAction(null);
     }
   }
+
+  const visibleChunks = showAllChunks ? chunks : chunks.slice(0, 3);
+  const hiddenChunkCount = Math.max(chunks.length - visibleChunks.length, 0);
 
   return (
     <div className="space-y-6">
@@ -231,16 +235,47 @@ export default function AdminKnowledgeDocumentDetailPage() {
         {chunks.length === 0 ? (
           <DashboardStateCard state="empty" title={t.admin.noChunksTitle} description={t.admin.noChunksDescription} />
         ) : (
-          <div className="space-y-3">
-            {chunks.map((chunk) => (
-              <Card key={chunk.id || `${chunk.chunk_index}`} className="space-y-2">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <Badge tone="primary">#{chunk.chunk_index ?? "-"}</Badge>
-                  <Badge tone={chunk.has_embedding ? "success" : "warning"}>{chunk.has_embedding ? t.admin.embeddedStatus : t.admin.notEmbeddedStatus}</Badge>
-                </div>
-                <p className="break-words text-sm text-[var(--color-muted)]">{chunk.text || "-"}</p>
-              </Card>
-            ))}
+          <div className="space-y-4">
+            <Card className="flex flex-wrap items-center justify-between gap-3 border-dashed bg-[var(--color-surface-muted)]/40">
+              <div className="space-y-1">
+                <p className="text-sm font-semibold text-[var(--color-text)]">
+                  {showAllChunks ? "Showing all chunks" : "Showing a preview of the chunks"}
+                </p>
+                <p className="text-xs text-[var(--color-muted)]">
+                  {chunks.length} total chunks {showAllChunks ? "visible" : `- ${hiddenChunkCount} hidden to keep the page readable`}
+                </p>
+              </div>
+              {chunks.length > 3 ? (
+                <Button variant="secondary" type="button" onClick={() => setShowAllChunks((prev) => !prev)}>
+                  {showAllChunks ? "Show fewer" : `Show all ${chunks.length} chunks`}
+                </Button>
+              ) : null}
+            </Card>
+
+            <div className="space-y-3">
+              {visibleChunks.map((chunk) => (
+                <Card key={chunk.id || `${chunk.chunk_index}`} className="space-y-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <Badge tone="primary">Chunk #{chunk.chunk_index ?? "-"}</Badge>
+                    <Badge tone={chunk.has_embedding ? "success" : "warning"}>
+                      {chunk.has_embedding ? t.admin.embeddedStatus : t.admin.notEmbeddedStatus}
+                    </Badge>
+                  </div>
+
+                  <div className="max-h-40 overflow-auto rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
+                    <p className="whitespace-pre-wrap break-words text-sm leading-6 text-[var(--color-muted)]">
+                      {chunk.text || "-"}
+                    </p>
+                  </div>
+                </Card>
+              ))}
+            </div>
+
+            {!showAllChunks && hiddenChunkCount > 0 ? (
+              <p className="text-sm text-[var(--color-muted)]">
+                {hiddenChunkCount} additional chunks are hidden by default.
+              </p>
+            ) : null}
           </div>
         )}
       </DashboardSection>
