@@ -21,6 +21,24 @@ function normalize(value: string | null | undefined): string {
   return trimmed.length > 0 ? trimmed : "—";
 }
 
+function renderReadableValue(value: string, variant: "text" | "license" = "text") {
+  const baseClass = "block leading-tight [overflow-wrap:anywhere]";
+
+  if (variant === "license") {
+    return (
+      <span className={`${baseClass} font-mono text-[clamp(1.1rem,2vw,1.9rem)] tracking-[0.02em]`}>
+        {value}
+      </span>
+    );
+  }
+
+  return (
+    <span className={`${baseClass} text-[clamp(1.15rem,2vw,2rem)] font-extrabold`}>
+      {value}
+    </span>
+  );
+}
+
 export function PharmacistDashboardSummary({
   user,
   userProfile,
@@ -68,11 +86,35 @@ export function PharmacistDashboardSummary({
       </div>
 
       <div className="mt-5">
-        <DashboardGrid columns="four">
-          <DashboardStatCard label={t.pharmacist.pharmacyName} value={normalize(roleProfile?.pharmacy_name)} icon={<PharmacyIcon size={20} />} tone="primary" surface="panel" />
-          <DashboardStatCard label={t.pharmacist.pharmacistName} value={pharmacistName} icon={<UserIcon size={20} />} tone="neutral" surface="panel" />
-          <DashboardStatCard label={t.pharmacist.pharmacistLicense} value={normalize(roleProfile?.pharmacist_license_number)} icon={<ShieldIcon size={20} />} tone="success" surface="panel" />
-          <DashboardStatCard label={t.pharmacist.pharmacyAddress} value={normalize(roleProfile?.pharmacy_address)} icon={<GridIcon size={20} />} tone="neutral" surface="panel" />
+        <DashboardGrid columns="two" className="2xl:grid-cols-4">
+          <DashboardStatCard
+            label={t.pharmacist.pharmacyName}
+            value={renderReadableValue(normalize(roleProfile?.pharmacy_name))}
+            icon={<PharmacyIcon size={20} />}
+            tone="primary"
+            surface="panel"
+          />
+          <DashboardStatCard
+            label={t.pharmacist.pharmacistName}
+            value={renderReadableValue(pharmacistName)}
+            icon={<UserIcon size={20} />}
+            tone="neutral"
+            surface="panel"
+          />
+          <DashboardStatCard
+            label={t.pharmacist.pharmacistLicense}
+            value={renderReadableValue(normalize(roleProfile?.pharmacist_license_number), "license")}
+            icon={<ShieldIcon size={20} />}
+            tone="success"
+            surface="panel"
+          />
+          <DashboardStatCard
+            label={t.pharmacist.pharmacyAddress}
+            value={renderReadableValue(normalize(roleProfile?.pharmacy_address))}
+            icon={<GridIcon size={20} />}
+            tone="neutral"
+            surface="panel"
+          />
         </DashboardGrid>
       </div>
 

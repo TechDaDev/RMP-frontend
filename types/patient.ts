@@ -169,6 +169,7 @@ export interface PatientPrescriptionListItem {
   doctor: SafeUserSummary;
   status?: PatientPrescriptionStatus;
   qr_token?: string;
+  qr_url?: string;
   issued_at?: string;
   expires_at?: string | null;
   fully_dispensed_at?: string | null;

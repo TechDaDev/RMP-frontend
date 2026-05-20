@@ -2,10 +2,38 @@
 
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
+import { PatientQrCode } from "@/components/patient/PatientQrCode";
 import { PatientInfoRow } from "@/components/patient/ui/PatientInfoRow";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import type { PatientLabOrderDetail } from "@/types/patient";
+
+const defaultLabGuidance =
+  "Show this QR code to any verified laboratory/laboratorian registered in the platform. The laboratory will scan it and view only the pending requested tests.";
+
+function normalizeText(value: string) {
+  return value.replace(/\s+/g, " ").trim().toLowerCase();
+}
+
+function getLocalizedGuidance(guidance: string | undefined, locale: string) {
+  if (!guidance) {
+    return "-";
+  }
+
+  if (normalizeText(guidance) !== normalizeText(defaultLabGuidance)) {
+    return guidance;
+  }
+
+  if (locale === "ar") {
+    return "اعرض رمز QR هذا على أي مختبر أو مختبري موثّق ومسجل في المنصة. سيقوم المختبر بمسحه وعرض الفحوصات المطلوبة المعلقة فقط.";
+  }
+
+  if (locale === "ku") {
+    return "ئەم کۆدی QR ـە پیشان بدە بە هەر تاقیگە یان کارمەندی تاقیگەیەکی پشتڕاستکراو و تۆمارکراو لە پلاتفۆڕمەکەدا. تاقیگەکە دەیسکانێت و تەنها تاقیکردنەوە داواکراوە چاوەڕوانەکان دەبینێت.";
+  }
+
+  return defaultLabGuidance;
+}
 
 function formatDate(value?: string | null) {
   if (!value) {
@@ -19,7 +47,7 @@ interface LabOrderDetailPanelProps {
 }
 
 export function LabOrderDetailPanel({ order }: LabOrderDetailPanelProps) {
-  const { t } = useAppPreferences();
+  const { locale, t } = useAppPreferences();
 
   return (
     <Card className="space-y-5">
@@ -34,8 +62,12 @@ export function LabOrderDetailPanel({ order }: LabOrderDetailPanelProps) {
         <PatientInfoRow label={t.patient.expiresAt} value={formatDate(order.expires_at)} />
       </DashboardGrid>
       <DashboardGrid columns="two">
-        <PatientInfoRow label={t.patient.qrToken} value={<span className="break-all">{order.qr_token || "-"}</span>} muted />
-        <PatientInfoRow label={t.patient.guidance} value={order.guidance || "-"} muted />
+        <PatientInfoRow
+          label={t.patient.qrToken}
+          value={<PatientQrCode token={order.qr_token} imageUrl={order.qr_url} alt={t.patient.qrToken} />}
+          muted
+        />
+        <PatientInfoRow label={t.patient.guidance} value={getLocalizedGuidance(order.guidance, locale)} muted />
       </DashboardGrid>
       <p className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 py-3 text-sm text-[var(--color-muted)]">
         {t.patient.labOrderPrivacyNote}
