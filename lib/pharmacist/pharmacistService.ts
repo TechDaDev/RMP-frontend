@@ -17,7 +17,18 @@ import type {
   PharmacistDispensePrescriptionRequest,
   PharmacistDispensePrescriptionResult,
   PharmacistDispensingHistoryResponse,
+  PharmacistPrescriptionDetail,
+  PharmacistPrescriptionItem,
+  PharmacistPrescriptionStatus,
 } from "@/types/pharmacist";
+
+interface RawPharmacistScanResponse {
+  prescription?: PharmacistPrescriptionDetail & { locked?: boolean };
+  items?: PharmacistPrescriptionItem[];
+  remaining_items?: PharmacistPrescriptionItem[];
+  locked?: boolean;
+  message?: string | null;
+}
 
 /**
  * Unwrap envelope response from API
@@ -36,6 +47,44 @@ function unwrapData<T>(value: T | ApiEnvelope<T>): T {
   return value as T;
 }
 
+function normalizePrescriptionStatus(
+  status?: PharmacistPrescriptionStatus,
+): PharmacistPrescriptionStatus | undefined {
+  if (status === "active") {
+    return "issued";
+  }
+
+  return status;
+}
+
+function normalizePrescriptionDetail(
+  prescription?: RawPharmacistScanResponse["prescription"],
+): PharmacistPrescriptionDetail | undefined {
+  if (!prescription) {
+    return undefined;
+  }
+
+  return {
+    ...prescription,
+    status: normalizePrescriptionStatus(prescription.status),
+  };
+}
+
+function normalizePharmacistScanResult(
+  value: RawPharmacistScanResponse,
+): PharmacistScanResponse {
+  const prescription = normalizePrescriptionDetail(value.prescription) ?? {};
+  const remainingItems = value.remaining_items ?? value.items ?? [];
+  const locked = value.locked ?? value.prescription?.locked ?? false;
+
+  return {
+    prescription,
+    remaining_items: remainingItems,
+    locked,
+    message: value.message ?? null,
+  };
+}
+
 /**
  * Scan prescription by QR token
  *
@@ -48,7 +97,7 @@ function unwrapData<T>(value: T | ApiEnvelope<T>): T {
 export async function scanPrescription(
   payload: PharmacistPrescriptionScanRequest
 ): Promise<PharmacistScanResponse> {
-  const response = await apiRequest<PharmacistScanResponse | ApiEnvelope<PharmacistScanResponse>>(
+  const response = await apiRequest<RawPharmacistScanResponse | ApiEnvelope<RawPharmacistScanResponse>>(
     API_ENDPOINTS.pharmacistPrescriptions.scan,
     {
       auth: true,
@@ -56,7 +105,7 @@ export async function scanPrescription(
     }
   );
 
-  return unwrapData(response);
+  return normalizePharmacistScanResult(unwrapData(response));
 }
 
 /**
@@ -106,7 +155,7 @@ export async function dispensePrescription(
     throw new Error("At least one item must be provided for dispensing");
   }
 
-  const response = await apiRequest<PharmacistDispensePrescriptionResult | ApiEnvelope<PharmacistDispensePrescriptionResult>>(
+  const response = await apiRequest<RawPharmacistScanResponse | ApiEnvelope<RawPharmacistScanResponse>>(
     API_ENDPOINTS.pharmacistPrescriptions.dispense(prescriptionId),
     {
       auth: true,
@@ -114,7 +163,7 @@ export async function dispensePrescription(
     }
   );
 
-  return unwrapData(response);
+  return normalizePharmacistScanResult(unwrapData(response));
 }
 
 /**

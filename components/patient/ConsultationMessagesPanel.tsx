@@ -25,7 +25,7 @@ interface ConsultationMessagesPanelProps {
   error?: string | null;
   success?: string | null;
   onRefresh: () => void;
-  onSend: (body: string) => Promise<void>;
+  onSend: (body: string, attachments: File[]) => Promise<void>;
 }
 
 export function ConsultationMessagesPanel({
@@ -40,11 +40,13 @@ export function ConsultationMessagesPanel({
 }: ConsultationMessagesPanelProps) {
   const { t } = useAppPreferences();
   const [body, setBody] = useState("");
+  const [attachments, setAttachments] = useState<File[]>([]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    await onSend(body);
+    await onSend(body, attachments);
     setBody("");
+    setAttachments([]);
   }
 
   return (
@@ -66,6 +68,23 @@ export function ConsultationMessagesPanel({
                 <p className="text-xs text-[var(--color-muted)]">{formatDate(message.created_at)}</p>
               </div>
               <p className="mt-3 break-words text-sm leading-7 text-[var(--color-text)]">{message.body}</p>
+              {message.attachments && message.attachments.length > 0 ? (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {message.attachments.map((attachment, index) => (
+                    attachment.file ? (
+                      <a
+                        key={attachment.id ?? attachment.file ?? String(index)}
+                        href={attachment.file}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="rounded-xl border border-[var(--color-border)] px-3 py-2 text-xs font-semibold text-[var(--color-primary)] underline-offset-2 hover:underline"
+                      >
+                        {attachment.file_name || attachment.file}
+                      </a>
+                    ) : null
+                  ))}
+                </div>
+              ) : null}
             </div>
           ))}
         </div>
@@ -92,7 +111,22 @@ export function ConsultationMessagesPanel({
             placeholder={t.patient.messagePlaceholder}
             disabled={sending}
           />
-          <Button type="submit" className="w-full sm:w-auto" disabled={sending || body.trim().length === 0}>
+          <label className="block space-y-2">
+            <span className="text-sm font-semibold text-[var(--color-text)]">{t.profile.uploadFile}</span>
+            <input
+              type="file"
+              multiple
+              className="min-h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-text)] outline-none transition file:mr-3 file:rounded-xl file:border-0 file:bg-[var(--color-surface-alt)] file:px-3 file:py-2 file:text-sm file:font-semibold file:text-[var(--color-text)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[color:color-mix(in_srgb,var(--color-primary)_18%,transparent)]"
+              onChange={(event) => setAttachments(Array.from(event.target.files ?? []))}
+              disabled={sending}
+            />
+            <p className="text-xs text-[var(--color-muted)]">
+              {attachments.length > 0
+                ? `${t.profile.selectedFile}: ${attachments.map((file) => file.name).join(", ")}`
+                : t.profile.noFileSelected}
+            </p>
+          </label>
+          <Button type="submit" className="w-full sm:w-auto" disabled={sending || (body.trim().length === 0 && attachments.length === 0)}>
             {sending ? t.patient.sendingMessage : t.patient.sendMessage}
           </Button>
         </form>

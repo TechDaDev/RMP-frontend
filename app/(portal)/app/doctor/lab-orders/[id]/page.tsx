@@ -46,8 +46,8 @@ export default function DoctorLabOrderDetailPage() {
     if (!labOrder) {
       return;
     }
-    const updated = await cancelDoctorLabOrder(labOrder.id);
-    setLabOrder(updated);
+    await cancelDoctorLabOrder(labOrder.id);
+    await loadDetail();
   }
 
   if (loading) {

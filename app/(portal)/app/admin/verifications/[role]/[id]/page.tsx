@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { DashboardSection } from "@/components/dashboard/DashboardSection";
@@ -57,14 +57,28 @@ export default function AdminVerificationDetailPage({
 
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
 
+  const loadDetail = useCallback(async () => {
+    if (!params) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const detail = await getAdminVerificationDetail(params.role, params.id);
+      setVerification(detail);
+    } catch {
+      setError(t.admin.loadFailedDescription);
+    } finally {
+      setLoading(false);
+    }
+  }, [params, t.admin.loadFailedDescription]);
+
   useEffect(() => {
     if (!params) return;
 
     let cancelled = false;
 
-    async function loadDetail() {
-      if (!params) return;
-      
+    void (async () => {
       setLoading(true);
       setError(null);
 
@@ -82,9 +96,7 @@ export default function AdminVerificationDetailPage({
           setLoading(false);
         }
       }
-    }
-
-    void loadDetail();
+    })();
 
     return () => {
       cancelled = true;
@@ -98,10 +110,10 @@ export default function AdminVerificationDetailPage({
     setApproving(true);
 
     try {
-      const updated = await approveAdminVerification(params.role, params.id, {
+      await approveAdminVerification(params.role, params.id, {
         note: approveNote || undefined,
       });
-      setVerification(updated);
+      await loadDetail();
       setApproveNote("");
       setActionSuccess(t.admin.verificationDecisionSucceeded);
     } catch {
@@ -125,8 +137,8 @@ export default function AdminVerificationDetailPage({
 
     try {
       const payload: AdminVerificationRejectRequest = { reason: rejectReason };
-      const updated = await rejectAdminVerification(params.role, params.id, payload);
-      setVerification(updated);
+      await rejectAdminVerification(params.role, params.id, payload);
+      await loadDetail();
       setRejectReason("");
       setActionSuccess(t.admin.verificationDecisionSucceeded);
     } catch {
@@ -151,8 +163,8 @@ export default function AdminVerificationDetailPage({
 
     try {
       const payload: AdminVerificationSuspendRequest = { reason: suspendReason };
-      const updated = await suspendAdminVerification(params.role, params.id, payload);
-      setVerification(updated);
+      await suspendAdminVerification(params.role, params.id, payload);
+      await loadDetail();
       setSuspendReason("");
       setActionSuccess(t.admin.verificationDecisionSucceeded);
     } catch {

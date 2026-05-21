@@ -222,46 +222,31 @@ export async function approveAdminVerification(
   role: string,
   id: string,
   payload: AdminVerificationApproveRequest,
-): Promise<AdminVerificationDetail> {
-  const response = await apiRequest<AdminVerificationDetail | ApiEnvelope<AdminVerificationDetail>>(
-    API_ENDPOINTS.admin.verificationApprove(role, id),
-    {
-      auth: true,
-      body: payload,
-    },
-  );
-
-  return unwrapData(response);
+): Promise<void> {
+  await apiRequest<void | ApiEnvelope<void>>(API_ENDPOINTS.admin.verificationApprove(role, id), {
+    auth: true,
+    body: payload,
+  });
 }
 
 export async function rejectAdminVerification(
   role: string,
   id: string,
   payload: AdminVerificationRejectRequest,
-): Promise<AdminVerificationDetail> {
-  const response = await apiRequest<AdminVerificationDetail | ApiEnvelope<AdminVerificationDetail>>(
-    API_ENDPOINTS.admin.verificationReject(role, id),
-    {
-      auth: true,
-      body: payload,
-    },
-  );
-
-  return unwrapData(response);
+): Promise<void> {
+  await apiRequest<void | ApiEnvelope<void>>(API_ENDPOINTS.admin.verificationReject(role, id), {
+    auth: true,
+    body: payload,
+  });
 }
 
 export async function suspendAdminVerification(
   role: string,
   id: string,
   payload: AdminVerificationSuspendRequest,
-): Promise<AdminVerificationDetail> {
-  const response = await apiRequest<AdminVerificationDetail | ApiEnvelope<AdminVerificationDetail>>(
-    API_ENDPOINTS.admin.verificationSuspend(role, id),
-    {
-      auth: true,
-      body: payload,
-    },
-  );
-
-  return unwrapData(response);
+): Promise<void> {
+  await apiRequest<void | ApiEnvelope<void>>(API_ENDPOINTS.admin.verificationSuspend(role, id), {
+    auth: true,
+    body: payload,
+  });
 }

@@ -5,6 +5,8 @@ import type {
   CompleteLabOrderRequest,
   CorrectLaboratoryResultRequest,
   LaboratoryCompletionResult,
+  LaboratoryOrderDetail,
+  LaboratoryOrderItem,
   LaboratoryOrderScanResponse,
   LaboratoryResultCreateRequest,
   LaboratoryResultDetail,
@@ -35,6 +37,38 @@ function normalizeList<T>(value: ListResponse<T>): T[] {
   }
 
   return [];
+}
+
+interface RawLaboratoryScanResponse {
+  lab_order: LaboratoryOrderDetail;
+  remaining_items?: LaboratoryOrderItem[];
+  completed_items?: LaboratoryOrderItem[];
+  locked?: boolean;
+  message?: string | null;
+}
+
+function normalizeLaboratoryScanResponse(
+  value: RawLaboratoryScanResponse,
+): LaboratoryOrderScanResponse {
+  const remainingItems = Array.isArray(value.remaining_items) ? value.remaining_items : [];
+  const completedItems = Array.isArray(value.completed_items)
+    ? value.completed_items
+    : Array.isArray(value.lab_order?.completed_items)
+      ? value.lab_order.completed_items
+      : [];
+  const locked = value.locked ?? value.lab_order?.locked ?? false;
+
+  return {
+    lab_order: {
+      ...value.lab_order,
+      locked,
+      completed_items: completedItems,
+    },
+    remaining_items: remainingItems,
+    completed_items: completedItems,
+    locked,
+    message: value.message,
+  };
 }
 
 function toQueryString(params?: Record<string, string | number | boolean | undefined>): string {
@@ -100,7 +134,7 @@ export function getLabTestCatalog(params?: { category?: string; search?: string 
 }
 
 export async function scanLabOrder(payload: ScanLabOrderRequest): Promise<LaboratoryOrderScanResponse> {
-  const response = await apiRequest<LaboratoryOrderScanResponse | ApiEnvelope<LaboratoryOrderScanResponse>>(
+  const response = await apiRequest<RawLaboratoryScanResponse | ApiEnvelope<RawLaboratoryScanResponse>>(
     API_ENDPOINTS.laboratoryOrders.scan,
     {
       auth: true,
@@ -108,11 +142,11 @@ export async function scanLabOrder(payload: ScanLabOrderRequest): Promise<Labora
     },
   );
 
-  return unwrapData(response);
+  return normalizeLaboratoryScanResponse(unwrapData(response));
 }
 
 export async function completeLabOrderItems(orderId: string, payload: CompleteLabOrderRequest): Promise<LaboratoryCompletionResult> {
-  const response = await apiRequest<LaboratoryCompletionResult | ApiEnvelope<LaboratoryCompletionResult>>(
+  const response = await apiRequest<RawLaboratoryScanResponse | ApiEnvelope<RawLaboratoryScanResponse>>(
     API_ENDPOINTS.laboratoryOrders.complete(orderId),
     {
       auth: true,
@@ -120,13 +154,21 @@ export async function completeLabOrderItems(orderId: string, payload: CompleteLa
     },
   );
 
-  const result = unwrapData(response) as LaboratoryCompletionResult & {
+  const result = unwrapData(response) as RawLaboratoryScanResponse & {
     pending_items?: LaboratoryCompletionResult["remaining_items"];
   };
+  const normalized = normalizeLaboratoryScanResponse({
+    ...result,
+    remaining_items: result.remaining_items ?? result.pending_items,
+  });
 
   return {
     ...result,
-    remaining_items: result.remaining_items ?? result.pending_items,
+    lab_order: normalized.lab_order,
+    remaining_items: normalized.remaining_items,
+    completed_items: normalized.completed_items,
+    locked: normalized.locked,
+    message: normalized.message,
   };
 }
 
@@ -152,14 +194,9 @@ export function getLaboratoryResultDetail(resultId: string): Promise<LaboratoryR
 export async function correctLaboratoryResult(
   resultId: string,
   payload: CorrectLaboratoryResultRequest,
-): Promise<LaboratoryResultDetail> {
-  const response = await apiRequest<LaboratoryResultDetail | ApiEnvelope<LaboratoryResultDetail>>(
-    API_ENDPOINTS.laboratoryResults.correct(resultId),
-    {
-      auth: true,
-      body: toResultRequestBody(payload),
-    },
-  );
-
-  return unwrapData(response);
+): Promise<void> {
+  await apiRequest<void | ApiEnvelope<void>>(API_ENDPOINTS.laboratoryResults.correct(resultId), {
+    auth: true,
+    body: toResultRequestBody(payload),
+  });
 }

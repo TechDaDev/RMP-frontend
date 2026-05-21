@@ -22,7 +22,7 @@ export function canPharmacistScan(isApproved: boolean): boolean {
 export function canViewPrescription(status: PharmacistPrescriptionStatus | undefined): boolean {
   if (!status) return false;
   // Expired, cancelled, and fully_dispensed are still viewable but locked
-  return ["issued", "partially_dispensed", "fully_dispensed", "expired", "cancelled"].includes(status);
+  return ["active", "issued", "partially_dispensed", "fully_dispensed", "expired", "cancelled"].includes(status);
 }
 
 /**
@@ -31,7 +31,7 @@ export function canViewPrescription(status: PharmacistPrescriptionStatus | undef
  */
 export function canDispensePrescription(status: PharmacistPrescriptionStatus | undefined): boolean {
   if (!status) return false;
-  return ["issued", "partially_dispensed"].includes(status);
+  return ["active", "issued", "partially_dispensed"].includes(status);
 }
 
 /**
@@ -67,6 +67,7 @@ export function getPrescriptionStatusTone(
   status: PharmacistPrescriptionStatus | undefined
 ): "neutral" | "info" | "success" | "warning" | "danger" {
   switch (status) {
+    case "active":
     case "issued":
       return "info";
     case "partially_dispensed":

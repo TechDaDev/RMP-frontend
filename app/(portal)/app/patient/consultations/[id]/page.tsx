@@ -190,15 +190,15 @@ export default function ConsultationDetailPage() {
     }
   }
 
-  async function handleSend(body: string) {
-    if (!body.trim()) {
+  async function handleSend(body: string, attachments: File[]) {
+    if (!body.trim() && attachments.length === 0) {
       return;
     }
     setMessageError(null);
     setMessageSuccess(null);
     setSending(true);
     try {
-      await sendConsultationMessage(consultationId, { body });
+      await sendConsultationMessage(consultationId, { body, attachments });
       setMessageSuccess(t.patient.messageSent);
       const nextMessages = await getConsultationMessages(consultationId);
       setMessages(nextMessages);

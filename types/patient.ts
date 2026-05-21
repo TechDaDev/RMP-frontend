@@ -161,7 +161,8 @@ export interface ConsultationMessage {
 }
 
 export interface ConsultationMessageCreateRequest {
-  body: string;
+  body?: string;
+  attachments?: File[];
 }
 
 export interface PatientPrescriptionListItem {

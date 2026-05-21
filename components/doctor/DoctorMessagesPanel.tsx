@@ -14,7 +14,7 @@ interface DoctorMessagesPanelProps {
   error: string | null;
   messages: DoctorMessage[];
   onRetry: () => void;
-  onSend: (body: string) => Promise<void>;
+  onSend: (body: string, attachments: File[]) => Promise<void>;
 }
 
 function getSenderLabel(message: DoctorMessage): string {
@@ -45,6 +45,7 @@ export function DoctorMessagesPanel({
 }: DoctorMessagesPanelProps) {
   const { t } = useAppPreferences();
   const [body, setBody] = useState("");
+  const [attachments, setAttachments] = useState<File[]>([]);
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState<string | null>(null);
 
@@ -68,15 +69,16 @@ export function DoctorMessagesPanel({
     event.preventDefault();
     const trimmed = body.trim();
 
-    if (!trimmed || !canWrite) {
+    if ((!trimmed && attachments.length === 0) || !canWrite) {
       return;
     }
 
     setSending(true);
     setSendError(null);
     try {
-      await onSend(trimmed);
+      await onSend(trimmed, attachments);
       setBody("");
+      setAttachments([]);
     } catch {
       setSendError(t.patient.noDataDescription);
     } finally {
@@ -116,6 +118,23 @@ export function DoctorMessagesPanel({
                 </p>
               </div>
               <p className="mt-2 text-sm text-[var(--color-text)] whitespace-pre-wrap">{message.body || "-"}</p>
+              {message.attachments && message.attachments.length > 0 ? (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {message.attachments.map((attachment, index) => (
+                    attachment.file ? (
+                      <a
+                        key={attachment.id ?? attachment.file ?? String(index)}
+                        href={attachment.file}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="rounded-xl border border-[var(--color-border)] px-3 py-2 text-xs font-semibold text-[var(--color-primary)] underline-offset-2 hover:underline"
+                      >
+                        {attachment.file_name || attachment.file}
+                      </a>
+                    ) : null
+                  ))}
+                </div>
+              ) : null}
             </div>
           ))}
         </div>
@@ -131,8 +150,23 @@ export function DoctorMessagesPanel({
           className="min-h-24 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-text)] outline-none focus:border-[var(--color-primary)]"
           disabled={!canWrite || sending}
         />
+        <label className="block space-y-2">
+          <span className="text-sm font-semibold text-[var(--color-text)]">{t.profile.uploadFile}</span>
+          <input
+            type="file"
+            multiple
+            className="min-h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-text)] outline-none transition file:mr-3 file:rounded-xl file:border-0 file:bg-[var(--color-surface-alt)] file:px-3 file:py-2 file:text-sm file:font-semibold file:text-[var(--color-text)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[color:color-mix(in_srgb,var(--color-primary)_18%,transparent)]"
+            onChange={(event) => setAttachments(Array.from(event.target.files ?? []))}
+            disabled={!canWrite || sending}
+          />
+          <p className="text-xs text-[var(--color-muted)]">
+            {attachments.length > 0
+              ? `${t.profile.selectedFile}: ${attachments.map((file) => file.name).join(", ")}`
+              : t.profile.noFileSelected}
+          </p>
+        </label>
         {sendError ? <p className="text-sm text-red-600 dark:text-red-300">{sendError}</p> : null}
-        <Button type="submit" className="w-full sm:w-auto" disabled={!canWrite || sending || body.trim().length === 0}>
+        <Button type="submit" className="w-full sm:w-auto" disabled={!canWrite || sending || (body.trim().length === 0 && attachments.length === 0)}>
           {sending ? t.doctor.sendingDoctorResponse : t.doctor.sendMessage}
         </Button>
       </form>

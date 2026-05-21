@@ -81,8 +81,8 @@ export default function DoctorConsultationDetailPage() {
     void loadDetail();
   }, [loadDetail]);
 
-  async function handleSendMessage(body: string) {
-    await sendConsultationMessage(params.id, { body });
+  async function handleSendMessage(body: string, attachments: File[]) {
+    await sendConsultationMessage(params.id, { body, attachments });
     await loadMessages(params.id, detail?.status ?? "submitted");
   }
 

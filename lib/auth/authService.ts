@@ -6,11 +6,17 @@ import type {
   BackendUser,
   LoginRequest,
   LoginResponseData,
+  ProfileCompletion,
+  ProfileVerification,
   RegisterRequest,
   ActivateAccountRequest,
   ResendActivationOtpRequest,
   PasswordResetRequest,
   PasswordResetConfirmRequest,
+  PatientProfileData,
+  DoctorProfileData,
+  PharmacistProfileData,
+  LaboratorianProfileData,
 } from "@/types/backend";
 import type { ProfilesMeResponse } from "@/types/backend";
 
@@ -29,9 +35,123 @@ interface ProfilesMeApiResponse {
   data: ProfilesMeResponse;
 }
 
+type RoleProfile =
+  | PatientProfileData
+  | DoctorProfileData
+  | PharmacistProfileData
+  | LaboratorianProfileData
+  | null;
+
+interface RawProfilesMeResponse {
+  user: BackendUser;
+  user_profile: ProfilesMeResponse["user_profile"];
+  patient_profile?: PatientProfileData | null;
+  doctor_profile?: DoctorProfileData | null;
+  pharmacist_profile?: PharmacistProfileData | null;
+  laboratorian_profile?: LaboratorianProfileData | null;
+  role_profile?: RoleProfile;
+  completion?: ProfileCompletion & {
+    is_complete?: boolean;
+    missing_fields?: string[];
+  };
+  verification?: ProfileVerification;
+  verification_status?: BackendUser["user_type"] extends never ? never : string | null;
+}
+
 interface MessageOnlyResponse {
   success: boolean;
   message?: string;
+}
+
+function normalizeCompletion(raw?: RawProfilesMeResponse["completion"]): ProfileCompletion {
+  if (!raw) {
+    return {
+      overall_complete: false,
+      missing_fields: [],
+      missing_shared_fields: [],
+      missing_role_fields: [],
+    };
+  }
+
+  const missingFields = raw.missing_fields ?? raw.missing_shared_fields ?? raw.missing_role_fields ?? [];
+  const overallComplete = raw.overall_complete ?? raw.is_complete ?? false;
+
+  return {
+    ...raw,
+    overall_complete: overallComplete,
+    missing_fields: raw.missing_fields ?? missingFields,
+    missing_shared_fields: raw.missing_shared_fields ?? raw.missing_fields ?? [],
+    missing_role_fields: raw.missing_role_fields ?? [],
+    percentage:
+      typeof raw.percentage === "number"
+        ? raw.percentage
+        : overallComplete
+          ? 100
+          : missingFields.length === 0
+            ? 0
+            : undefined,
+  };
+}
+
+function normalizeVerification(raw: RawProfilesMeResponse): ProfileVerification {
+  if (raw.verification) {
+    return raw.verification;
+  }
+
+  const status = raw.verification_status ?? null;
+  const required = raw.user.user_type === "doctor" || raw.user.user_type === "pharmacist" || raw.user.user_type === "laboratorian";
+  const isApproved = status === "approved";
+
+  return {
+    required,
+    status,
+    is_approved: required ? isApproved : null,
+    rejection_reason:
+      status === "rejected" && raw.role_profile && "verification_notes" in raw.role_profile
+        ? raw.role_profile.verification_notes ?? null
+        : null,
+    message:
+      status === "approved"
+        ? "Verification approved."
+        : status === "pending"
+          ? "Verification pending."
+          : status === "rejected"
+            ? "Verification rejected."
+            : status === "suspended"
+              ? "Verification suspended."
+              : undefined,
+  };
+}
+
+function normalizeRoleProfile(raw: RawProfilesMeResponse): RoleProfile {
+  if (raw.role_profile !== undefined) {
+    return raw.role_profile;
+  }
+
+  switch (raw.user.user_type) {
+    case "patient":
+      return raw.patient_profile ?? null;
+    case "doctor":
+      return raw.doctor_profile ?? null;
+    case "pharmacist":
+      return raw.pharmacist_profile ?? null;
+    case "laboratorian":
+      return raw.laboratorian_profile ?? null;
+    default:
+      return null;
+  }
+}
+
+function normalizeProfilesResponse(raw: RawProfilesMeResponse): ProfilesMeResponse {
+  const roleProfile = normalizeRoleProfile(raw);
+
+  return {
+    user: raw.user,
+    user_profile: raw.user_profile ?? null,
+    role_profile: roleProfile,
+    completion: normalizeCompletion(raw.completion),
+    verification: normalizeVerification({ ...raw, role_profile: roleProfile }),
+  };
 }
 
 /**
@@ -104,14 +224,15 @@ export async function getCurrentUserService(): Promise<BackendUser> {
  * Fetch the current user's full profile (includes verification info).
  */
 export async function getCurrentProfileService(): Promise<ProfilesMeResponse> {
-  const resp = await apiRequest<ProfilesMeApiResponse | ProfilesMeResponse>(
+  const resp = await apiRequest<ProfilesMeApiResponse | RawProfilesMeResponse | ProfilesMeResponse>(
     API_ENDPOINTS.profiles.me,
     { auth: true },
   );
-  if ("data" in resp) {
-    return resp.data;
+  const payload = "data" in resp ? resp.data : resp;
+  if (payload && typeof payload === "object" && "role_profile" in payload && "verification" in payload) {
+    return payload as ProfilesMeResponse;
   }
-  return resp;
+  return normalizeProfilesResponse(payload as RawProfilesMeResponse);
 }
 
 /**

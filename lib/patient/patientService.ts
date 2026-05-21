@@ -59,6 +59,24 @@ async function getListResource<T>(path: string): Promise<T[]> {
   return normalizeList(unwrapData(response));
 }
 
+function toConsultationMessageBody(payload: ConsultationMessageCreateRequest): FormData | Record<string, unknown> {
+  const trimmedBody = payload.body?.trim();
+  const attachments = payload.attachments?.filter((file): file is File => file instanceof File) ?? [];
+
+  if (attachments.length > 0) {
+    const formData = new FormData();
+    if (trimmedBody) {
+      formData.append("body", trimmedBody);
+    }
+    attachments.forEach((file) => {
+      formData.append("attachments", file);
+    });
+    return formData;
+  }
+
+  return trimmedBody ? { body: trimmedBody } : {};
+}
+
 export async function getPatientDashboardSummary(): Promise<PatientDashboardSummary> {
   const [consultations, prescriptions, labOrders, labResults, medicalRecord] = await Promise.all([
     getMyConsultations(),
@@ -142,7 +160,7 @@ export async function sendConsultationMessage(
     API_ENDPOINTS.consultations.messages(consultationId),
     {
       auth: true,
-      body: payload,
+      body: toConsultationMessageBody(payload),
     },
   );
 

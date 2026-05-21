@@ -65,24 +65,24 @@ export default function DoctorLabResultDetailPage() {
     if (!result) {
       return;
     }
-    const updated = await reviewDoctorLabResult(result.id, payload);
-    setResult(updated);
+    await reviewDoctorLabResult(result.id, payload);
+    await loadDetail();
   }
 
   async function handleRelease() {
     if (!result) {
       return;
     }
-    const updated = await releaseDoctorLabResult(result.id);
-    setResult(updated);
+    await releaseDoctorLabResult(result.id);
+    await loadDetail();
   }
 
   async function handleLink(payload: LinkLabResultToMedicalRecordRequest) {
     if (!result) {
       return;
     }
-    const updated = await linkLabResultToMedicalRecord(result.id, payload);
-    setResult(updated);
+    await linkLabResultToMedicalRecord(result.id, payload);
+    await loadDetail();
   }
 
   if (loading) {

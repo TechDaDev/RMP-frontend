@@ -89,6 +89,11 @@ export interface DoctorMessage {
   read_at?: string | null;
   created_at?: string;
   updated_at?: string;
+  attachments?: Array<{
+    id?: string;
+    file?: string;
+    file_name?: string;
+  }>;
 }
 
 export interface DoctorResponseRequest {
@@ -97,7 +102,8 @@ export interface DoctorResponseRequest {
 }
 
 export interface DoctorMessageRequest {
-  body: string;
+  body?: string;
+  attachments?: File[];
 }
 
 export type DoctorPrescriptionStatus =

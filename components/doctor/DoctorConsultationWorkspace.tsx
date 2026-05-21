@@ -19,7 +19,7 @@ interface DoctorConsultationWorkspaceProps {
   messagesLoading: boolean;
   messagesError: string | null;
   onRetryMessages: () => void;
-  onSendMessage: (body: string) => Promise<void>;
+  onSendMessage: (body: string, attachments: File[]) => Promise<void>;
   onSendResponse: (payload: DoctorResponseRequest) => Promise<void>;
   onCloseConsultation: () => Promise<void>;
 }

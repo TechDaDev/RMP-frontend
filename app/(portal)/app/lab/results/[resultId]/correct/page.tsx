@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
@@ -31,27 +31,39 @@ export default function LaboratoryCorrectResultPage() {
   const isApproved = verification?.is_approved === true;
   const canCorrect = result?.status ? canCorrectResult(result.status) : false;
 
-  useEffect(() => {
+  const loadResult = useCallback(async () => {
     if (!resultId) {
       return;
     }
 
-    const loadResult = async () => {
-      try {
-        setLoading(true);
-        const data = await getLaboratoryResultDetail(resultId);
-        setResult(data);
-        setError(null);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load result");
-        setResult(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadResult();
+    try {
+      setLoading(true);
+      const data = await getLaboratoryResultDetail(resultId);
+      setResult(data);
+      setError(null);
+      return data;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load result");
+      setResult(null);
+      return null;
+    } finally {
+      setLoading(false);
+    }
   }, [resultId]);
+
+  useEffect(() => {
+    if (!resultId) {
+      return;
+    }
+    void loadResult();
+  }, [loadResult, resultId]);
+
+  const handleCorrected = useCallback(async () => {
+    const refreshed = await loadResult();
+    if (refreshed) {
+      setCorrectedResult(refreshed);
+    }
+  }, [loadResult]);
 
   if (!resultId) {
     return (
@@ -148,7 +160,7 @@ export default function LaboratoryCorrectResultPage() {
               <LaboratoryResultCorrectionForm
                 result={result}
                 resultId={resultId}
-                onCorrected={setCorrectedResult}
+                onCorrected={() => void handleCorrected()}
               />
             </DashboardSection>
             <div className="flex flex-col gap-3 sm:flex-row">

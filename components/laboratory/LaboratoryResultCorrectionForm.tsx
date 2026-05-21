@@ -12,7 +12,7 @@ import type { LaboratoryResultDetail, CorrectLaboratoryResultRequest, Laboratory
 interface LaboratoryResultCorrectionFormProps {
   result: LaboratoryResultDetail;
   resultId: string;
-  onCorrected: (result: LaboratoryResultDetail) => void;
+  onCorrected: () => void;
 }
 
 export function LaboratoryResultCorrectionForm({
@@ -67,7 +67,8 @@ export function LaboratoryResultCorrectionForm({
       };
 
       const corrected = await correctLaboratoryResult(resultId, payload);
-      onCorrected(corrected);
+      await correctLaboratoryResult(resultId, payload);
+      onCorrected();
     } catch (err) {
       const error = err as Error | ApiError;
       if (error instanceof ApiError && error.fieldErrors) {

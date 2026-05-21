@@ -73,6 +73,7 @@ export interface PharmacistPrescriptionDetail {
   pharmacist?: PharmacistPersonSummary;
   doctor?: PharmacistPersonSummary;
   status?: PharmacistPrescriptionStatus;
+  locked?: boolean;
   items?: PharmacistPrescriptionItem[];
   issued_at?: string;
   expires_at?: string;
@@ -89,6 +90,7 @@ export interface PharmacistPrescriptionDetail {
  */
 export interface PharmacistPrescriptionScanResult {
   prescription: PharmacistPrescriptionDetail;
+  items?: PharmacistPrescriptionItem[];
   remaining_items?: PharmacistPrescriptionItem[];
   locked?: boolean;
   message?: string | null;

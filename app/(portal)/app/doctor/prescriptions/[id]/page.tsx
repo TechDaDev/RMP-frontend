@@ -46,8 +46,8 @@ export default function DoctorPrescriptionDetailPage() {
     if (!prescription) {
       return;
     }
-    const updated = await cancelDoctorPrescription(prescription.id);
-    setPrescription(updated);
+    await cancelDoctorPrescription(prescription.id);
+    await loadDetail();
   }
 
   if (loading) {

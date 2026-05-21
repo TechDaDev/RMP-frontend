@@ -70,6 +70,7 @@ export interface LaboratoryOrderDetail {
   id: string;
   qr_token?: string;
   status?: LaboratoryOrderStatus;
+  locked?: boolean;
   patient?: LaboratorySafeUser | null;
   doctor?: LaboratorySafeUser | null;
   consultation?: string | { id?: string } | null;
@@ -83,6 +84,7 @@ export interface LaboratoryOrderDetail {
 export interface LaboratoryOrderScanResponse {
   lab_order: LaboratoryOrderDetail;
   remaining_items: LaboratoryOrderItem[];
+  completed_items?: LaboratoryOrderItem[];
   locked: boolean;
   message?: string | null;
 }
