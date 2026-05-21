@@ -97,9 +97,9 @@ export interface ConsultationListItem {
   duration: ConsultationDuration;
   severity: ConsultationSeverity;
   selected_specialty?: string | null;
-  selected_specialty_other?: string;
+  selected_specialty_other?: string | null;
   recommended_specialty?: string | null;
-  assigned_doctor?: string | null;
+  assigned_doctor?: SafeUserSummary | null;
   has_fever?: boolean;
   has_pain?: boolean;
   has_breathing_difficulty?: boolean;
@@ -131,6 +131,7 @@ export interface ConsultationAttachment {
 export interface ConsultationDetail extends ConsultationListItem {
   patient?: SafeUserSummary;
   doctor?: SafeUserSummary | null;
+  selected_specialty_other?: string | null;
   symptoms?: Symptom[];
   responses?: ConsultationResponse[];
   attachments?: ConsultationAttachment[];

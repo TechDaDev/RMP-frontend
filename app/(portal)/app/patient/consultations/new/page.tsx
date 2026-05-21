@@ -10,14 +10,9 @@ import { PatientPageFrame } from "@/components/patient/ui/PatientPageFrame";
 import { Badge } from "@/components/ui/Badge";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { ApiError } from "@/lib/api/errors";
-import {
-  createConsultation,
-  getSymptomCategories,
-  getSymptoms,
-} from "@/lib/patient/patientService";
+import { createConsultation, getSymptomCategories } from "@/lib/patient/patientService";
 import type {
   ConsultationCreateRequest,
-  Symptom,
   SymptomCategory,
 } from "@/types/patient";
 
@@ -26,42 +21,37 @@ export default function NewConsultationPage() {
   const router = useRouter();
 
   const [categories, setCategories] = useState<SymptomCategory[]>([]);
-  const [symptoms, setSymptoms] = useState<Symptom[]>([]);
-  const [loadingSymptoms, setLoadingSymptoms] = useState(true);
+  const [loadingCategories, setLoadingCategories] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const unavailable = useMemo(
-    () => !loadingSymptoms && symptoms.length === 0,
-    [loadingSymptoms, symptoms.length],
+    () => !loadingCategories && categories.length === 0,
+    [loadingCategories, categories.length],
   );
 
   useEffect(() => {
     let active = true;
 
     async function loadInitial() {
-      setLoadingSymptoms(true);
+      setLoadingCategories(true);
       setError(null);
 
       try {
-        const [loadedCategories, loadedSymptoms] = await Promise.all([
-          getSymptomCategories(),
-          getSymptoms(),
-        ]);
+        const loadedCategories = await getSymptomCategories();
 
         if (!active) {
           return;
         }
 
         setCategories(loadedCategories);
-        setSymptoms(loadedSymptoms);
       } catch {
         if (active) {
           setError(t.patient.consultationCreateError);
         }
       } finally {
         if (active) {
-          setLoadingSymptoms(false);
+          setLoadingCategories(false);
         }
       }
     }
@@ -113,8 +103,6 @@ export default function NewConsultationPage() {
         ) : (
           <ConsultationForm
             categories={categories}
-            symptoms={symptoms}
-            loadingSymptoms={loadingSymptoms}
             submitting={submitting}
             error={error}
             onSubmit={handleSubmit}

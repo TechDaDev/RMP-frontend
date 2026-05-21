@@ -42,7 +42,9 @@ export function ConsultationList({ consultations }: ConsultationListProps) {
           key={consultation.id}
           title={consultation.selected_specialty
             ? t.patient.specialtyLabels[consultation.selected_specialty] ?? consultation.selected_specialty
-            : consultation.selected_specialty_other || t.patient.consultationDetailTitle}
+            : consultation.recommended_specialty
+              ? t.patient.specialtyLabels[consultation.recommended_specialty] ?? consultation.recommended_specialty
+              : t.patient.consultationDetailTitle}
           meta={`${t.patient.createdAt}: ${formatDate(consultation.created_at)}`}
           badge={<ConsultationStatusBadge status={consultation.status} />}
           href={`/app/patient/consultations/${consultation.id}`}

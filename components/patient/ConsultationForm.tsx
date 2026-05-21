@@ -1,10 +1,12 @@
 "use client";
 
-import { useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { DashboardStateCard } from "@/components/dashboard/DashboardStateCard";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { getSymptoms } from "@/lib/patient/patientService";
+import { localizeMedicalTerm } from "@/lib/patient/symptomLocalization";
 import type {
   ConsultationCreateRequest,
   ConsultationDuration,
@@ -18,8 +20,6 @@ const textAreaClassName = "w-full rounded-2xl border border-[var(--color-border)
 
 interface ConsultationFormProps {
   categories: SymptomCategory[];
-  symptoms: Symptom[];
-  loadingSymptoms: boolean;
   submitting: boolean;
   error?: string | null;
   onSubmit: (payload: ConsultationCreateRequest) => Promise<void>;
@@ -27,16 +27,18 @@ interface ConsultationFormProps {
 
 export function ConsultationForm({
   categories,
-  symptoms,
-  loadingSymptoms,
   submitting,
   error,
   onSubmit,
 }: ConsultationFormProps) {
-  const { t } = useAppPreferences();
+  const { t, locale } = useAppPreferences();
   const [selectedCategory, setSelectedCategory] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectionError, setSelectionError] = useState<string | null>(null);
+  const [loadingSymptoms, setLoadingSymptoms] = useState(false);
+  const [symptomError, setSymptomError] = useState<string | null>(null);
+  const [symptoms, setSymptoms] = useState<Symptom[]>([]);
+  const [symptomCache, setSymptomCache] = useState<Record<string, Symptom>>({});
   const [duration, setDuration] = useState<ConsultationDuration>("less_than_24_hours");
   const [severity, setSeverity] = useState<ConsultationSeverity>("mild");
   const [hasFever, setHasFever] = useState(false);
@@ -53,32 +55,76 @@ export function ConsultationForm({
     [t.patient.severityLabels],
   );
 
-  // Count symptoms per category for the dropdown label
-  const categoryCounts = useMemo(() => {
-    const counts: Record<string, number> = {};
-    for (const s of symptoms) {
-      if (s.category?.id) {
-        counts[s.category.id] = (counts[s.category.id] ?? 0) + 1;
+  useEffect(() => {
+    let active = true;
+
+    async function loadSymptomsForCategory(categoryId: string) {
+      setLoadingSymptoms(true);
+      setSymptomError(null);
+      setSymptoms([]);
+
+      try {
+        const loadedSymptoms = await getSymptoms({ categoryId });
+        if (!active) {
+          return;
+        }
+
+        setSymptoms(loadedSymptoms);
+        setSymptomCache((current) => {
+          const next = { ...current };
+          for (const symptom of loadedSymptoms) {
+            next[symptom.id] = symptom;
+          }
+          return next;
+        });
+      } catch {
+        if (active) {
+          setSymptomError(t.patient.consultationCreateError);
+        }
+      } finally {
+        if (active) {
+          setLoadingSymptoms(false);
+        }
       }
     }
-    return counts;
-  }, [symptoms]);
 
-  // Client-side category + search filtering, then sorting
+    if (!selectedCategory) {
+      setSymptoms([]);
+      setLoadingSymptoms(false);
+      setSymptomError(null);
+      return () => {
+        active = false;
+      };
+    }
+
+    void loadSymptomsForCategory(selectedCategory);
+
+    return () => {
+      active = false;
+    };
+  }, [selectedCategory, t.patient.consultationCreateError]);
+
+  // Client-side search filtering within the selected category
   const filteredSymptoms = useMemo(() => {
     let list = symptoms;
-
-    if (selectedCategory) {
-      list = list.filter((s) => s.category?.id === selectedCategory);
-    }
 
     const query = searchQuery.trim().toLowerCase();
     if (query) {
       list = list.filter((symptom) => {
         const name = symptom.name.toLowerCase();
+        const localizedName = localizeMedicalTerm(symptom.name, locale).toLowerCase();
         const description = symptom.description?.toLowerCase() ?? "";
+        const localizedDescription = localizeMedicalTerm(symptom.description, locale).toLowerCase();
         const categoryName = symptom.category?.name?.toLowerCase() ?? "";
-        return name.includes(query) || description.includes(query) || categoryName.includes(query);
+        const localizedCategoryName = localizeMedicalTerm(symptom.category?.name, locale).toLowerCase();
+        return (
+          name.includes(query)
+          || localizedName.includes(query)
+          || description.includes(query)
+          || localizedDescription.includes(query)
+          || categoryName.includes(query)
+          || localizedCategoryName.includes(query)
+        );
       });
     }
 
@@ -92,12 +138,12 @@ export function ConsultationForm({
       if (aRedFlag !== bRedFlag) return aRedFlag - bRedFlag;
       return (a.display_order ?? 999) - (b.display_order ?? 999);
     });
-  }, [symptoms, selectedCategory, searchQuery, selectedSymptoms]);
+  }, [symptoms, selectedCategory, searchQuery, selectedSymptoms, locale]);
 
   // Data for selected symptom chips
   const selectedSymptomsData = useMemo(
-    () => symptoms.filter((s) => selectedSymptoms.includes(s.id)),
-    [symptoms, selectedSymptoms],
+    () => selectedSymptoms.map((id) => symptomCache[id]).filter((symptom): symptom is Symptom => Boolean(symptom)),
+    [selectedSymptoms, symptomCache],
   );
 
   // Whether any selected symptom is a red flag
@@ -206,15 +252,19 @@ export function ConsultationForm({
                   const value = event.target.value;
                   setSelectedCategory(value);
                   setSelectionError(null);
+                  setSearchQuery("");
                 }}
               >
-                <option value="">{t.patient.allCategories} ({symptoms.length})</option>
+                <option value="">{t.patient.allCategories}</option>
                 {categories.map((category) => (
                   <option key={category.id} value={category.id}>
-                    {category.name}{categoryCounts[category.id] !== undefined ? ` (${categoryCounts[category.id]})` : ""}
+                    {localizeMedicalTerm(category.name, locale)}
                   </option>
                 ))}
               </select>
+              {categories.length > 0 && !selectedCategory ? (
+                <p className="text-xs text-[var(--color-muted)]">{t.patient.symptomCategoryPrompt}</p>
+              ) : null}
             </label>
 
             <label className="block space-y-2">
@@ -259,10 +309,10 @@ export function ConsultationForm({
                   key={symptom.id}
                   className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-[var(--color-primary)] bg-[color:color-mix(in_srgb,var(--color-primary)_12%,var(--color-surface))] px-3 py-1 text-xs font-medium text-[var(--color-primary)]"
                 >
-                  <span className="truncate">{symptom.name}</span>
+                  <span className="truncate">{localizeMedicalTerm(symptom.name, locale)}</span>
                   <button
                     type="button"
-                    aria-label={`${t.patient.removeSymptom}: ${symptom.name}`}
+                    aria-label={`${t.patient.removeSymptom}: ${localizeMedicalTerm(symptom.name, locale)}`}
                     className="shrink-0 opacity-70 transition hover:opacity-100"
                     onClick={() => removeSymptom(symptom.id)}
                   >
@@ -280,13 +330,17 @@ export function ConsultationForm({
             </div>
           ) : null}
 
-          {loadingSymptoms ? (
+          {symptomError ? (
+            <DashboardStateCard state="error" title={t.patient.noSymptomsAvailable} description={symptomError} />
+          ) : loadingSymptoms ? (
             <DashboardStateCard state="loading" description={t.patient.loading} />
+          ) : !selectedCategory ? (
+            <DashboardStateCard state="empty" title={t.patient.symptomCategoryPrompt} description={t.patient.symptomCategoryPrompt} />
           ) : symptoms.length === 0 ? (
             <DashboardStateCard
               state="empty"
               title={t.patient.noSymptomsAvailable}
-              description={t.patient.consultationCreateUnavailableDescription}
+              description={t.patient.noSymptomsMatch}
             />
           ) : filteredSymptoms.length === 0 ? (
             <DashboardStateCard
@@ -319,12 +373,14 @@ export function ConsultationForm({
                       }}
                     >
                       <span className="block text-sm text-[var(--color-text)]">
-                        <span className="block font-semibold">{symptom.name}</span>
+                        <span className="block font-semibold">{localizeMedicalTerm(symptom.name, locale)}</span>
                         <span className="mt-1 block text-xs text-[var(--color-muted)]">
-                          {symptom.category?.name ?? t.patient.systemAssignedSpecialty}
+                          {symptom.category?.name ? localizeMedicalTerm(symptom.category.name, locale) : t.patient.symptomCategory}
                         </span>
                         {symptom.description ? (
-                          <span className="mt-1 block text-xs text-[var(--color-muted)]">{symptom.description}</span>
+                          <span className="mt-1 block text-xs text-[var(--color-muted)]">
+                            {localizeMedicalTerm(symptom.description, locale)}
+                          </span>
                         ) : null}
                         {symptom.is_red_flag ? (
                           <span className="mt-2 inline-flex rounded-full border border-red-300 bg-red-50 px-2 py-0.5 text-xs font-semibold text-red-700 dark:border-red-700 dark:bg-red-950 dark:text-red-200">

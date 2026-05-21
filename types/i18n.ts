@@ -316,6 +316,7 @@ export interface Translations {
     consultationDetailSubtitle: string;
     consultationNewTitle: string;
     consultationNewSubtitle: string;
+      consultationId: string;
     consultationCreateSuccess: string;
     consultationCreateUnavailableTitle: string;
     consultationCreateUnavailableDescription: string;
@@ -333,6 +334,7 @@ export interface Translations {
     additionalNotes: string;
     symptoms: string;
     symptomCategories: string;
+    symptomCategoryPrompt: string;
     selectSymptoms: string;
     selectedSymptoms: string;
     symptomCategory: string;
@@ -363,6 +365,7 @@ export interface Translations {
     messagesEmptyDescription: string;
     messagesRefresh: string;
     messageSent: string;
+    responses: string;
     messagingPending: string;
     messagingClosed: string;
     messagingCancelled: string;
@@ -436,6 +439,11 @@ export interface Translations {
     specialtyLabels: Record<string, string>;
     medicalRecordCategoryLabels: Record<string, string>;
     valueTypeLabels: Record<string, string>;
+      recommendedSpecialty: string;
+      selectedSpecialty: string;
+      assignedDoctor: string;
+      acceptedAt: string;
+      waitingForDoctor: string;
   };
   doctor: {
     doctorDashboard: string;

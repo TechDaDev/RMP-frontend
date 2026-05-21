@@ -38,6 +38,7 @@ export default function ConsultationDetailPage() {
   const status = consultation?.status ?? "submitted";
   const lifecycle = getConsultationLifecycle(status);
   const messagingAllowed = canPatientUseMessages(status);
+  const shouldPollForAssignment = consultation ? lifecycle === "pending_review" && !consultation.assigned_doctor : true;
 
   const unavailableReason = useMemo(() => {
     if (messagingAllowed) return null;
@@ -121,6 +122,35 @@ export default function ConsultationDetailPage() {
     t.patient.noDataDescription,
     t.patient.messagingPermissionDenied,
   ]);
+
+  useEffect(() => {
+    if (!shouldPollForAssignment) {
+      return undefined;
+    }
+
+    const interval = window.setInterval(() => {
+      void getConsultationDetail(consultationId)
+        .then((consultationData) => {
+          setConsultation(consultationData);
+
+          if (canPatientUseMessages(consultationData.status)) {
+            void getConsultationMessages(consultationId)
+              .then((messageData) => {
+                setMessages(messageData);
+                void markConsultationMessagesRead(consultationId);
+              })
+              .catch(() => {
+                setMessages([]);
+              });
+          }
+        })
+        .catch(() => undefined);
+    }, 10000);
+
+    return () => {
+      window.clearInterval(interval);
+    };
+  }, [consultationId, shouldPollForAssignment]);
 
   async function handleRefresh() {
     setLoading(true);
