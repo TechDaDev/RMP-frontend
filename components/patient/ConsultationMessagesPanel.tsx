@@ -17,6 +17,31 @@ function formatDate(value?: string) {
   return new Date(value).toLocaleString();
 }
 
+function getSenderLabel(message: ConsultationMessage, fallbackLabel: string): string {
+  const fullName = message.sender?.full_name;
+  if (fullName && fullName.length > 0) {
+    return fullName;
+  }
+
+  const firstName = message.sender?.first_name ?? "";
+  const lastName = message.sender?.last_name ?? "";
+  const combinedName = `${firstName} ${lastName}`.trim();
+
+  if (combinedName.length > 0) {
+    return combinedName;
+  }
+
+  if (message.sender?.email) {
+    return message.sender.email;
+  }
+
+  if (message.sender_role) {
+    return message.sender_role;
+  }
+
+  return fallbackLabel;
+}
+
 interface ConsultationMessagesPanelProps {
   canSend: boolean;
   unavailableReason?: string | null;
@@ -64,7 +89,7 @@ export function ConsultationMessagesPanel({
           {messages.map((message) => (
             <div key={message.id} className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 py-3">
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <p className="break-words text-sm font-semibold text-[var(--color-text)]">{message.sender?.full_name || t.portal.demoUser}</p>
+                <p className="break-words text-sm font-semibold text-[var(--color-text)]">{getSenderLabel(message, t.portal.demoUser)}</p>
                 <p className="text-xs text-[var(--color-muted)]">{formatDate(message.created_at)}</p>
               </div>
               <p className="mt-3 break-words text-sm leading-7 text-[var(--color-text)]">{message.body}</p>

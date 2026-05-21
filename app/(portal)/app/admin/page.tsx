@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { useAuth } from "@/components/auth/AuthProvider";
@@ -49,7 +50,7 @@ function formatDateOnly(value?: string | null, localeTag = "en-US") {
 
 export default function AdminPortalPage() {
   const { t, locale } = useAppPreferences();
-  const { user, profile } = useAuth();
+  const { profile } = useAuth();
   const localeTag = resolveLocaleTag(locale);
   const roleProfile = profile?.role_profile as {
     role_display?: string;
@@ -225,16 +226,16 @@ export default function AdminPortalPage() {
       <DashboardSection title={t.admin.adminFeaturesTitle}>
         <div className="flex flex-wrap gap-4">
           <PermissionGuard permission="can_approve_professionals">
-            <a href="/app/admin/verifications" className={buttonClassName({ variant: "primary" })}>{t.admin.adminFeatureVerifications}</a>
+            <Link href="/app/admin/verifications" className={buttonClassName({ variant: "primary" })}>{t.admin.adminFeatureVerifications}</Link>
           </PermissionGuard>
           <PermissionGuard permission="can_manage_knowledge_base">
-            <a href="/app/admin/knowledge-base" className={buttonClassName({ variant: "primary" })}>{t.admin.adminFeatureKnowledgeBase}</a>
+            <Link href="/app/admin/knowledge-base" className={buttonClassName({ variant: "primary" })}>{t.admin.adminFeatureKnowledgeBase}</Link>
           </PermissionGuard>
           <PermissionGuard permission="can_export_datasets">
-            <a href="/app/admin/analytics" className={buttonClassName({ variant: "primary" })}>{t.admin.adminFeatureAnalyticsExport}</a>
+            <Link href="/app/admin/analytics" className={buttonClassName({ variant: "primary" })}>{t.admin.adminFeatureAnalyticsExport}</Link>
           </PermissionGuard>
           <PermissionGuard permission="can_view_audit_logs">
-            <a href="/app/admin/audit-logs" className={buttonClassName({ variant: "primary" })}>{t.admin.adminFeatureAuditLogs}</a>
+            <Link href="/app/admin/audit-logs" className={buttonClassName({ variant: "primary" })}>{t.admin.adminFeatureAuditLogs}</Link>
           </PermissionGuard>
         </div>
       </DashboardSection>

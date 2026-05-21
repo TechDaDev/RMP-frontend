@@ -55,8 +55,34 @@ export default function LaboratoryCorrectResultPage() {
     if (!resultId) {
       return;
     }
-    void loadResult();
-  }, [loadResult, resultId]);
+
+    let active = true;
+
+    void getLaboratoryResultDetail(resultId)
+      .then((data) => {
+        if (!active) {
+          return;
+        }
+        setResult(data);
+        setError(null);
+      })
+      .catch((err) => {
+        if (!active) {
+          return;
+        }
+        setError(err instanceof Error ? err.message : "Failed to load result");
+        setResult(null);
+      })
+      .finally(() => {
+        if (active) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [resultId]);
 
   const handleCorrected = useCallback(async () => {
     const refreshed = await loadResult();

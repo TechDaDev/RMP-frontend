@@ -31,6 +31,11 @@ export function canPatientUseMessages(status: string): boolean {
   return lifecycle === "accepted" || lifecycle === "in_progress";
 }
 
+export function canPatientReadMessages(status: string): boolean {
+  const lifecycle = getConsultationLifecycle(status);
+  return lifecycle === "accepted" || lifecycle === "in_progress" || lifecycle === "closed";
+}
+
 export type ConsultationStatusTone = "neutral" | "info" | "success" | "warning" | "danger";
 
 export function getConsultationStatusTone(status: string): ConsultationStatusTone {

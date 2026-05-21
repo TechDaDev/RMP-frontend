@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
@@ -13,7 +13,8 @@ import { PatientPageFrame } from "@/components/patient/ui/PatientPageFrame";
 import { Badge } from "@/components/ui/Badge";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { ApiError } from "@/lib/api/errors";
-import { canPatientUseMessages, getConsultationLifecycle } from "@/lib/patient/consultationStatus";
+import { canPatientReadMessages, canPatientUseMessages, getConsultationLifecycle } from "@/lib/patient/consultationStatus";
+import { useConsultationMessagesRealtime } from "@/lib/realtime/useConsultationMessagesRealtime";
 import {
   getConsultationDetail,
   getConsultationMessages,
@@ -21,6 +22,19 @@ import {
   sendConsultationMessage,
 } from "@/lib/patient/patientService";
 import type { ConsultationDetail, ConsultationMessage } from "@/types/patient";
+
+function mergeMessagesById(messages: ConsultationMessage[], incoming: ConsultationMessage): ConsultationMessage[] {
+  const next = new Map(messages.map((message) => [message.id, message]));
+  next.set(incoming.id, {
+    ...(next.get(incoming.id) ?? {}),
+    ...incoming,
+  });
+  return Array.from(next.values()).sort((left, right) => {
+    const leftTime = left.created_at ? new Date(left.created_at).getTime() : 0;
+    const rightTime = right.created_at ? new Date(right.created_at).getTime() : 0;
+    return leftTime - rightTime;
+  });
+}
 
 export default function ConsultationDetailPage() {
   const { t } = useAppPreferences();
@@ -38,7 +52,36 @@ export default function ConsultationDetailPage() {
   const status = consultation?.status ?? "submitted";
   const lifecycle = getConsultationLifecycle(status);
   const messagingAllowed = canPatientUseMessages(status);
+  const messageReadingAllowed = canPatientReadMessages(status);
   const shouldPollForAssignment = consultation ? lifecycle === "pending_review" && !consultation.assigned_doctor : true;
+
+  const loadMessages = useCallback(async () => {
+    if (!messageReadingAllowed) {
+      setMessages([]);
+      return;
+    }
+
+    const messageData = await getConsultationMessages(consultationId);
+    setMessages(messageData);
+    void markConsultationMessagesRead(consultationId);
+  }, [consultationId, messageReadingAllowed]);
+
+  const loadConsultation = useCallback(async () => {
+    const consultationData = await getConsultationDetail(consultationId);
+    setConsultation(consultationData);
+    return consultationData;
+  }, [consultationId]);
+
+  const syncConsultationState = useCallback(async () => {
+    try {
+      const consultationData = await loadConsultation();
+      if (canPatientReadMessages(consultationData.status)) {
+        await loadMessages();
+      }
+    } catch {
+      // Fallback sync should be best-effort only.
+    }
+  }, [loadConsultation, loadMessages]);
 
   const unavailableReason = useMemo(() => {
     if (messagingAllowed) return null;
@@ -81,7 +124,7 @@ export default function ConsultationDetailPage() {
         return;
       }
 
-      if (canPatientUseMessages(consultationData.status)) {
+      if (canPatientReadMessages(consultationData.status)) {
         try {
           const messageData = await getConsultationMessages(consultationId);
           if (!active) {
@@ -133,7 +176,7 @@ export default function ConsultationDetailPage() {
         .then((consultationData) => {
           setConsultation(consultationData);
 
-          if (canPatientUseMessages(consultationData.status)) {
+          if (canPatientReadMessages(consultationData.status)) {
             void getConsultationMessages(consultationId)
               .then((messageData) => {
                 setMessages(messageData);
@@ -161,7 +204,7 @@ export default function ConsultationDetailPage() {
       const consultationData = await getConsultationDetail(consultationId);
       setConsultation(consultationData);
 
-      if (canPatientUseMessages(consultationData.status)) {
+      if (canPatientReadMessages(consultationData.status)) {
         try {
           const messageData = await getConsultationMessages(consultationId);
           setMessages(messageData);
@@ -198,10 +241,9 @@ export default function ConsultationDetailPage() {
     setMessageSuccess(null);
     setSending(true);
     try {
-      await sendConsultationMessage(consultationId, { body, attachments });
+      const createdMessage = await sendConsultationMessage(consultationId, { body, attachments });
+      setMessages((current) => mergeMessagesById(current, createdMessage));
       setMessageSuccess(t.patient.messageSent);
-      const nextMessages = await getConsultationMessages(consultationId);
-      setMessages(nextMessages);
       void markConsultationMessagesRead(consultationId);
     } catch {
       setMessageError(t.patient.consultationCreateError);
@@ -209,6 +251,38 @@ export default function ConsultationDetailPage() {
       setSending(false);
     }
   }
+
+  useConsultationMessagesRealtime<ConsultationMessage>({
+    consultationId,
+    enabled: messageReadingAllowed,
+    onMessageCreated: (message) => {
+      setMessages((current) => mergeMessagesById(current, message));
+      setMessageError(null);
+      setMessageSuccess(null);
+      void markConsultationMessagesRead(consultationId);
+    },
+    onMessagesRead: () => {
+      void loadMessages();
+    },
+    onConsultationUpdated: (update) => {
+      setConsultation((current) => {
+        if (!current || current.id !== update.id) {
+          return current;
+        }
+
+        return {
+          ...current,
+          status: (update.status as ConsultationDetail["status"] | undefined) ?? current.status,
+          accepted_at: update.accepted_at ?? current.accepted_at,
+          closed_at: update.closed_at ?? current.closed_at,
+          updated_at: update.updated_at ?? current.updated_at,
+        };
+      });
+
+      void syncConsultationState();
+    },
+    onFallbackSync: syncConsultationState,
+  });
 
   if (loading) {
     return (

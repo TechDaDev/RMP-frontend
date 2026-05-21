@@ -66,7 +66,6 @@ export function LaboratoryResultCorrectionForm({
         laboratorian_notes: formState.laboratorianNotes || undefined,
       };
 
-      const corrected = await correctLaboratoryResult(resultId, payload);
       await correctLaboratoryResult(resultId, payload);
       onCorrected();
     } catch (err) {

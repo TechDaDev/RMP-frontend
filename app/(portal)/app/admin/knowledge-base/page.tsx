@@ -97,8 +97,30 @@ export default function AdminKnowledgeBasePage() {
   }, [t.admin.loadFailedDescription]);
 
   useEffect(() => {
-    void loadDocuments();
-  }, [loadDocuments]);
+    let cancelled = false;
+
+    void getAdminKnowledgeDocuments()
+      .then((response) => {
+        if (cancelled) {
+          return;
+        }
+        setDocuments(response);
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setError(t.admin.loadFailedDescription);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [t.admin.loadFailedDescription]);
 
   async function handleUpload(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();

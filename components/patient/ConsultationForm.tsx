@@ -56,15 +56,14 @@ export function ConsultationForm({
   );
 
   useEffect(() => {
+    if (!selectedCategory) {
+      return;
+    }
+
     let active = true;
 
-    async function loadSymptomsForCategory(categoryId: string) {
-      setLoadingSymptoms(true);
-      setSymptomError(null);
-      setSymptoms([]);
-
-      try {
-        const loadedSymptoms = await getSymptoms({ categoryId });
+    void getSymptoms({ categoryId: selectedCategory })
+      .then((loadedSymptoms) => {
         if (!active) {
           return;
         }
@@ -77,27 +76,17 @@ export function ConsultationForm({
           }
           return next;
         });
-      } catch {
+      })
+      .catch(() => {
         if (active) {
           setSymptomError(t.patient.consultationCreateError);
         }
-      } finally {
+      })
+      .finally(() => {
         if (active) {
           setLoadingSymptoms(false);
         }
-      }
-    }
-
-    if (!selectedCategory) {
-      setSymptoms([]);
-      setLoadingSymptoms(false);
-      setSymptomError(null);
-      return () => {
-        active = false;
-      };
-    }
-
-    void loadSymptomsForCategory(selectedCategory);
+      });
 
     return () => {
       active = false;
@@ -138,7 +127,7 @@ export function ConsultationForm({
       if (aRedFlag !== bRedFlag) return aRedFlag - bRedFlag;
       return (a.display_order ?? 999) - (b.display_order ?? 999);
     });
-  }, [symptoms, selectedCategory, searchQuery, selectedSymptoms, locale]);
+  }, [symptoms, searchQuery, selectedSymptoms, locale]);
 
   // Data for selected symptom chips
   const selectedSymptomsData = useMemo(
@@ -250,9 +239,15 @@ export function ConsultationForm({
                 value={selectedCategory}
                 onChange={(event) => {
                   const value = event.target.value;
+                  setLoadingSymptoms(Boolean(value));
+                  setSymptomError(null);
+                  setSymptoms([]);
                   setSelectedCategory(value);
                   setSelectionError(null);
                   setSearchQuery("");
+                  if (!value) {
+                    setLoadingSymptoms(false);
+                  }
                 }}
               >
                 <option value="">{t.patient.allCategories}</option>

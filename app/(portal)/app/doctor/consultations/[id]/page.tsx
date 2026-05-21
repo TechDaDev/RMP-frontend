@@ -21,7 +21,21 @@ import {
   sendDoctorResponse,
 } from "@/lib/doctor/doctorService";
 import { canDoctorReadMessages } from "@/lib/doctor/doctorConsultationStatus";
+import { useConsultationMessagesRealtime } from "@/lib/realtime/useConsultationMessagesRealtime";
 import type { DoctorConsultationDetail, DoctorMessage, DoctorResponseRequest } from "@/types/doctor";
+
+function mergeMessagesById(messages: DoctorMessage[], incoming: DoctorMessage): DoctorMessage[] {
+  const next = new Map(messages.map((message) => [message.id, message]));
+  next.set(incoming.id, {
+    ...(next.get(incoming.id) ?? {}),
+    ...incoming,
+  });
+  return Array.from(next.values()).sort((left, right) => {
+    const leftTime = left.created_at ? new Date(left.created_at).getTime() : 0;
+    const rightTime = right.created_at ? new Date(right.created_at).getTime() : 0;
+    return leftTime - rightTime;
+  });
+}
 
 export default function DoctorConsultationDetailPage() {
   const { t } = useAppPreferences();
@@ -35,6 +49,7 @@ export default function DoctorConsultationDetailPage() {
   const [error, setError] = useState<string | null>(null);
 
   const isApproved = verification?.is_approved === true;
+  const messageReadingAllowed = detail ? canDoctorReadMessages(detail.status) : false;
 
   const loadMessages = useCallback(async (consultationId: string, status: string) => {
     if (!canDoctorReadMessages(status)) {
@@ -76,14 +91,25 @@ export default function DoctorConsultationDetailPage() {
     }
   }, [loadMessages, params.id, t.doctor.verifiedDoctorRequiredDescription, t.patient.noDataDescription]);
 
+  const syncConsultationState = useCallback(async () => {
+    try {
+      const data = await getDoctorConsultationDetail(params.id);
+      setDetail(data);
+      await loadMessages(params.id, data.status);
+    } catch {
+      // Best-effort fallback while socket reconnects.
+    }
+  }, [loadMessages, params.id]);
+
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     void loadDetail();
   }, [loadDetail]);
 
   async function handleSendMessage(body: string, attachments: File[]) {
-    await sendConsultationMessage(params.id, { body, attachments });
-    await loadMessages(params.id, detail?.status ?? "submitted");
+    const createdMessage = await sendConsultationMessage(params.id, { body, attachments });
+    setMessages((current) => mergeMessagesById(current, createdMessage));
+    void markConsultationMessagesRead(params.id);
   }
 
   async function handleSendResponse(payload: DoctorResponseRequest) {
@@ -95,6 +121,38 @@ export default function DoctorConsultationDetailPage() {
     await closeConsultation(params.id);
     await loadDetail();
   }
+
+  useConsultationMessagesRealtime<DoctorMessage>({
+    consultationId: params.id,
+    enabled: messageReadingAllowed,
+    onMessageCreated: (message) => {
+      setMessages((current) => mergeMessagesById(current, message));
+      setMessagesError(null);
+      void markConsultationMessagesRead(params.id);
+    },
+    onMessagesRead: () => {
+      if (detail) {
+        void loadMessages(params.id, detail.status);
+      }
+    },
+    onConsultationUpdated: (update) => {
+      setDetail((current) => {
+        if (!current || current.id !== update.id) {
+          return current;
+        }
+
+        return {
+          ...current,
+          status: update.status ?? current.status,
+          accepted_at: update.accepted_at ?? current.accepted_at,
+          closed_at: update.closed_at ?? current.closed_at,
+        };
+      });
+
+      void syncConsultationState();
+    },
+    onFallbackSync: syncConsultationState,
+  });
 
   if (loading) {
     return (

@@ -71,6 +71,8 @@ export type BloodGroup =
 export interface SafeUserSummary {
   id: string;
   full_name: string;
+  first_name?: string;
+  last_name?: string;
   email: string;
 }
 
@@ -156,6 +158,7 @@ export interface ConsultationMessage {
   id: string;
   body: string;
   sender?: SafeUserSummary;
+  sender_role?: string;
   created_at?: string;
   attachments?: ConsultationMessageAttachment[];
 }
