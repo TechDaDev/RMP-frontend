@@ -69,9 +69,13 @@ export default function DoctorPendingConsultationsPage() {
     setSuccessMessage(null);
     setAcceptingId(consultationId);
     try {
-      await acceptConsultation(consultationId);
+      const accepted = await acceptConsultation(consultationId);
       setSuccessMessage(t.doctor.consultationAccepted);
-      await loadPending();
+      if (accepted) {
+        setConsultations((current) => current.filter((item) => item.id !== consultationId));
+      } else {
+        await loadPending();
+      }
     } catch (err) {
       if (err instanceof ApiError) {
         setError(errorMessageForStatus(err.status, t.doctor.acceptFailed, t.doctor.verifiedDoctorRequiredDescription));

@@ -4,6 +4,7 @@ import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
 import { DashboardSection } from "@/components/dashboard/DashboardSection";
 import { DoctorClinicalFlagsCard } from "@/components/doctor/DoctorClinicalFlagsCard";
+import { DoctorAiCaseSummaryCard } from "@/components/doctor/DoctorAiCaseSummaryCard";
 import { DoctorCloseConsultationCard } from "@/components/doctor/DoctorCloseConsultationCard";
 import DoctorPatientSummaryCard from "@/components/doctor/DoctorPatientSummaryCard";
 import { DoctorMessagesPanel } from "@/components/doctor/DoctorMessagesPanel";
@@ -40,9 +41,10 @@ export function DoctorConsultationWorkspace({
   return (
     <div className="space-y-6">
       <DashboardSection title={t.doctor.patientSummary}>
-        <DashboardGrid columns="two">
-        <DoctorPatientSummaryCard consultation={consultation} />
-        <DoctorSymptomsCard consultation={consultation} />
+        <DashboardGrid columns="three">
+          <DoctorPatientSummaryCard consultation={consultation} />
+          <DoctorSymptomsCard consultation={consultation} />
+          <DoctorAiCaseSummaryCard summary={consultation.ai_case_summary} />
         </DashboardGrid>
       </DashboardSection>
 
@@ -64,16 +66,16 @@ export function DoctorConsultationWorkspace({
 
       <DashboardSection title={t.doctor.doctorResponse}>
         <DashboardGrid columns="two">
-        <DoctorResponseForm
-          status={consultation.status}
-          isApproved={isApproved}
-          onSubmitResponse={onSendResponse}
-        />
-        <DoctorCloseConsultationCard
-          status={consultation.status}
-          isApproved={isApproved}
-          onCloseConsultation={onCloseConsultation}
-        />
+          <DoctorResponseForm
+            status={consultation.status}
+            isApproved={isApproved}
+            onSubmitResponse={onSendResponse}
+          />
+          <DoctorCloseConsultationCard
+            status={consultation.status}
+            isApproved={isApproved}
+            onCloseConsultation={onCloseConsultation}
+          />
         </DashboardGrid>
       </DashboardSection>
 

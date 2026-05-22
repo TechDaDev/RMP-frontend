@@ -492,6 +492,10 @@ export interface Translations {
     patientSummary: string;
     clinicalSummary: string;
     symptomsAndRouting: string;
+    noSymptomsProvided: string;
+    aiCaseSummaryTitle: string;
+    aiCaseSummaryFallback: string;
+    aiCaseSummaryDisclaimer: string;
     clinicalFlags: string;
     patientNotes: string;
     doctorMessages: string;

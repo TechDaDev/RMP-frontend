@@ -27,7 +27,7 @@ export function DoctorSymptomsCard({ consultation }: DoctorSymptomsCardProps) {
       <div className="space-y-2">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--color-muted)]">{t.patient.symptoms}</p>
         {symptoms.length === 0 ? (
-          <p className="text-sm text-[var(--color-muted)]">-</p>
+          <p className="text-sm text-[var(--color-muted)]">{t.doctor.noSymptomsProvided}</p>
         ) : (
           <div className="space-y-2">
             {symptoms.map((symptom) => (

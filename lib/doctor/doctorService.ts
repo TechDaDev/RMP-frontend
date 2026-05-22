@@ -87,11 +87,22 @@ export function getDoctorConsultationDetail(id: string): Promise<DoctorConsultat
   return getResource<DoctorConsultationDetail>(API_ENDPOINTS.doctorConsultations.detail(id));
 }
 
-export async function acceptConsultation(id: string): Promise<void> {
-  await apiRequest<void | ApiEnvelope<void>>(API_ENDPOINTS.doctorConsultations.accept(id), {
+export async function acceptConsultation(id: string): Promise<DoctorConsultationDetail | null> {
+  const response = await apiRequest<
+    DoctorConsultationDetail | ApiEnvelope<DoctorConsultationDetail> | void | ApiEnvelope<void>
+  >(API_ENDPOINTS.doctorConsultations.accept(id), {
     auth: true,
     body: {},
   });
+
+  if (response && typeof response === "object" && "data" in response) {
+    const envelope = response as ApiEnvelope<DoctorConsultationDetail>;
+    return envelope.data ?? null;
+  }
+
+  return response && typeof response === "object"
+    ? (response as DoctorConsultationDetail)
+    : null;
 }
 
 export async function sendDoctorResponse(id: string, payload: DoctorResponseRequest): Promise<void> {

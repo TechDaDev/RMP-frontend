@@ -13,6 +13,7 @@ import { Button, buttonClassName } from "@/components/ui/Button";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { ApiError } from "@/lib/api/errors";
 import {
+  acceptConsultation,
   closeConsultation,
   getConsultationMessages,
   getDoctorConsultationDetail,
@@ -47,6 +48,8 @@ export default function DoctorConsultationDetailPage() {
   const [messagesError, setMessagesError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [accepting, setAccepting] = useState(false);
+  const [acceptError, setAcceptError] = useState<string | null>(null);
 
   const isApproved = verification?.is_approved === true;
   const messageReadingAllowed = detail ? canDoctorReadMessages(detail.status) : false;
@@ -112,6 +115,30 @@ export default function DoctorConsultationDetailPage() {
     void markConsultationMessagesRead(params.id);
   }
 
+  async function handleAcceptConsultation() {
+    setAcceptError(null);
+    setAccepting(true);
+
+    try {
+      const accepted = await acceptConsultation(params.id);
+
+      if (accepted) {
+        setDetail(accepted);
+        await loadMessages(params.id, accepted.status);
+      } else {
+        await loadDetail();
+      }
+    } catch (err) {
+      if (err instanceof ApiError && err.status === 403) {
+        setAcceptError(t.doctor.verifiedDoctorRequiredDescription);
+      } else {
+        setAcceptError(t.doctor.acceptFailed);
+      }
+    } finally {
+      setAccepting(false);
+    }
+  }
+
   async function handleSendResponse(payload: DoctorResponseRequest) {
     await sendDoctorResponse(params.id, payload);
     await loadDetail();
@@ -168,15 +195,15 @@ export default function DoctorConsultationDetailPage() {
         description={error ?? t.patient.noDataDescription}
         action={
           <>
-          <Link href="/app/doctor/consultations/pending" className={buttonClassName({ variant: "secondary" })}>
-            {t.doctor.backToPendingConsultations}
-          </Link>
-          <Link href="/app/doctor/consultations/assigned" className={buttonClassName({ variant: "secondary" })}>
-            {t.doctor.backToAssignedConsultations}
-          </Link>
-          <Link href="/app/doctor" className={buttonClassName({ variant: "secondary" })}>
-            {t.doctor.backToDoctorDashboard}
-          </Link>
+            <Link href="/app/doctor/consultations/pending" className={buttonClassName({ variant: "secondary" })}>
+              {t.doctor.backToPendingConsultations}
+            </Link>
+            <Link href="/app/doctor/consultations/assigned" className={buttonClassName({ variant: "secondary" })}>
+              {t.doctor.backToAssignedConsultations}
+            </Link>
+            <Link href="/app/doctor" className={buttonClassName({ variant: "secondary" })}>
+              {t.doctor.backToDoctorDashboard}
+            </Link>
           </>
         }
       />
@@ -190,11 +217,22 @@ export default function DoctorConsultationDetailPage() {
         title={t.doctor.consultationWorkspace}
         description={t.doctor.doctorWorkspaceSubtitle}
         actions={
-          <Button variant="secondary" onClick={() => void loadDetail()}>
-            {t.patient.retry}
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            {detail.status === "submitted" ? (
+              <Button onClick={() => void handleAcceptConsultation()} disabled={!isApproved || accepting}>
+                {accepting ? t.doctor.acceptingConsultation : t.doctor.acceptConsultation}
+              </Button>
+            ) : null}
+            <Button variant="secondary" onClick={() => void loadDetail()}>
+              {t.patient.retry}
+            </Button>
+          </div>
         }
       />
+
+      {acceptError ? (
+        <DashboardStateCard state="error" title={t.common.error} description={acceptError} />
+      ) : null}
 
       <DoctorConsultationWorkspace
         consultation={detail}
@@ -218,6 +256,9 @@ export default function DoctorConsultationDetailPage() {
         <Link href="/app/doctor" className={buttonClassName({ variant: "secondary" })}>
           {t.doctor.backToDoctorDashboard}
         </Link>
+        <Button variant="secondary" onClick={() => void loadDetail()}>
+          {t.patient.retry}
+        </Button>
       </div>
     </DoctorPageFrame>
   );

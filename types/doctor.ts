@@ -64,6 +64,7 @@ export interface DoctorConsultationListItem {
 }
 
 export interface DoctorConsultationDetail extends DoctorConsultationListItem {
+  ai_case_summary?: string;
   selected_specialty_other?: string | null;
   recommended_specialty?: string | null;
   has_breathing_difficulty?: boolean;

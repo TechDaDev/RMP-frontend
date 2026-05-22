@@ -111,9 +111,17 @@ export default function DoctorPortalPage() {
     setAcceptingId(consultationId);
 
     try {
-      await acceptConsultation(consultationId);
+      const accepted = await acceptConsultation(consultationId);
       setSuccessMessage(t.doctor.consultationAccepted);
-      await loadQueues();
+      if (accepted) {
+        setPending((current) => current.filter((item) => item.id !== consultationId));
+        setAssigned((current) => {
+          const next = [accepted, ...current.filter((item) => item.id !== accepted.id)];
+          return next;
+        });
+      } else {
+        await loadQueues();
+      }
     } catch (err) {
       if (err instanceof ApiError && err.status === 403) {
         setError(t.doctor.verifiedDoctorRequiredDescription);
