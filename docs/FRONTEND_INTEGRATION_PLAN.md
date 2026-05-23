@@ -237,6 +237,22 @@ Notes:
 8. Realtime decision for this phase: use API reload/manual refresh after generate/mark-read; no user-level websocket hook exists yet for `doctor_ai.message.created`. ✅
 9. Validation: lint, TypeScript noEmit, and production build passed after integration. ✅
 
+## Phase 10G.1 — Build Stability + Assistant Realtime Safety ✅ COMPLETE
+
+1. Removed Google font imports from `app/layout.tsx` (`next/font/google` Inter + Noto Sans Arabic). ✅
+2. Added stable local/system font variable stacks in `app/globals.css`:
+   - `--font-sans-latin: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`
+   - `--font-arabic: Tahoma, Arial, system-ui, sans-serif`
+3. Preserved existing RTL/LTR direction-aware typography behavior and Arabic default locale bootstrap. ✅
+4. Confirmed no remaining `next/font/google` references in application source. ✅
+5. Production build now completes without Google font fetch dependency. ✅
+6. Realtime contract decision: deferred assistant realtime hook because backend websocket docs do not define `doctor_ai.message.created` payload/permission contract. ✅
+7. Assistant panel separation remains unchanged:
+   - no patient exposure
+   - no injection into consultation chat stream
+   - no `DoctorMessage` type mixing
+8. Validation: lint ✅ | TypeScript ✅ | build ✅.
+
 ## Phase 6 — Laboratory Portal
 
 1. Laboratory dashboard with verification gating.

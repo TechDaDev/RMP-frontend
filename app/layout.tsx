@@ -1,18 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Noto_Sans_Arabic } from "next/font/google";
 import { AppProviders } from "@/components/AppProviders";
 import "./globals.css";
-
-const inter = Inter({
-  variable: "--font-sans-latin",
-  subsets: ["latin"],
-});
-
-const notoSansArabic = Noto_Sans_Arabic({
-  variable: "--font-arabic",
-  subsets: ["arabic"],
-  weight: ["400", "500", "600", "700"],
-});
 
 export const metadata: Metadata = {
   title: "منصة الرافدين الطبية الرقمية | Al-Rafidain Digital Medical Platform",
@@ -83,7 +71,7 @@ export default function RootLayout({
       dir="rtl"
       suppressHydrationWarning
       data-scroll-behavior="smooth"
-      className={`${inter.variable} ${notoSansArabic.variable} h-full antialiased`}
+      className="h-full antialiased"
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: preferencesBootstrap }} />

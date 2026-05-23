@@ -240,6 +240,25 @@ Admin portal UI implemented under `/app/admin` with documented staff/admin backe
 - Mobile-safe stacked layout (`space-y-*`, wrapped badges/actions) with no horizontal overflow introduced.
 - Localized labels and helper text provided for Arabic, Kurdish, and English.
 
+## Phase 10G.1 — Font Stability Without Google Fetch
+
+### Typography infrastructure update
+
+- Removed runtime/build dependency on `next/font/google` in the root layout.
+- Repointed font variables to local/system stacks in global CSS while preserving existing variable names and direction-aware usage.
+- Kept Arabic/Kurdish RTL and English LTR body font rules intact.
+
+### UI impact guardrails
+
+- Existing page spacing, component sizing, and Phase 8 card/button/badge visual system were not changed.
+- No role workflow components were redesigned; this change is typography infrastructure only.
+- Assistant panel long-text wrapping behavior remains unchanged.
+
+### Build and rendering outcome
+
+- Production build no longer depends on fetching Google Fonts in restricted/offline environments.
+- Theme and direction primitives remain unchanged (`dark` class + `dir` switching logic).
+
 - TypeScript ✅ | ESLint ✅ | Build ✅ (all admin routes in build manifest)
 
 

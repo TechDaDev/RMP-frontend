@@ -45,9 +45,25 @@ This integration intentionally keeps assistant messages separate from doctor-pat
 ## Realtime Strategy
 
 - Current codebase has consultation-scoped chat websocket hook only.
-- No user-level websocket hook currently exists for doctor AI assistant events.
+- User websocket endpoint exists (`/ws/user/`), but current backend docs only define notification/consultation/prescription/lab order/lab result events.
+- No documented `doctor_ai.message.created` websocket event contract exists yet (payload schema + permission scope not specified).
 - Phase 10G uses manual refresh and post-action reload for assistant stream consistency.
 - Dedicated user-channel realtime support can be added in a future phase.
+
+## Phase 10G.1 Build Stability
+
+- Removed `next/font/google` usage from `app/layout.tsx` to avoid build-time remote fetch.
+- Kept existing font variable strategy and repointed variables in `app/globals.css` to local/system stacks:
+  - `--font-sans-latin: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`
+  - `--font-arabic: Tahoma, Arial, system-ui, sans-serif`
+- Preserved RTL/LTR-specific font application and Arabic default direction bootstrapping.
+- Production build now succeeds in restricted/offline environments where Google Fonts are unreachable.
+
+## Phase 10G.1 Realtime Decision
+
+- Realtime assistant hook intentionally deferred.
+- Reason: backend websocket contract does not yet confirm doctor-only assistant event delivery (`doctor_ai.message.created`) on `/ws/user/`.
+- Safety rule maintained: no assistant data is routed through consultation chat socket.
 
 ## Safety and Privacy Constraints
 
