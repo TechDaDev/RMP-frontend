@@ -93,7 +93,11 @@ export interface DoctorMessage {
   attachments?: Array<{
     id?: string;
     file?: string;
+    file_url?: string;
     file_name?: string;
+    original_name?: string;
+    uploaded_by?: string;
+    created_at?: string;
   }>;
 }
 

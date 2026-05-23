@@ -4,6 +4,7 @@ import { FormEvent, KeyboardEvent, useMemo, useRef, useState } from "react";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { isImageAttachmentUrl, resolveAttachmentUrl } from "@/lib/chat/attachmentUrl";
 import { canDoctorMessage } from "@/lib/doctor/doctorConsultationStatus";
 import type { DoctorMessage } from "@/types/doctor";
 
@@ -37,15 +38,6 @@ function getSenderLabel(message: DoctorMessage): string {
   }
 
   return message.sender_role ?? "-";
-}
-
-function isImageAttachment(path?: string): boolean {
-  if (!path) {
-    return false;
-  }
-
-  const sanitizedPath = path.split("?")[0];
-  return /\.(png|jpe?g|gif|webp|bmp|svg|avif)$/i.test(sanitizedPath);
 }
 
 export function DoctorMessagesPanel({
@@ -150,25 +142,26 @@ export function DoctorMessagesPanel({
               {message.attachments && message.attachments.length > 0 ? (
                 <div className="mt-2 flex flex-wrap gap-2">
                   {message.attachments.map((attachment, index) => {
-                    if (!attachment.file) {
+                    const resolvedUrl = resolveAttachmentUrl(attachment);
+                    if (!resolvedUrl) {
                       return null;
                     }
 
-                    const key = attachment.id ?? attachment.file ?? String(index);
-                    const label = attachment.file_name || attachment.file;
+                    const key = attachment.id ?? attachment.file_url ?? attachment.file ?? String(index);
+                    const label = attachment.original_name || attachment.file_name || attachment.file_url || attachment.file || "file";
 
-                    if (isImageAttachment(attachment.file_name ?? attachment.file)) {
+                    if (isImageAttachmentUrl(resolvedUrl)) {
                       return (
                         <button
                           key={key}
                           type="button"
                           className="group overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] text-start"
-                          onClick={() => setPreviewImage({ src: attachment.file as string, label })}
+                          onClick={() => setPreviewImage({ src: resolvedUrl, label })}
                           aria-label={label}
                         >
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
-                            src={attachment.file}
+                            src={resolvedUrl}
                             alt={label}
                             className="h-24 w-24 object-cover transition group-hover:scale-105"
                           />
@@ -179,7 +172,7 @@ export function DoctorMessagesPanel({
                     return (
                       <a
                         key={key}
-                        href={attachment.file}
+                        href={resolvedUrl}
                         target="_blank"
                         rel="noreferrer"
                         className="rounded-xl border border-[var(--color-border)] px-3 py-2 text-xs font-semibold text-[var(--color-primary)] underline-offset-2 hover:underline"
