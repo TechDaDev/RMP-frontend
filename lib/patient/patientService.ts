@@ -107,6 +107,8 @@ export async function createConsultation(
     severity: payload.severity,
     has_fever: payload.has_fever,
     has_pain: payload.has_pain,
+    has_breathing_difficulty: payload.has_breathing_difficulty,
+    previous_visit_for_same_issue: payload.previous_visit_for_same_issue,
     additional_notes: payload.additional_notes,
     symptom_ids: payload.symptom_ids,
   };
@@ -133,7 +135,7 @@ export function getSymptomCategories(): Promise<SymptomCategory[]> {
 export function getSymptoms(params?: SymptomsQueryParams): Promise<Symptom[]> {
   const searchParams = new URLSearchParams();
 
-  if (params?.categoryId) {
+  if (params?.categoryId && params.categoryId !== "all") {
     searchParams.set("category", params.categoryId);
   }
 

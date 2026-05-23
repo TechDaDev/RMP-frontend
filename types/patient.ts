@@ -144,6 +144,8 @@ export interface ConsultationCreateRequest {
   severity: ConsultationSeverity;
   has_fever: boolean;
   has_pain: boolean;
+  has_breathing_difficulty: boolean;
+  previous_visit_for_same_issue: boolean;
   additional_notes?: string;
   symptom_ids: string[];
 }

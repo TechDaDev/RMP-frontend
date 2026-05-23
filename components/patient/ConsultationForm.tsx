@@ -32,10 +32,10 @@ export function ConsultationForm({
   onSubmit,
 }: ConsultationFormProps) {
   const { t, locale } = useAppPreferences();
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectionError, setSelectionError] = useState<string | null>(null);
-  const [loadingSymptoms, setLoadingSymptoms] = useState(false);
+  const [loadingSymptoms, setLoadingSymptoms] = useState(true);
   const [symptomError, setSymptomError] = useState<string | null>(null);
   const [symptoms, setSymptoms] = useState<Symptom[]>([]);
   const [symptomCache, setSymptomCache] = useState<Record<string, Symptom>>({});
@@ -43,6 +43,8 @@ export function ConsultationForm({
   const [severity, setSeverity] = useState<ConsultationSeverity>("mild");
   const [hasFever, setHasFever] = useState(false);
   const [hasPain, setHasPain] = useState(false);
+  const [hasBreathingDifficulty, setHasBreathingDifficulty] = useState(false);
+  const [previousVisitForSameIssue, setPreviousVisitForSameIssue] = useState(false);
   const [additionalNotes, setAdditionalNotes] = useState("");
   const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>([]);
 
@@ -56,13 +58,13 @@ export function ConsultationForm({
   );
 
   useEffect(() => {
-    if (!selectedCategory) {
-      return;
-    }
-
     let active = true;
 
-    void getSymptoms({ categoryId: selectedCategory })
+    const categoryId = selectedCategory && selectedCategory !== "all"
+      ? selectedCategory
+      : undefined;
+
+    void getSymptoms(categoryId ? { categoryId } : undefined)
       .then((loadedSymptoms) => {
         if (!active) {
           return;
@@ -80,6 +82,7 @@ export function ConsultationForm({
       .catch(() => {
         if (active) {
           setSymptomError(t.patient.consultationCreateError);
+          setSymptoms([]);
         }
       })
       .finally(() => {
@@ -159,6 +162,8 @@ export function ConsultationForm({
       severity,
       has_fever: hasFever,
       has_pain: hasPain,
+      has_breathing_difficulty: hasBreathingDifficulty,
+      previous_visit_for_same_issue: previousVisitForSameIssue,
       additional_notes: additionalNotes.trim() || undefined,
       symptom_ids: selectedSymptoms,
     });
@@ -217,6 +222,22 @@ export function ConsultationForm({
             <input type="checkbox" checked={hasPain} onChange={(event) => setHasPain(event.target.checked)} />
             {t.patient.pain}
           </label>
+          <label className="flex items-center gap-3 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 py-3 text-sm font-semibold text-[var(--color-text)]">
+            <input
+              type="checkbox"
+              checked={hasBreathingDifficulty}
+              onChange={(event) => setHasBreathingDifficulty(event.target.checked)}
+            />
+            {t.patient.breathingDifficulty}
+          </label>
+          <label className="flex items-center gap-3 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 py-3 text-sm font-semibold text-[var(--color-text)]">
+            <input
+              type="checkbox"
+              checked={previousVisitForSameIssue}
+              onChange={(event) => setPreviousVisitForSameIssue(event.target.checked)}
+            />
+            {t.patient.previousVisit}
+          </label>
         </div>
 
         <label className="block space-y-2">
@@ -239,27 +260,21 @@ export function ConsultationForm({
                 value={selectedCategory}
                 onChange={(event) => {
                   const value = event.target.value;
-                  setLoadingSymptoms(Boolean(value));
+                  setLoadingSymptoms(true);
                   setSymptomError(null);
                   setSymptoms([]);
                   setSelectedCategory(value);
                   setSelectionError(null);
                   setSearchQuery("");
-                  if (!value) {
-                    setLoadingSymptoms(false);
-                  }
                 }}
               >
-                <option value="">{t.patient.allCategories}</option>
+                <option value="all">{t.patient.allCategories}</option>
                 {categories.map((category) => (
                   <option key={category.id} value={category.id}>
                     {localizeMedicalTerm(category.name, locale)}
                   </option>
                 ))}
               </select>
-              {categories.length > 0 && !selectedCategory ? (
-                <p className="text-xs text-[var(--color-muted)]">{t.patient.symptomCategoryPrompt}</p>
-              ) : null}
             </label>
 
             <label className="block space-y-2">
@@ -329,8 +344,6 @@ export function ConsultationForm({
             <DashboardStateCard state="error" title={t.patient.noSymptomsAvailable} description={symptomError} />
           ) : loadingSymptoms ? (
             <DashboardStateCard state="loading" description={t.patient.loading} />
-          ) : !selectedCategory ? (
-            <DashboardStateCard state="empty" title={t.patient.symptomCategoryPrompt} description={t.patient.symptomCategoryPrompt} />
           ) : symptoms.length === 0 ? (
             <DashboardStateCard
               state="empty"
