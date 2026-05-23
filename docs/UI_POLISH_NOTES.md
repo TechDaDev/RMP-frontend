@@ -259,6 +259,27 @@ Admin portal UI implemented under `/app/admin` with documented staff/admin backe
 - Production build no longer depends on fetching Google Fonts in restricted/offline environments.
 - Theme and direction primitives remain unchanged (`dark` class + `dir` switching logic).
 
+## Phase 10G.2B — Doctor Assistant Realtime UI Safety
+
+### Realtime UI integration
+
+- Added doctor assistant realtime updates through user-socket channel only (`/ws/user/`).
+- Assistant realtime updates are applied only to assistant panel state and filtered by active consultation ID.
+- Consultation chat panel remains connected only to consultation-chat websocket hook.
+
+### Safety and isolation outcomes
+
+- No assistant UI appears in patient consultation routes.
+- No assistant payload is rendered inside `DoctorMessagesPanel`.
+- Patient chat remains consultation-message-only UI.
+
+### Authenticated visual QA outcomes
+
+- Doctor consultation workspace still renders assistant panel as separate section with safety notice.
+- Invalid assistant generate action displays safe error state without leaking internal payload fields.
+- Doctor consultation chat composer and sent-message rendering remain visually intact after realtime hook wiring.
+- Patient consultation detail continues to render only standard consultation timeline + chat surfaces.
+
 - TypeScript ✅ | ESLint ✅ | Build ✅ (all admin routes in build manifest)
 
 

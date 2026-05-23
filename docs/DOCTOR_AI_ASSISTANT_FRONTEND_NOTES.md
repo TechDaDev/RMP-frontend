@@ -42,13 +42,21 @@ This integration intentionally keeps assistant messages separate from doctor-pat
 - Mark read/unread updates local assistant message state and preserves newest-first ordering.
 - Existing consultation chat list, send flow, and chat realtime hook remain unchanged.
 
-## Realtime Strategy
+## Realtime Strategy (Phase 10G.2B)
 
-- Current codebase has consultation-scoped chat websocket hook only.
-- User websocket endpoint exists (`/ws/user/`), but current backend docs only define notification/consultation/prescription/lab order/lab result events.
-- No documented `doctor_ai.message.created` websocket event contract exists yet (payload schema + permission scope not specified).
-- Phase 10G uses manual refresh and post-action reload for assistant stream consistency.
-- Dedicated user-channel realtime support can be added in a future phase.
+- Added dedicated doctor assistant realtime hook in `lib/realtime/useDoctorAIAssistantRealtime.ts`.
+- WebSocket endpoint used: `/ws/user/?token=<access_token>`.
+- Handled events:
+  - `doctor_ai.message.created`
+  - `doctor_ai.message.updated`
+- Event safety filters:
+  - ignores all non-assistant websocket events
+  - applies assistant updates only when `message.consultation` matches active consultation ID
+- Reliability behavior:
+  - reconnect on close/error
+  - reconnect when access token changes
+  - fallback polling sync via existing assistant list API
+- Consultation chat websocket remains unchanged in `useConsultationMessagesRealtime`.
 
 ## Phase 10G.1 Build Stability
 
@@ -61,9 +69,20 @@ This integration intentionally keeps assistant messages separate from doctor-pat
 
 ## Phase 10G.1 Realtime Decision
 
-- Realtime assistant hook intentionally deferred.
-- Reason: backend websocket contract does not yet confirm doctor-only assistant event delivery (`doctor_ai.message.created`) on `/ws/user/`.
-- Safety rule maintained: no assistant data is routed through consultation chat socket.
+- This deferment has been superseded by Phase 10G.2B after backend websocket contract confirmation.
+
+## Phase 10G.2B Authenticated QA Summary
+
+- Doctor login and consultation detail access verified.
+- Assistant panel rendered in doctor workspace and remained separate from consultation chat panel.
+- Invalid report ID generation path returned safe error UI message.
+- Consultation chat still sent and rendered doctor message normally.
+- Patient login and consultation detail access verified.
+- No assistant panel appeared in patient routes, and patient chat remained standard consultation messaging only.
+
+Observed runtime limitation during live QA:
+
+- Assistant list endpoint returned server error on the tested consultation context, so live mark-read/unread and websocket-created/update event assertions were limited to integration-level verification in frontend code plus fallback sync behavior.
 
 ## Safety and Privacy Constraints
 

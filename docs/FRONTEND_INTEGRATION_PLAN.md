@@ -253,6 +253,23 @@ Notes:
    - no `DoctorMessage` type mixing
 8. Validation: lint ✅ | TypeScript ✅ | build ✅.
 
+## Phase 10G.2B — Doctor Assistant Realtime + Authenticated QA ✅ COMPLETE
+
+1. Reused existing websocket user endpoint mapping in `lib/api/endpoints.ts` (`/ws/user/`) and kept consultation chat websocket mapping unchanged. ✅
+2. Added `lib/realtime/useDoctorAIAssistantRealtime.ts` with consultation-scoped assistant event filtering and isolated callbacks. ✅
+3. Implemented handling for doctor-only events:
+   - `doctor_ai.message.created`
+   - `doctor_ai.message.updated`
+4. Wired realtime hook into doctor consultation detail page for assistant-state-only updates (no normal chat impact). ✅
+5. Added assistant message merge/update-by-id behavior with newest-first ordering and assistant error reset on realtime events. ✅
+6. Added fallback sync callback to reload assistant list when realtime reconnect/fallback polling runs. ✅
+7. Preserved safety boundaries:
+   - no assistant rendering in patient portal
+   - no assistant injection into `DoctorMessagesPanel`
+   - no `DoctorMessage` casting for assistant payloads
+8. Authenticated live QA executed for doctor/patient flows; patient isolation confirmed.
+9. Observed backend-runtime limitation on tested consultation: assistant list endpoint returned server error, limiting live websocket event proof to code-path verification plus fallback sync behavior.
+
 ## Phase 6 — Laboratory Portal
 
 1. Laboratory dashboard with verification gating.

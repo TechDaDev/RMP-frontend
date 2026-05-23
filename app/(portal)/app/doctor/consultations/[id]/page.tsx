@@ -25,6 +25,7 @@ import {
   sendDoctorResponse,
 } from "@/lib/doctor/doctorService";
 import { canDoctorReadMessages } from "@/lib/doctor/doctorConsultationStatus";
+import { useDoctorAIAssistantRealtime } from "@/lib/realtime/useDoctorAIAssistantRealtime";
 import { useConsultationMessagesRealtime } from "@/lib/realtime/useConsultationMessagesRealtime";
 import type {
   DoctorAIAssistantMessage,
@@ -58,6 +59,19 @@ function sortAssistantMessagesNewestFirst(
     const rightTime = right.created_at ? new Date(right.created_at).getTime() : 0;
     return rightTime - leftTime;
   });
+}
+
+function mergeAssistantMessagesById(
+  messages: DoctorAIAssistantMessage[],
+  incoming: DoctorAIAssistantMessage,
+): DoctorAIAssistantMessage[] {
+  const next = new Map(messages.map((message) => [message.id, message]));
+  next.set(incoming.id, {
+    ...(next.get(incoming.id) ?? {}),
+    ...incoming,
+  });
+
+  return sortAssistantMessagesNewestFirst(Array.from(next.values()));
 }
 
 export default function DoctorConsultationDetailPage() {
@@ -267,6 +281,20 @@ export default function DoctorConsultationDetailPage() {
       void syncConsultationState();
     },
     onFallbackSync: syncConsultationState,
+  });
+
+  useDoctorAIAssistantRealtime({
+    consultationId: params.id,
+    enabled: isApproved && Boolean(detail),
+    onMessageCreated: (message) => {
+      setAssistantMessages((current) => mergeAssistantMessagesById(current, message));
+      setAssistantError(null);
+    },
+    onMessageUpdated: (message) => {
+      setAssistantMessages((current) => mergeAssistantMessagesById(current, message));
+      setAssistantError(null);
+    },
+    onFallbackSync: () => loadAssistantMessages(params.id),
   });
 
   if (loading) {
