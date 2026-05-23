@@ -41,10 +41,12 @@ export function DoctorConsultationWorkspace({
   return (
     <div className="space-y-6">
       <DashboardSection title={t.doctor.patientSummary}>
-        <DashboardGrid columns="three">
+        <DashboardGrid columns="two" className="items-start">
           <DoctorPatientSummaryCard consultation={consultation} />
           <DoctorSymptomsCard consultation={consultation} />
-          <DoctorAiCaseSummaryCard summary={consultation.ai_case_summary} />
+          <div className="md:col-span-2">
+            <DoctorAiCaseSummaryCard summary={consultation.ai_case_summary} />
+          </div>
         </DashboardGrid>
       </DashboardSection>
 
