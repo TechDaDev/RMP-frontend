@@ -17,6 +17,11 @@ interface DoctorMessagesPanelProps {
   onSend: (body: string) => Promise<void>;
 }
 
+interface PreviewImage {
+  src: string;
+  label: string;
+}
+
 function getSenderLabel(message: DoctorMessage): string {
   const fullName = message.sender?.full_name;
   if (fullName && fullName.length > 0) {
@@ -34,6 +39,15 @@ function getSenderLabel(message: DoctorMessage): string {
   return message.sender_role ?? "-";
 }
 
+function isImageAttachment(path?: string): boolean {
+  if (!path) {
+    return false;
+  }
+
+  const sanitizedPath = path.split("?")[0];
+  return /\.(png|jpe?g|gif|webp|bmp|svg|avif)$/i.test(sanitizedPath);
+}
+
 export function DoctorMessagesPanel({
   status,
   isApproved,
@@ -48,6 +62,7 @@ export function DoctorMessagesPanel({
   const [body, setBody] = useState("");
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState<string | null>(null);
+  const [previewImage, setPreviewImage] = useState<PreviewImage | null>(null);
 
   const canWrite = isApproved && canDoctorMessage(status);
   const isReadOnlyClosed = status === "closed";
@@ -129,22 +144,50 @@ export function DoctorMessagesPanel({
                   {message.created_at ? new Date(message.created_at).toLocaleString() : "-"}
                 </p>
               </div>
-              <p className="mt-2 text-sm text-[var(--color-text)] whitespace-pre-wrap">{message.body || "-"}</p>
+              {message.body ? (
+                <p className="mt-2 whitespace-pre-wrap text-sm text-[var(--color-text)]">{message.body}</p>
+              ) : null}
               {message.attachments && message.attachments.length > 0 ? (
                 <div className="mt-2 flex flex-wrap gap-2">
-                  {message.attachments.map((attachment, index) => (
-                    attachment.file ? (
+                  {message.attachments.map((attachment, index) => {
+                    if (!attachment.file) {
+                      return null;
+                    }
+
+                    const key = attachment.id ?? attachment.file ?? String(index);
+                    const label = attachment.file_name || attachment.file;
+
+                    if (isImageAttachment(attachment.file_name ?? attachment.file)) {
+                      return (
+                        <button
+                          key={key}
+                          type="button"
+                          className="group overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] text-start"
+                          onClick={() => setPreviewImage({ src: attachment.file as string, label })}
+                          aria-label={label}
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={attachment.file}
+                            alt={label}
+                            className="h-24 w-24 object-cover transition group-hover:scale-105"
+                          />
+                        </button>
+                      );
+                    }
+
+                    return (
                       <a
-                        key={attachment.id ?? attachment.file ?? String(index)}
+                        key={key}
                         href={attachment.file}
                         target="_blank"
                         rel="noreferrer"
                         className="rounded-xl border border-[var(--color-border)] px-3 py-2 text-xs font-semibold text-[var(--color-primary)] underline-offset-2 hover:underline"
                       >
-                        {attachment.file_name || attachment.file}
+                        {label}
                       </a>
-                    ) : null
-                  ))}
+                    );
+                  })}
                 </div>
               ) : null}
             </div>
@@ -168,6 +211,35 @@ export function DoctorMessagesPanel({
           {sending ? t.doctor.sendingDoctorResponse : t.doctor.sendMessage}
         </Button>
       </form>
+
+      {previewImage ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(3,10,20,0.8)] p-4"
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setPreviewImage(null)}
+        >
+          <div
+            className="max-h-[90vh] w-full max-w-5xl overflow-hidden rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="mb-3 flex items-center justify-between gap-2">
+              <p className="truncate text-sm font-semibold text-[var(--color-text)]">{previewImage.label}</p>
+              <Button variant="secondary" onClick={() => setPreviewImage(null)}>
+                {t.common.cancel}
+              </Button>
+            </div>
+            <div className="flex max-h-[calc(90vh-5rem)] items-center justify-center rounded-xl bg-[var(--color-surface-alt)] p-2">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={previewImage.src}
+                alt={previewImage.label}
+                className="max-h-[calc(90vh-7rem)] w-auto max-w-full object-contain"
+              />
+            </div>
+          </div>
+        </div>
+      ) : null}
     </Card>
   );
 }
