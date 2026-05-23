@@ -3,6 +3,7 @@
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
 import { DashboardSection } from "@/components/dashboard/DashboardSection";
+import { DoctorAIAssistantPanel } from "@/components/doctor/assistant/DoctorAIAssistantPanel";
 import { DoctorClinicalFlagsCard } from "@/components/doctor/DoctorClinicalFlagsCard";
 import { DoctorAiCaseSummaryCard } from "@/components/doctor/DoctorAiCaseSummaryCard";
 import { DoctorCloseConsultationCard } from "@/components/doctor/DoctorCloseConsultationCard";
@@ -11,7 +12,12 @@ import { DoctorMessagesPanel } from "@/components/doctor/DoctorMessagesPanel";
 import { DoctorResponseForm } from "@/components/doctor/DoctorResponseForm";
 import { DoctorSymptomsCard } from "@/components/doctor/DoctorSymptomsCard";
 import { DoctorWorkspaceActions } from "@/components/doctor/DoctorWorkspaceActions";
-import type { DoctorConsultationDetail, DoctorMessage, DoctorResponseRequest } from "@/types/doctor";
+import type {
+  DoctorAIAssistantMessage,
+  DoctorConsultationDetail,
+  DoctorMessage,
+  DoctorResponseRequest,
+} from "@/types/doctor";
 
 interface DoctorConsultationWorkspaceProps {
   consultation: DoctorConsultationDetail;
@@ -19,8 +25,15 @@ interface DoctorConsultationWorkspaceProps {
   messages: DoctorMessage[];
   messagesLoading: boolean;
   messagesError: string | null;
+  assistantMessages: DoctorAIAssistantMessage[];
+  assistantLoading: boolean;
+  assistantError: string | null;
+  assistantGenerating: boolean;
   onRetryMessages: () => void;
+  onRetryAssistantMessages: () => void;
   onSendMessage: (body: string) => Promise<void>;
+  onGenerateAssistantMessageFromReport: (reportId: string, question?: string) => Promise<void>;
+  onMarkAssistantMessageRead: (messageId: string, read: boolean) => Promise<void>;
   onSendResponse: (payload: DoctorResponseRequest) => Promise<void>;
   onCloseConsultation: () => Promise<void>;
 }
@@ -31,8 +44,15 @@ export function DoctorConsultationWorkspace({
   messages,
   messagesLoading,
   messagesError,
+  assistantMessages,
+  assistantLoading,
+  assistantError,
+  assistantGenerating,
   onRetryMessages,
+  onRetryAssistantMessages,
   onSendMessage,
+  onGenerateAssistantMessageFromReport,
+  onMarkAssistantMessageRead,
   onSendResponse,
   onCloseConsultation,
 }: DoctorConsultationWorkspaceProps) {
@@ -52,6 +72,23 @@ export function DoctorConsultationWorkspace({
 
       <DashboardSection title={t.doctor.clinicalFlags}>
         <DoctorClinicalFlagsCard consultation={consultation} />
+      </DashboardSection>
+
+      <DashboardSection
+        title={t.doctor.aiAssistantTitle}
+        description={t.doctor.aiAssistantDescription}
+      >
+        <DoctorAIAssistantPanel
+          consultationId={consultation.id}
+          isApproved={isApproved}
+          messages={assistantMessages}
+          loading={assistantLoading}
+          error={assistantError}
+          generating={assistantGenerating}
+          onRetry={onRetryAssistantMessages}
+          onGenerateFromReport={onGenerateAssistantMessageFromReport}
+          onMarkRead={onMarkAssistantMessageRead}
+        />
       </DashboardSection>
 
       <DashboardSection title={t.doctor.doctorMessages}>

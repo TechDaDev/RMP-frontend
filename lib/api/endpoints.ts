@@ -159,6 +159,14 @@ export const API_ENDPOINTS = {
     adminAnalyticsSummary: "/api/rag/admin/analytics/summary/",
     adminExportDataset: "/api/rag/admin/exports/dataset/",
   },
+  ragDoctorAssistant: {
+    consultationMessages: (consultationId: string) =>
+      `/api/rag/consultations/${consultationId}/doctor-ai-messages/`,
+    generateFromMedicalReport: (reportId: string) =>
+      `/api/rag/medical-reports/${reportId}/doctor-ai-message/`,
+    detail: (messageId: string) => `/api/rag/doctor-ai-messages/${messageId}/`,
+    markRead: (messageId: string) => `/api/rag/doctor-ai-messages/${messageId}/mark-read/`,
+  },
   admin: {
     knowledgeDocuments: "/api/knowledge-base/documents/",
     knowledgeDocumentDetail: (id: string) => `/api/knowledge-base/documents/${id}/`,

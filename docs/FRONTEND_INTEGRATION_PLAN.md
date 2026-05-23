@@ -217,6 +217,26 @@ Notes:
 4. TypeScript clean: 0 errors. Lint clean: 0 warnings. Build: ✅ pass.
 5. See `docs/DOCTOR_PORTAL_FINAL_QA.md` for full report.
 
+## Phase 10G — Frontend Doctor AI Assistant Panel ✅ COMPLETE
+
+1. Added dedicated doctor AI assistant endpoint group under `ragDoctorAssistant` in `lib/api/endpoints.ts`. ✅
+2. Added strict doctor assistant types in `types/doctor.ts` (message, status, safety, source summary, generate/mark payloads). ✅
+3. Added service methods in `lib/doctor/doctorService.ts`:
+   - `getDoctorAIAssistantMessages`
+   - `getDoctorAIAssistantMessageDetail`
+   - `generateDoctorAIMessageFromReport`
+   - `markDoctorAIMessageRead`
+4. Added new doctor assistant UI components under `components/doctor/assistant/`:
+   - `DoctorAIAssistantPanel`
+   - `DoctorAIAssistantMessageCard`
+   - `DoctorAIAssistantGenerateCard`
+   - `DoctorAIAssistantStatusBadge`
+5. Integrated assistant panel into doctor consultation workspace as a separate section with separate state/actions from normal doctor-patient chat. ✅
+6. Added doctor-only privacy/safety notice and explicit chat separation messaging in UI. ✅
+7. Added full i18n key contract + locale values (ar/ku/en) for assistant panel actions, states, and safety badges. ✅
+8. Realtime decision for this phase: use API reload/manual refresh after generate/mark-read; no user-level websocket hook exists yet for `doctor_ai.message.created`. ✅
+9. Validation: lint, TypeScript noEmit, and production build passed after integration. ✅
+
 ## Phase 6 — Laboratory Portal
 
 1. Laboratory dashboard with verification gating.

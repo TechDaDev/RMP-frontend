@@ -4,6 +4,7 @@ import type { ApiEnvelope, PaginatedResponse } from "@/types/api";
 import type {
   CancelDoctorPrescriptionRequest,
   CreateDoctorLabOrderRequest,
+  DoctorAIAssistantMessage,
   CreateDoctorPrescriptionRequest,
   DoctorConsultationDetail,
   DoctorConsultationListItem,
@@ -14,6 +15,8 @@ import type {
   DoctorMessage,
   DoctorMessageRequest,
   DoctorPrescriptionDetail,
+  GenerateDoctorAIMessageRequest,
+  MarkDoctorAIMessageReadRequest,
   ReleaseDoctorLabResultRequest,
   ReviewDoctorLabResultRequest,
   DoctorResponseRequest,
@@ -140,6 +143,46 @@ export async function markConsultationMessagesRead(id: string): Promise<void> {
     auth: true,
     body: {},
   });
+}
+
+export function getDoctorAIAssistantMessages(consultationId: string): Promise<DoctorAIAssistantMessage[]> {
+  return getListResource<DoctorAIAssistantMessage>(
+    API_ENDPOINTS.ragDoctorAssistant.consultationMessages(consultationId),
+  );
+}
+
+export function getDoctorAIAssistantMessageDetail(messageId: string): Promise<DoctorAIAssistantMessage> {
+  return getResource<DoctorAIAssistantMessage>(API_ENDPOINTS.ragDoctorAssistant.detail(messageId));
+}
+
+export async function generateDoctorAIMessageFromReport(
+  reportId: string,
+  payload: GenerateDoctorAIMessageRequest = {},
+): Promise<DoctorAIAssistantMessage> {
+  const response = await apiRequest<DoctorAIAssistantMessage | ApiEnvelope<DoctorAIAssistantMessage>>(
+    API_ENDPOINTS.ragDoctorAssistant.generateFromMedicalReport(reportId),
+    {
+      auth: true,
+      body: payload,
+    },
+  );
+
+  return unwrapData(response);
+}
+
+export async function markDoctorAIMessageRead(
+  messageId: string,
+  payload: MarkDoctorAIMessageReadRequest,
+): Promise<DoctorAIAssistantMessage> {
+  const response = await apiRequest<DoctorAIAssistantMessage | ApiEnvelope<DoctorAIAssistantMessage>>(
+    API_ENDPOINTS.ragDoctorAssistant.markRead(messageId),
+    {
+      auth: true,
+      body: payload,
+    },
+  );
+
+  return unwrapData(response);
 }
 
 export async function createPrescriptionFromConsultation(

@@ -15,15 +15,23 @@ import { ApiError } from "@/lib/api/errors";
 import {
   acceptConsultation,
   closeConsultation,
+  generateDoctorAIMessageFromReport,
   getConsultationMessages,
+  getDoctorAIAssistantMessages,
   getDoctorConsultationDetail,
+  markDoctorAIMessageRead,
   markConsultationMessagesRead,
   sendConsultationMessage,
   sendDoctorResponse,
 } from "@/lib/doctor/doctorService";
 import { canDoctorReadMessages } from "@/lib/doctor/doctorConsultationStatus";
 import { useConsultationMessagesRealtime } from "@/lib/realtime/useConsultationMessagesRealtime";
-import type { DoctorConsultationDetail, DoctorMessage, DoctorResponseRequest } from "@/types/doctor";
+import type {
+  DoctorAIAssistantMessage,
+  DoctorConsultationDetail,
+  DoctorMessage,
+  DoctorResponseRequest,
+} from "@/types/doctor";
 
 function sortMessagesNewestFirst(messages: DoctorMessage[]): DoctorMessage[] {
   return [...messages].sort((left, right) => {
@@ -42,6 +50,16 @@ function mergeMessagesById(messages: DoctorMessage[], incoming: DoctorMessage): 
   return sortMessagesNewestFirst(Array.from(next.values()));
 }
 
+function sortAssistantMessagesNewestFirst(
+  messages: DoctorAIAssistantMessage[],
+): DoctorAIAssistantMessage[] {
+  return [...messages].sort((left, right) => {
+    const leftTime = left.created_at ? new Date(left.created_at).getTime() : 0;
+    const rightTime = right.created_at ? new Date(right.created_at).getTime() : 0;
+    return rightTime - leftTime;
+  });
+}
+
 export default function DoctorConsultationDetailPage() {
   const { t } = useAppPreferences();
   const { verification } = useAuth();
@@ -50,6 +68,10 @@ export default function DoctorConsultationDetailPage() {
   const [messages, setMessages] = useState<DoctorMessage[]>([]);
   const [messagesLoading, setMessagesLoading] = useState(false);
   const [messagesError, setMessagesError] = useState<string | null>(null);
+  const [assistantMessages, setAssistantMessages] = useState<DoctorAIAssistantMessage[]>([]);
+  const [assistantLoading, setAssistantLoading] = useState(false);
+  const [assistantError, setAssistantError] = useState<string | null>(null);
+  const [assistantGenerating, setAssistantGenerating] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [accepting, setAccepting] = useState(false);
@@ -80,6 +102,28 @@ export default function DoctorConsultationDetailPage() {
     }
   }, [t.patient.noDataDescription]);
 
+  const loadAssistantMessages = useCallback(async (consultationId: string) => {
+    if (!isApproved) {
+      setAssistantMessages([]);
+      setAssistantError(null);
+      setAssistantLoading(false);
+      return;
+    }
+
+    setAssistantLoading(true);
+    setAssistantError(null);
+
+    try {
+      const data = await getDoctorAIAssistantMessages(consultationId);
+      setAssistantMessages(sortAssistantMessagesNewestFirst(data));
+    } catch {
+      setAssistantMessages([]);
+      setAssistantError(t.doctor.aiAssistantLoadFailed);
+    } finally {
+      setAssistantLoading(false);
+    }
+  }, [isApproved, t.doctor.aiAssistantLoadFailed]);
+
   const loadDetail = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -87,6 +131,7 @@ export default function DoctorConsultationDetailPage() {
       const data = await getDoctorConsultationDetail(params.id);
       setDetail(data);
       await loadMessages(params.id, data.status);
+      await loadAssistantMessages(params.id);
     } catch (err) {
       if (err instanceof ApiError && err.status === 403) {
         setError(t.doctor.verifiedDoctorRequiredDescription);
@@ -96,17 +141,24 @@ export default function DoctorConsultationDetailPage() {
     } finally {
       setLoading(false);
     }
-  }, [loadMessages, params.id, t.doctor.verifiedDoctorRequiredDescription, t.patient.noDataDescription]);
+  }, [
+    loadAssistantMessages,
+    loadMessages,
+    params.id,
+    t.doctor.verifiedDoctorRequiredDescription,
+    t.patient.noDataDescription,
+  ]);
 
   const syncConsultationState = useCallback(async () => {
     try {
       const data = await getDoctorConsultationDetail(params.id);
       setDetail(data);
       await loadMessages(params.id, data.status);
+      await loadAssistantMessages(params.id);
     } catch {
       // Best-effort fallback while socket reconnects.
     }
-  }, [loadMessages, params.id]);
+  }, [loadAssistantMessages, loadMessages, params.id]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -151,6 +203,38 @@ export default function DoctorConsultationDetailPage() {
   async function handleCloseConsultation() {
     await closeConsultation(params.id);
     await loadDetail();
+  }
+
+  async function handleGenerateAssistantMessageFromReport(reportId: string, question?: string) {
+    setAssistantGenerating(true);
+    setAssistantError(null);
+
+    try {
+      await generateDoctorAIMessageFromReport(reportId, {
+        question,
+        top_k: 5,
+      });
+      await loadAssistantMessages(params.id);
+    } catch {
+      setAssistantError(t.doctor.aiAssistantGenerateFailed);
+    } finally {
+      setAssistantGenerating(false);
+    }
+  }
+
+  async function handleMarkAssistantMessageRead(messageId: string, read: boolean) {
+    try {
+      const updated = await markDoctorAIMessageRead(messageId, { read });
+      setAssistantMessages((current) =>
+        sortAssistantMessagesNewestFirst(
+          current.some((message) => message.id === updated.id)
+            ? current.map((message) => (message.id === updated.id ? updated : message))
+            : [...current, updated],
+        ),
+      );
+    } catch {
+      setAssistantError(t.doctor.aiAssistantMarkReadFailed);
+    }
   }
 
   useConsultationMessagesRealtime<DoctorMessage>({
@@ -244,8 +328,15 @@ export default function DoctorConsultationDetailPage() {
         messages={messages}
         messagesLoading={messagesLoading}
         messagesError={messagesError}
+        assistantMessages={assistantMessages}
+        assistantLoading={assistantLoading}
+        assistantError={assistantError}
+        assistantGenerating={assistantGenerating}
         onRetryMessages={() => void loadMessages(params.id, detail.status)}
+        onRetryAssistantMessages={() => void loadAssistantMessages(params.id)}
         onSendMessage={handleSendMessage}
+        onGenerateAssistantMessageFromReport={handleGenerateAssistantMessageFromReport}
+        onMarkAssistantMessageRead={handleMarkAssistantMessageRead}
         onSendResponse={handleSendResponse}
         onCloseConsultation={handleCloseConsultation}
       />

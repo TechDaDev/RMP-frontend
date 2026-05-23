@@ -218,6 +218,28 @@ Admin portal UI implemented under `/app/admin` with documented staff/admin backe
 
 ### Validation
 
+## Phase 10G — Doctor AI Assistant Panel UI
+
+### New doctor assistant UI surface
+
+- Added a dedicated doctor-only assistant section in consultation workspace using existing dashboard section rhythm.
+- Added assistant safety header emphasizing internal clinical usage and non-patient visibility.
+- Added generate card for report-driven AI message creation with optional question prompt.
+- Added message cards with status and safety badges, source list, confidence, fallback reason, and read/unread action.
+
+### Separation and privacy rules
+
+- Assistant panel state, types, and service calls are isolated from doctor-patient chat.
+- Normal `DoctorMessagesPanel` behavior and message contracts remain unchanged.
+- Assistant copy explicitly states messages are not visible to patients.
+- No patient routes or components render assistant payloads.
+
+### Accessibility and responsive behavior
+
+- Uses existing `Card`, `Badge`, `Button`, and `DashboardStateCard` primitives for consistent keyboard and theme behavior.
+- Mobile-safe stacked layout (`space-y-*`, wrapped badges/actions) with no horizontal overflow introduced.
+- Localized labels and helper text provided for Arabic, Kurdish, and English.
+
 - TypeScript ✅ | ESLint ✅ | Build ✅ (all admin routes in build manifest)
 
 

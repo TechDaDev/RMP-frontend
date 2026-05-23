@@ -111,6 +111,67 @@ export interface DoctorMessageRequest {
   attachments?: File[];
 }
 
+export type DoctorAIAssistantTriggerType =
+  | "medical_report_case_update"
+  | "manual_rag_case_update"
+  | "consultation_context_update"
+  | "lab_result_context_update"
+  | "system";
+
+export type DoctorAIAssistantMessageStatus =
+  | "unread"
+  | "read"
+  | "archived";
+
+export type DoctorAIAssistantSafetyLevel =
+  | "doctor_only"
+  | "needs_review"
+  | "low_confidence"
+  | "no_context"
+  | "failed";
+
+export interface DoctorAIAssistantSourceSummary {
+  rag_response_id?: string;
+  rag_query_id?: string;
+  service_context?: string;
+  source_count?: number;
+  document_titles?: string[];
+  confidence?: number | null;
+  fallback_reason?: string | null;
+  source_report_id?: string | null;
+  linked_medical_record_entry_id?: string | null;
+}
+
+export interface DoctorAIAssistantMessage {
+  id: string;
+  consultation: string;
+  trigger_type: DoctorAIAssistantTriggerType;
+  status: DoctorAIAssistantMessageStatus;
+  safety_level: DoctorAIAssistantSafetyLevel;
+  title: string;
+  body: string;
+  summary?: DoctorAIAssistantSourceSummary | Record<string, unknown>;
+  source_report?: string | null;
+  source_rag_response?: string | null;
+  source_medical_record_entry?: string | null;
+  source_metadata?: Record<string, unknown>;
+  read_at?: string | null;
+  archived_at?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface GenerateDoctorAIMessageRequest {
+  question?: string;
+  top_k?: number;
+  force?: boolean;
+  create_if_exists?: boolean;
+}
+
+export interface MarkDoctorAIMessageReadRequest {
+  read: boolean;
+}
+
 export type DoctorPrescriptionStatus =
   | "issued"
   | "partially_dispensed"
