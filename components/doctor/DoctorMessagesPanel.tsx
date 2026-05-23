@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, KeyboardEvent, useMemo, useRef, useState } from "react";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -14,7 +14,7 @@ interface DoctorMessagesPanelProps {
   error: string | null;
   messages: DoctorMessage[];
   onRetry: () => void;
-  onSend: (body: string, attachments: File[]) => Promise<void>;
+  onSend: (body: string) => Promise<void>;
 }
 
 function getSenderLabel(message: DoctorMessage): string {
@@ -44,8 +44,8 @@ export function DoctorMessagesPanel({
   onSend,
 }: DoctorMessagesPanelProps) {
   const { t } = useAppPreferences();
+  const formRef = useRef<HTMLFormElement | null>(null);
   const [body, setBody] = useState("");
-  const [attachments, setAttachments] = useState<File[]>([]);
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState<string | null>(null);
 
@@ -69,21 +69,33 @@ export function DoctorMessagesPanel({
     event.preventDefault();
     const trimmed = body.trim();
 
-    if ((!trimmed && attachments.length === 0) || !canWrite) {
+    if (!trimmed || !canWrite) {
       return;
     }
 
     setSending(true);
     setSendError(null);
     try {
-      await onSend(trimmed, attachments);
+      await onSend(trimmed);
       setBody("");
-      setAttachments([]);
     } catch {
       setSendError(t.patient.noDataDescription);
     } finally {
       setSending(false);
     }
+  }
+
+  function handleMessageKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
+    if (event.key !== "Enter") {
+      return;
+    }
+
+    if (event.ctrlKey) {
+      return;
+    }
+
+    event.preventDefault();
+    formRef.current?.requestSubmit();
   }
 
   return (
@@ -142,31 +154,17 @@ export function DoctorMessagesPanel({
 
       {blockedMessage ? <p className="text-sm text-[var(--color-muted)]">{blockedMessage}</p> : null}
 
-      <form className="space-y-2" onSubmit={handleSubmit}>
+      <form ref={formRef} className="space-y-2" onSubmit={handleSubmit}>
         <textarea
           value={body}
           onChange={(event) => setBody(event.target.value)}
+          onKeyDown={handleMessageKeyDown}
           placeholder={t.doctor.messagePlaceholder}
           className="min-h-24 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-text)] outline-none focus:border-[var(--color-primary)]"
           disabled={!canWrite || sending}
         />
-        <label className="block space-y-2">
-          <span className="text-sm font-semibold text-[var(--color-text)]">{t.profile.uploadFile}</span>
-          <input
-            type="file"
-            multiple
-            className="min-h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-3 py-2 text-sm text-[var(--color-text)] outline-none transition file:mr-3 file:rounded-xl file:border-0 file:bg-[var(--color-surface-alt)] file:px-3 file:py-2 file:text-sm file:font-semibold file:text-[var(--color-text)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[color:color-mix(in_srgb,var(--color-primary)_18%,transparent)]"
-            onChange={(event) => setAttachments(Array.from(event.target.files ?? []))}
-            disabled={!canWrite || sending}
-          />
-          <p className="text-xs text-[var(--color-muted)]">
-            {attachments.length > 0
-              ? `${t.profile.selectedFile}: ${attachments.map((file) => file.name).join(", ")}`
-              : t.profile.noFileSelected}
-          </p>
-        </label>
         {sendError ? <p className="text-sm text-red-600 dark:text-red-300">{sendError}</p> : null}
-        <Button type="submit" className="w-full sm:w-auto" disabled={!canWrite || sending || (body.trim().length === 0 && attachments.length === 0)}>
+        <Button type="submit" className="w-full sm:w-auto" disabled={!canWrite || sending || body.trim().length === 0}>
           {sending ? t.doctor.sendingDoctorResponse : t.doctor.sendMessage}
         </Button>
       </form>

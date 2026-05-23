@@ -25,17 +25,21 @@ import { canDoctorReadMessages } from "@/lib/doctor/doctorConsultationStatus";
 import { useConsultationMessagesRealtime } from "@/lib/realtime/useConsultationMessagesRealtime";
 import type { DoctorConsultationDetail, DoctorMessage, DoctorResponseRequest } from "@/types/doctor";
 
+function sortMessagesNewestFirst(messages: DoctorMessage[]): DoctorMessage[] {
+  return [...messages].sort((left, right) => {
+    const leftTime = left.created_at ? new Date(left.created_at).getTime() : 0;
+    const rightTime = right.created_at ? new Date(right.created_at).getTime() : 0;
+    return rightTime - leftTime;
+  });
+}
+
 function mergeMessagesById(messages: DoctorMessage[], incoming: DoctorMessage): DoctorMessage[] {
   const next = new Map(messages.map((message) => [message.id, message]));
   next.set(incoming.id, {
     ...(next.get(incoming.id) ?? {}),
     ...incoming,
   });
-  return Array.from(next.values()).sort((left, right) => {
-    const leftTime = left.created_at ? new Date(left.created_at).getTime() : 0;
-    const rightTime = right.created_at ? new Date(right.created_at).getTime() : 0;
-    return leftTime - rightTime;
-  });
+  return sortMessagesNewestFirst(Array.from(next.values()));
 }
 
 export default function DoctorConsultationDetailPage() {
@@ -66,7 +70,7 @@ export default function DoctorConsultationDetailPage() {
     setMessagesError(null);
     try {
       const data = await getConsultationMessages(consultationId);
-      setMessages(data);
+      setMessages(sortMessagesNewestFirst(data));
       await markConsultationMessagesRead(consultationId);
     } catch {
       setMessagesError(t.patient.noDataDescription);
@@ -109,8 +113,8 @@ export default function DoctorConsultationDetailPage() {
     void loadDetail();
   }, [loadDetail]);
 
-  async function handleSendMessage(body: string, attachments: File[]) {
-    const createdMessage = await sendConsultationMessage(params.id, { body, attachments });
+  async function handleSendMessage(body: string) {
+    const createdMessage = await sendConsultationMessage(params.id, { body, attachments: [] });
     setMessages((current) => mergeMessagesById(current, createdMessage));
     void markConsultationMessagesRead(params.id);
   }

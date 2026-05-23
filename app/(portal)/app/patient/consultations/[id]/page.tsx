@@ -23,17 +23,21 @@ import {
 } from "@/lib/patient/patientService";
 import type { ConsultationDetail, ConsultationMessage } from "@/types/patient";
 
+function sortMessagesNewestFirst(messages: ConsultationMessage[]): ConsultationMessage[] {
+  return [...messages].sort((left, right) => {
+    const leftTime = left.created_at ? new Date(left.created_at).getTime() : 0;
+    const rightTime = right.created_at ? new Date(right.created_at).getTime() : 0;
+    return rightTime - leftTime;
+  });
+}
+
 function mergeMessagesById(messages: ConsultationMessage[], incoming: ConsultationMessage): ConsultationMessage[] {
   const next = new Map(messages.map((message) => [message.id, message]));
   next.set(incoming.id, {
     ...(next.get(incoming.id) ?? {}),
     ...incoming,
   });
-  return Array.from(next.values()).sort((left, right) => {
-    const leftTime = left.created_at ? new Date(left.created_at).getTime() : 0;
-    const rightTime = right.created_at ? new Date(right.created_at).getTime() : 0;
-    return leftTime - rightTime;
-  });
+  return sortMessagesNewestFirst(Array.from(next.values()));
 }
 
 export default function ConsultationDetailPage() {
@@ -62,7 +66,7 @@ export default function ConsultationDetailPage() {
     }
 
     const messageData = await getConsultationMessages(consultationId);
-    setMessages(messageData);
+    setMessages(sortMessagesNewestFirst(messageData));
     void markConsultationMessagesRead(consultationId);
   }, [consultationId, messageReadingAllowed]);
 
@@ -130,7 +134,7 @@ export default function ConsultationDetailPage() {
           if (!active) {
             return;
           }
-          setMessages(messageData);
+          setMessages(sortMessagesNewestFirst(messageData));
           void markConsultationMessagesRead(consultationId);
         } catch (err) {
           if (active) {
@@ -179,7 +183,7 @@ export default function ConsultationDetailPage() {
           if (canPatientReadMessages(consultationData.status)) {
             void getConsultationMessages(consultationId)
               .then((messageData) => {
-                setMessages(messageData);
+                setMessages(sortMessagesNewestFirst(messageData));
                 void markConsultationMessagesRead(consultationId);
               })
               .catch(() => {
@@ -207,7 +211,7 @@ export default function ConsultationDetailPage() {
       if (canPatientReadMessages(consultationData.status)) {
         try {
           const messageData = await getConsultationMessages(consultationId);
-          setMessages(messageData);
+          setMessages(sortMessagesNewestFirst(messageData));
           void markConsultationMessagesRead(consultationId);
         } catch (err) {
           setMessages([]);

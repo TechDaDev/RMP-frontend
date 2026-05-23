@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent, type KeyboardEvent } from "react";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -64,6 +64,7 @@ export function ConsultationMessagesPanel({
   onSend,
 }: ConsultationMessagesPanelProps) {
   const { t } = useAppPreferences();
+  const formRef = useRef<HTMLFormElement | null>(null);
   const [body, setBody] = useState("");
   const [attachments, setAttachments] = useState<File[]>([]);
 
@@ -72,6 +73,19 @@ export function ConsultationMessagesPanel({
     await onSend(body, attachments);
     setBody("");
     setAttachments([]);
+  }
+
+  function handleMessageKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
+    if (event.key !== "Enter") {
+      return;
+    }
+
+    if (event.ctrlKey) {
+      return;
+    }
+
+    event.preventDefault();
+    formRef.current?.requestSubmit();
   }
 
   return (
@@ -85,9 +99,9 @@ export function ConsultationMessagesPanel({
       </div>
 
       {messages.length > 0 ? (
-        <div className="space-y-3">
+        <div className="max-h-96 space-y-3 overflow-y-auto rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-3">
           {messages.map((message) => (
-            <div key={message.id} className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] px-4 py-3">
+            <div key={message.id} className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <p className="break-words text-sm font-semibold text-[var(--color-text)]">{getSenderLabel(message, t.portal.demoUser)}</p>
                 <p className="text-xs text-[var(--color-muted)]">{formatDate(message.created_at)}</p>
@@ -127,12 +141,13 @@ export function ConsultationMessagesPanel({
       {error ? <p className="text-sm font-medium text-red-600 dark:text-red-300">{error}</p> : null}
 
       {canSend ? (
-        <form className="space-y-4" onSubmit={handleSubmit} noValidate>
+        <form ref={formRef} className="space-y-4" onSubmit={handleSubmit} noValidate>
           <textarea
             className={textAreaClassName}
             rows={4}
             value={body}
             onChange={(event) => setBody(event.target.value)}
+            onKeyDown={handleMessageKeyDown}
             placeholder={t.patient.messagePlaceholder}
             disabled={sending}
           />
