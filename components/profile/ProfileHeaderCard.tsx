@@ -16,6 +16,19 @@ export function ProfileHeaderCard() {
   const fullName = user.full_name ?? `${user.first_name} ${user.last_name}`.trim();
   const profileImage = profile?.user_profile?.profile_image;
   const resolvedProfileImage = profileImage ? mediaUrl(profileImage) : null;
+  const roleLabel = effectiveRole === "financial"
+    ? "Financial"
+    : effectiveRole === "admin"
+      ? t.roles.admin
+      : user.user_type === "laboratorian"
+        ? t.roles.laboratory
+        : user.user_type === "patient"
+          ? t.roles.patient
+          : user.user_type === "doctor"
+            ? t.roles.doctor
+            : user.user_type === "pharmacist"
+              ? t.roles.pharmacist
+              : t.roles.admin;
 
   return (
     <Card className="rounded-[2rem]">
@@ -43,9 +56,7 @@ export function ProfileHeaderCard() {
             {user.is_active ? t.profile.activeAccount : t.profile.inactiveAccount}
           </Badge>
           <Badge tone="primary">
-            {effectiveRole === "admin"
-              ? t.roles.admin
-              : t.roles[user.user_type === "laboratorian" ? "laboratory" : user.user_type]}
+            {roleLabel}
           </Badge>
           {verification?.required ? (
             <Badge tone={verification.is_approved ? "success" : "primary"}>

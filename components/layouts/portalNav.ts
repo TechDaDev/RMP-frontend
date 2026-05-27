@@ -61,6 +61,20 @@ export function getPortalNavItems(userType: string | undefined | null, t: Transl
         { href: "/app/admin/knowledge-base", label: t.admin.knowledgeBaseTitle, icon: FileTextIcon },
         { href: "/app/admin/rag-feedback", label: t.admin.ragFeedbackTitle, icon: ShieldIcon },
         { href: "/app/admin/verifications", label: t.admin.verificationReviewTitle, icon: ShieldIcon },
+        { href: "/app/financial", label: "Finance Dashboard", icon: GridIcon },
+        { href: "/app/financial/wallet-transactions", label: "Wallet Transactions", icon: FileTextIcon },
+        { href: "/app/financial/payment-intents", label: "Payment Intents", icon: FileTextIcon },
+        { href: "/app/financial/manual-recharge", label: "Manual Recharge", icon: ShieldIcon },
+        { href: "/app/financial/provider-earnings", label: "Provider Earnings", icon: FileTextIcon },
+        { href: "/app/profile", label: t.portal.profile, icon: UserIcon, exact: true },
+      ];
+    case "financial":
+      return [
+        { href: "/app/financial", label: "Finance Dashboard", icon: GridIcon, exact: true },
+        { href: "/app/financial/wallet-transactions", label: "Wallet Transactions", icon: FileTextIcon },
+        { href: "/app/financial/payment-intents", label: "Payment Intents", icon: FileTextIcon },
+        { href: "/app/financial/manual-recharge", label: "Manual Recharge", icon: ShieldIcon },
+        { href: "/app/financial/provider-earnings", label: "Provider Earnings", icon: FileTextIcon },
         { href: "/app/profile", label: t.portal.profile, icon: UserIcon, exact: true },
       ];
     default:

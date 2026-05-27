@@ -17,6 +17,7 @@ import {
   getCurrentProfileService,
 } from "@/lib/auth/authService";
 import { getAccessToken, clearTokens } from "@/lib/auth/tokenStorage";
+import { resolveEffectiveRole, type EffectiveRole } from "@/lib/auth/roleHelpers";
 import type {
   BackendUser,
   ProfileCompletion,
@@ -44,7 +45,7 @@ interface AuthContextValue extends AuthState {
   refreshProfile: () => Promise<void>;
   updateProfileStateAfterSave: (updatedProfile: ProfilesMeResponse) => void;
   isAuthenticated: boolean;
-  effectiveRole: string | null;
+  effectiveRole: EffectiveRole;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -158,7 +159,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       refreshProfile: loadProfile,
       updateProfileStateAfterSave,
       isAuthenticated: state.user !== null,
-      effectiveRole: state.adminAccess ? "admin" : state.user?.user_type ?? null,
+      effectiveRole: resolveEffectiveRole({
+        user: state.user,
+        profile: state.profile,
+        adminAccess: state.adminAccess,
+      }),
     }),
     [state, login, logout, loadProfile, updateProfileStateAfterSave],
   );

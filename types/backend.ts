@@ -3,7 +3,15 @@ export type BackendUserType =
   | "doctor"
   | "pharmacist"
   | "laboratorian"
+  | "staff"
   | "admin";
+
+export interface StaffProfileData {
+  id?: string;
+  staff_role?: string | null;
+  title?: string | null;
+  department?: string | null;
+}
 
 export type VerificationStatus =
   | "not_required"
@@ -22,6 +30,8 @@ export interface BackendUser {
   full_name?: string;
   profile_image?: string | null;
   user_type: BackendUserType;
+  staff_role?: string | null;
+  staff_profile?: StaffProfileData | null;
   is_active: boolean;
   date_joined?: string;
 }
@@ -234,6 +244,7 @@ export interface ProfilesMeResponse {
     | DoctorProfileData
     | PharmacistProfileData
     | LaboratorianProfileData
+    | StaffProfileData
     | null;
   completion: ProfileCompletion;
   verification: ProfileVerification;

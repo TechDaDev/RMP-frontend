@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useMemo, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { AppLoading } from "@/components/ui/AppLoading";
+import { getDashboardRoute } from "@/lib/auth/roleHelpers";
 
 /** Maps user_type → their canonical dashboard route. */
 const roleRouteMap: Record<string, string> = {
@@ -12,11 +13,13 @@ const roleRouteMap: Record<string, string> = {
   pharmacist: "/app/pharmacist",
   laboratorian: "/app/lab",
   admin: "/app/admin",
+  financial: "/app/financial",
 };
 
 interface RequireRoleProps {
   /** The user_type that is allowed to view this page. */
-  role: string;
+  role?: string;
+  roles?: string[];
   children: ReactNode;
 }
 
@@ -29,23 +32,24 @@ interface RequireRoleProps {
  * RequireAuth, so this component can assume the user is authenticated once
  * loading is false).
  */
-export function RequireRole({ role, children }: RequireRoleProps) {
+export function RequireRole({ role, roles, children }: RequireRoleProps) {
   const { effectiveRole, loading } = useAuth();
   const router = useRouter();
+  const allowedRoles = useMemo(() => roles ?? (role ? [role] : []), [role, roles]);
 
   useEffect(() => {
-    if (!loading && effectiveRole && effectiveRole !== role) {
-      const correctRoute = roleRouteMap[effectiveRole] ?? "/app";
+    if (!loading && effectiveRole && allowedRoles.length > 0 && !allowedRoles.includes(effectiveRole)) {
+      const correctRoute = roleRouteMap[effectiveRole] ?? getDashboardRoute(effectiveRole);
       router.replace(correctRoute);
     }
-  }, [effectiveRole, loading, role, router]);
+  }, [allowedRoles, effectiveRole, loading, router]);
 
   if (loading) {
     return <AppLoading />;
   }
 
   // While redirect is pending or user is null (handled by RequireAuth above)
-  if (!effectiveRole || effectiveRole !== role) {
+  if (!effectiveRole || (allowedRoles.length > 0 && !allowedRoles.includes(effectiveRole))) {
     return null;
   }
 

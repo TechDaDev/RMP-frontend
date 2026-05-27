@@ -3,4 +3,5 @@ export type UserRole =
   | "doctor"
   | "pharmacist"
   | "laboratory"
+  | "financial"
   | "admin";

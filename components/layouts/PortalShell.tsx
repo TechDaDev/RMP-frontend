@@ -21,6 +21,7 @@ function activeRoleFromPath(pathname: string): UserRole | undefined {
   if (pathname.startsWith("/app/doctor")) return "doctor";
   if (pathname.startsWith("/app/pharmacist")) return "pharmacist";
   if (pathname.startsWith("/app/lab")) return "laboratory";
+  if (pathname.startsWith("/app/financial")) return "financial";
   if (pathname.startsWith("/app/admin")) return "admin";
   return undefined;
 }

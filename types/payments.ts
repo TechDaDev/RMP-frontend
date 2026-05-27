@@ -28,6 +28,12 @@ export interface WalletTransaction {
   status?: string;
   service_type?: ServiceType | string;
   reference_id?: string | null;
+  payment_intent?: string | null;
+  provider_transaction_id?: string | null;
+  external_reference?: string | null;
+  created_by?: string | null;
+  updated_at?: string;
+  notes?: string | null;
   created_at?: string;
   description?: string | null;
 }
@@ -36,12 +42,19 @@ export interface PaymentIntent {
   id: string;
   service_type: ServiceType | string;
   reference_id?: string | null;
+  provider_id?: string | null;
+  patient_id?: string | null;
   amount?: string;
   currency?: string;
   payment_method?: string;
   status?: PaymentStatus | string;
+  provider_transaction_id?: string | null;
+  external_reference?: string | null;
+  source?: string | null;
+  notes?: string | null;
   client_message?: string | null;
   created_at?: string;
+  updated_at?: string;
   paid_at?: string | null;
 }
 
@@ -53,8 +66,10 @@ export interface PaymentIntentCreateRequest {
 }
 
 export interface AdminManualRechargeRequest {
-  user_id: string;
+  user?: string;
+  user_id?: string;
   amount: string | number;
   currency?: string;
+  description?: string;
   note?: string;
 }

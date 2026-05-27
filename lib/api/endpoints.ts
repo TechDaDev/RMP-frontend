@@ -155,6 +155,7 @@ export const API_ENDPOINTS = {
     walletTransactions: "/api/payments/wallet/transactions/",
     adminManualRecharge: "/api/payments/admin/manual-recharge/",
     intents: "/api/payments/intents/",
+    intentDetail: (id: string) => `/api/payments/intents/${id}/`,
     payWallet: (id: string) => `/api/payments/intents/${id}/pay-wallet/`,
   },
   patientRecords: {

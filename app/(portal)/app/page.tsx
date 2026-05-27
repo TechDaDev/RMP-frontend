@@ -16,6 +16,7 @@ const roleRouteMap: Record<string, string> = {
   doctor: "/app/doctor",
   pharmacist: "/app/pharmacist",
   laboratorian: "/app/lab",
+  financial: "/app/financial",
   admin: "/app/admin",
 };
 

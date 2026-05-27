@@ -96,6 +96,21 @@ export const roleMetadata: Record<UserRole, RoleMetadata> = {
     },
     Icon: ShieldIcon,
   },
+  financial: {
+    key: "financial",
+    labels: {
+      ar: "المالية",
+      ku: "دارایی",
+      en: "Financial",
+    },
+    defaultRoute: "/app/financial",
+    description: {
+      ar: "متابعة عمليات الدفع وشحن المحافظ ومراجعة الحركات المالية.",
+      ku: "بەدواداچوونی پارەدان و زیادکردنی کیف و پشکنینی جوڵەی دارایی.",
+      en: "Review payments, wallet recharges, and finance operations.",
+    },
+    Icon: ShieldIcon,
+  },
 };
 
 export const portalRoles: UserRole[] = [
@@ -103,6 +118,7 @@ export const portalRoles: UserRole[] = [
   "doctor",
   "pharmacist",
   "laboratory",
+  "financial",
   "admin",
 ];
 

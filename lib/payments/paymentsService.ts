@@ -101,6 +101,26 @@ export async function createPaymentIntent(payload: PaymentIntentCreateRequest): 
   return unwrapData(response);
 }
 
+export async function getPaymentIntents(params?: QueryParams): Promise<PaymentIntent[]> {
+  const response = await apiRequest<ListResponse<PaymentIntent> | ApiEnvelope<ListResponse<PaymentIntent>>>(
+    withQuery(API_ENDPOINTS.payments.intents, params),
+    {
+      auth: true,
+    },
+  );
+
+  return normalizeList(unwrapData(response));
+}
+
+export async function getPaymentIntentDetail(id: string): Promise<PaymentIntent> {
+  const response = await apiRequest<PaymentIntent | ApiEnvelope<PaymentIntent>>(API_ENDPOINTS.payments.intentDetail(id), {
+    auth: true,
+    method: "GET",
+  });
+
+  return unwrapData(response);
+}
+
 export async function payIntentWithWallet(id: string): Promise<PaymentIntent> {
   const response = await apiRequest<PaymentIntent | ApiEnvelope<PaymentIntent>>(API_ENDPOINTS.payments.payWallet(id), {
     auth: true,
@@ -111,11 +131,18 @@ export async function payIntentWithWallet(id: string): Promise<PaymentIntent> {
 }
 
 export async function adminManualRecharge(payload: AdminManualRechargeRequest): Promise<WalletTransaction> {
+  const normalizedPayload = {
+    user: payload.user ?? payload.user_id,
+    amount: payload.amount,
+    currency: payload.currency,
+    description: payload.description ?? payload.note,
+  };
+
   const response = await apiRequest<WalletTransaction | ApiEnvelope<WalletTransaction>>(
     API_ENDPOINTS.payments.adminManualRecharge,
     {
       auth: true,
-      body: payload,
+      body: normalizedPayload,
     },
   );
 
