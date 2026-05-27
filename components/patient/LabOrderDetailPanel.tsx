@@ -2,6 +2,7 @@
 
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
+import { PaymentStatusBadge } from "@/components/payments/PaymentStatusBadge";
 import { PatientQrCode } from "@/components/patient/PatientQrCode";
 import { PatientInfoRow } from "@/components/patient/ui/PatientInfoRow";
 import { Badge } from "@/components/ui/Badge";
@@ -61,6 +62,7 @@ export function LabOrderDetailPanel({ order }: LabOrderDetailPanelProps) {
         <PatientInfoRow label={t.patient.issuedAt} value={formatDate(order.issued_at)} />
         <PatientInfoRow label={t.patient.expiresAt} value={formatDate(order.expires_at)} />
       </DashboardGrid>
+      <PatientInfoRow label="Payment" value={<PaymentStatusBadge status={order.payment_status} />} muted />
       <DashboardGrid columns="two">
         <PatientInfoRow
           label={t.patient.qrToken}

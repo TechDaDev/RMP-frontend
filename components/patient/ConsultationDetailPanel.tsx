@@ -3,6 +3,8 @@
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
 import { ConsultationStatusBadge } from "@/components/patient/ConsultationStatusBadge";
+import { PriceDisplay } from "@/components/common/PriceDisplay";
+import { PaymentStatusBadge } from "@/components/payments/PaymentStatusBadge";
 import { PatientInfoRow } from "@/components/patient/ui/PatientInfoRow";
 import { Card } from "@/components/ui/Card";
 import { getConsultationLifecycle } from "@/lib/patient/consultationStatus";
@@ -83,6 +85,15 @@ export function ConsultationDetailPanel({ consultation }: ConsultationDetailPane
         <PatientInfoRow label={t.patient.status} value={t.patient.statusLabels[consultation.status] ?? consultation.status} />
         <PatientInfoRow label={t.patient.recommendedSpecialty} value={formatSpecialty(consultation.recommended_specialty)} />
         <PatientInfoRow label={t.patient.selectedSpecialty} value={formatSpecialty(consultation.selected_specialty)} />
+      </DashboardGrid>
+
+      <DashboardGrid columns="three">
+        <PatientInfoRow
+          label="Consultation fee"
+          value={<PriceDisplay amount={consultation.consultation_fee} currency={consultation.consultation_currency} />}
+        />
+        <PatientInfoRow label="Fee snapshot at" value={formatDate(consultation.fee_snapshot_at)} />
+        <PatientInfoRow label="Payment status" value={<PaymentStatusBadge status={consultation.payment_status} />} />
       </DashboardGrid>
 
       <DashboardGrid columns="three">

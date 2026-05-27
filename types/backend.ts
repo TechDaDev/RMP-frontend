@@ -113,6 +113,8 @@ export interface DoctorProfileData {
   years_of_experience: number | null;
   bio: string;
   work_address: string;
+  consultation_fee?: string | null;
+  consultation_currency?: string | null;
   verification_status: string;
   verified_at: string | null;
   verification_notes: string;
@@ -199,6 +201,8 @@ export interface UpdateDoctorProfileRequest {
   years_of_experience?: number | null;
   bio?: string;
   work_address?: string;
+  consultation_fee?: string | number | null;
+  consultation_currency?: string;
 }
 
 export interface UpdatePharmacistProfileRequest {

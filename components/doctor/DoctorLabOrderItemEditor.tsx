@@ -1,6 +1,7 @@
 "use client";
 
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
+import { LabTestAutocomplete } from "@/components/catalog/LabTestAutocomplete";
 import { Button } from "@/components/ui/Button";
 import type { CreateDoctorLabOrderItemRequest } from "@/types/doctor";
 
@@ -9,18 +10,6 @@ const fieldClassName =
 
 const textAreaClassName =
   "w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-text)] outline-none transition placeholder:text-[var(--color-muted)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[color:color-mix(in_srgb,var(--color-primary)_18%,transparent)]";
-
-const CATEGORIES = [
-  "hematology",
-  "biochemistry",
-  "microbiology",
-  "immunology",
-  "pathology",
-  "endocrinology",
-  "genetics",
-  "urinalysis",
-  "other",
-] as const;
 
 export type DoctorLabOrderItemDraft = CreateDoctorLabOrderItemRequest;
 
@@ -62,46 +51,54 @@ export function DoctorLabOrderItemEditor({
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <label className="block space-y-2">
-          <span className="text-sm font-semibold text-[var(--color-text)]">{t.doctor.testName}</span>
-          <input
-            className={fieldClassName}
-            value={item.test_name ?? ""}
-            onChange={(event) => updateField("test_name", event.target.value)}
-            required
+        <div className="md:col-span-2">
+          <LabTestAutocomplete
+            value={item.custom_test_name ?? item.test_name ?? ""}
+            selectedTestId={item.lab_test}
+            onSelectTest={(selected) => {
+              onChange({
+                ...item,
+                lab_test: selected?.id,
+                custom_test_name: selected ? "" : item.custom_test_name,
+                test_name: selected ? "" : item.test_name,
+              });
+            }}
+            onCustomTestNameChange={(value) => {
+              updateField("custom_test_name", value);
+              updateField("test_name", value);
+            }}
+            label={t.doctor.testName}
           />
+          {errors?.custom_test_name ? (
+            <p className="text-xs font-medium text-red-600 dark:text-red-300">{errors.custom_test_name}</p>
+          ) : null}
           {errors?.test_name ? (
             <p className="text-xs font-medium text-red-600 dark:text-red-300">{errors.test_name}</p>
           ) : null}
-        </label>
+        </div>
 
         <label className="block space-y-2">
-          <span className="text-sm font-semibold text-[var(--color-text)]">{t.doctor.testCategory}</span>
+          <span className="text-sm font-semibold text-[var(--color-text)]">Priority</span>
           <select
             className={fieldClassName}
-            value={item.category ?? ""}
-            onChange={(event) => updateField("category", event.target.value)}
-            required
+            value={item.priority ?? "routine"}
+            onChange={(event) => updateField("priority", event.target.value)}
           >
-            <option value="">{t.doctor.testCategory}</option>
-            {CATEGORIES.map((category) => (
-              <option key={category} value={category}>
-                {category}
-              </option>
-            ))}
+            <option value="routine">routine</option>
+            <option value="urgent">urgent</option>
           </select>
-          {errors?.category ? (
-            <p className="text-xs font-medium text-red-600 dark:text-red-300">{errors.category}</p>
+          {errors?.priority ? (
+            <p className="text-xs font-medium text-red-600 dark:text-red-300">{errors.priority}</p>
           ) : null}
         </label>
 
         <label className="block space-y-2">
-          <span className="text-sm font-semibold text-[var(--color-text)]">{t.doctor.testCode}</span>
+          <span className="text-sm font-semibold text-[var(--color-text)]">Legacy test code</span>
           <input
             className={fieldClassName}
             value={item.test ?? ""}
             onChange={(event) => updateField("test", event.target.value)}
-            placeholder={t.doctor.testCode}
+            placeholder="Optional legacy code"
           />
         </label>
 
@@ -115,12 +112,15 @@ export function DoctorLabOrderItemEditor({
         </label>
 
         <label className="block space-y-2 md:col-span-2">
-          <span className="text-sm font-semibold text-[var(--color-text)]">{t.doctor.testInstructions}</span>
+          <span className="text-sm font-semibold text-[var(--color-text)]">Notes</span>
           <textarea
             className={textAreaClassName}
             rows={3}
-            value={item.instructions ?? ""}
-            onChange={(event) => updateField("instructions", event.target.value)}
+            value={item.notes ?? item.instructions ?? ""}
+            onChange={(event) => {
+              updateField("notes", event.target.value);
+              updateField("instructions", event.target.value);
+            }}
           />
         </label>
       </div>

@@ -5,7 +5,7 @@ import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
 import { DoctorInfoRow } from "@/components/doctor/ui/DoctorInfoRow";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
-import type { DoctorPrescriptionDetail } from "@/types/doctor";
+import type { DoctorPrescriptionDetail, DoctorPrescriptionItem } from "@/types/doctor";
 
 function formatDate(value?: string | null) {
   if (!value) {
@@ -16,6 +16,17 @@ function formatDate(value?: string | null) {
 
 interface DoctorPrescriptionDetailPanelProps {
   prescription: DoctorPrescriptionDetail;
+}
+
+function getDrugDisplayName(item: DoctorPrescriptionItem) {
+  return (
+    item.display_drug_name
+    || item.drug_detail?.display_name
+    || item.custom_drug_name
+    || item.medication_name
+    || item.drug_name
+    || "-"
+  );
 }
 
 export function DoctorPrescriptionDetailPanel({ prescription }: DoctorPrescriptionDetailPanelProps) {
@@ -47,15 +58,22 @@ export function DoctorPrescriptionDetailPanel({ prescription }: DoctorPrescripti
         {prescription.items?.length ? (
           <div className="space-y-3">
             {prescription.items.map((item, index) => (
-              <div key={item.id ?? `${item.medication_name}-${index}`} className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-4">
+              <div key={item.id ?? `${getDrugDisplayName(item)}-${index}`} className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-4">
                 <DashboardGrid columns="three">
-                  <DoctorInfoRow label={t.doctor.medicationName} value={item.medication_name || "-"} />
+                  <DoctorInfoRow label={t.doctor.medicationName} value={getDrugDisplayName(item)} />
                   <DoctorInfoRow label={t.doctor.dosage} value={item.dosage || "-"} muted />
                   <DoctorInfoRow label={t.doctor.frequency} value={item.frequency || "-"} muted />
                   <DoctorInfoRow label={t.doctor.duration} value={item.duration || "-"} muted />
                   <DoctorInfoRow label={t.doctor.quantity} value={item.quantity || "-"} muted />
                   <DoctorInfoRow label={t.doctor.prescriptionStatus} value={item.status || "-"} muted />
                 </DashboardGrid>
+                {item.drug_detail ? (
+                  <DashboardGrid columns="three" className="mt-3">
+                    <DoctorInfoRow label="Catalog name" value={item.drug_detail.display_name || "-"} muted />
+                    <DoctorInfoRow label="Form" value={item.drug_detail.form || "-"} muted />
+                    <DoctorInfoRow label="Route" value={item.drug_detail.route || "-"} muted />
+                  </DashboardGrid>
+                ) : null}
                 <DashboardGrid columns="two" className="mt-3">
                   <DoctorInfoRow label={t.doctor.instructions} value={item.instructions || "-"} muted />
                   <DoctorInfoRow label={t.doctor.route} value={item.route ? ((t.doctor[`route${item.route.charAt(0).toUpperCase()}${item.route.slice(1)}` as keyof typeof t.doctor] as string) ?? item.route) : "-"} muted />

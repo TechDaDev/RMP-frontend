@@ -1,7 +1,9 @@
 "use client";
 
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
+import { DrugAutocomplete } from "@/components/catalog/DrugAutocomplete";
 import { Button } from "@/components/ui/Button";
+import type { DrugCatalogItem } from "@/types/catalog";
 import type { DoctorPrescriptionItemCreateRequest, MedicationRoute } from "@/types/doctor";
 
 const fieldClassName =
@@ -22,7 +24,9 @@ const ROUTES: MedicationRoute[] = [
   "other",
 ];
 
-export type PrescriptionItemDraft = Omit<DoctorPrescriptionItemCreateRequest, "route"> & { route: MedicationRoute | "" };
+export type PrescriptionItemDraft = Omit<DoctorPrescriptionItemCreateRequest, "route"> & {
+  route: MedicationRoute | "";
+};
 
 interface DoctorPrescriptionItemEditorProps {
   index: number;
@@ -47,6 +51,16 @@ export function DoctorPrescriptionItemEditor({
     onChange({ ...item, [field]: value });
   }
 
+  function handleDrugSelect(drug: DrugCatalogItem | null) {
+    onChange({
+      ...item,
+      drug: drug?.id,
+      custom_drug_name: drug ? "" : item.custom_drug_name,
+      medication_name: drug ? "" : item.medication_name,
+      drug_name: drug ? "" : item.drug_name,
+    });
+  }
+
   return (
     <div className="space-y-4 rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -59,16 +73,20 @@ export function DoctorPrescriptionItemEditor({
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <label className="block space-y-2">
-          <span className="text-sm font-semibold text-[var(--color-text)]">{t.doctor.medicationName}</span>
-          <input
-            className={fieldClassName}
-            value={item.medication_name}
-            onChange={(event) => updateField("medication_name", event.target.value)}
-            required
+        <div className="md:col-span-2">
+          <DrugAutocomplete
+            value={item.custom_drug_name ?? item.medication_name ?? item.drug_name ?? ""}
+            selectedDrugId={item.drug}
+            onSelectDrug={handleDrugSelect}
+            onCustomDrugNameChange={(value) => {
+              updateField("custom_drug_name", value);
+              updateField("medication_name", value);
+            }}
+            label={t.doctor.medicationName}
           />
+          {errors?.custom_drug_name ? <p className="text-xs font-medium text-red-600 dark:text-red-300">{errors.custom_drug_name}</p> : null}
           {errors?.medication_name ? <p className="text-xs font-medium text-red-600 dark:text-red-300">{errors.medication_name}</p> : null}
-        </label>
+        </div>
 
         <label className="block space-y-2">
           <span className="text-sm font-semibold text-[var(--color-text)]">{t.doctor.dosage}</span>

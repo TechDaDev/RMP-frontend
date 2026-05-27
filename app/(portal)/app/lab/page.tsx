@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
@@ -99,6 +100,20 @@ export default function LaboratoryPortalPage() {
             <DashboardGrid columns="two">
               <LaboratoryWorkflowCard />
               <LaboratoryPrivacyNotice />
+              <div className="rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-[var(--card-shadow)]">
+                <h3 className="text-base font-semibold text-[var(--color-text)]">Offerings</h3>
+                <p className="mt-1 text-sm text-[var(--color-muted)]">Manage catalog-based and custom lab offerings.</p>
+                <Link href="/app/lab/offerings" className="mt-3 inline-flex rounded-2xl border border-[var(--color-border)] px-4 py-2 text-sm font-semibold text-[var(--color-text)]">
+                  Open offerings
+                </Link>
+              </div>
+              <div className="rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-[var(--card-shadow)]">
+                <h3 className="text-base font-semibold text-[var(--color-text)]">Lab requests</h3>
+                <p className="mt-1 text-sm text-[var(--color-muted)]">Quote and manage service requests.</p>
+                <Link href="/app/lab/requests" className="mt-3 inline-flex rounded-2xl border border-[var(--color-border)] px-4 py-2 text-sm font-semibold text-[var(--color-text)]">
+                  Open requests
+                </Link>
+              </div>
             </DashboardGrid>
           </DashboardSection>
           <DashboardSection title={t.laboratory.testCatalogPreview} description={t.laboratory.workflowStartsWithQr}>

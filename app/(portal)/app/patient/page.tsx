@@ -102,6 +102,27 @@ export default function PatientPortalPage() {
       icon: <LabIcon size={20} />,
     },
     {
+      title: "Lab service requests",
+      description: "Review lab quotes and payments",
+      href: "/app/patient/lab-requests",
+      ctaLabel: "View lab requests",
+      icon: <LabIcon size={20} />,
+    },
+    {
+      title: "Pharmacy service requests",
+      description: "Review pharmacy quotes and payments",
+      href: "/app/patient/pharmacy-requests",
+      ctaLabel: "View pharmacy requests",
+      icon: <PrescriptionIcon size={20} />,
+    },
+    {
+      title: "Wallet",
+      description: "View balance and transactions",
+      href: "/app/patient/wallet",
+      ctaLabel: "Open wallet",
+      icon: <FileTextIcon size={20} />,
+    },
+    {
       title: t.patient.viewMedicalRecord,
       description: t.patient.medicalRecordSubtitle,
       href: "/app/patient/medical-record",

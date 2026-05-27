@@ -2,6 +2,7 @@
 
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
+import { PaymentStatusBadge } from "@/components/payments/PaymentStatusBadge";
 import { PatientQrCode } from "@/components/patient/PatientQrCode";
 import { PatientInfoRow } from "@/components/patient/ui/PatientInfoRow";
 import { Badge } from "@/components/ui/Badge";
@@ -34,6 +35,7 @@ export function PrescriptionDetailPanel({ prescription }: PrescriptionDetailPane
         <PatientInfoRow label={t.patient.issuedAt} value={formatDate(prescription.issued_at)} />
         <PatientInfoRow label={t.patient.expiresAt} value={formatDate(prescription.expires_at)} />
       </DashboardGrid>
+      <PatientInfoRow label="Payment" value={<PaymentStatusBadge status={prescription.payment_status} />} muted />
       <PatientInfoRow
         label={t.patient.qrToken}
         value={<PatientQrCode token={prescription.qr_token} imageUrl={prescription.qr_url} alt={t.patient.qrToken} />}

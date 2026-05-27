@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { DashboardStateCard } from "@/components/dashboard/DashboardStateCard";
+import { PaymentIntentCheckout } from "@/components/payments/PaymentIntentCheckout";
+import { PaymentStatusBadge } from "@/components/payments/PaymentStatusBadge";
 import { Button, buttonClassName } from "@/components/ui/Button";
 import { ConsultationDetailPanel } from "@/components/patient/ConsultationDetailPanel";
 import { ConsultationLifecycleCard } from "@/components/patient/ConsultationLifecycleCard";
@@ -96,6 +98,13 @@ export default function ConsultationDetailPage() {
       default: return t.patient.messagingPermissionDenied;
     }
   }, [messagingAllowed, lifecycle, t.patient.messagingPending, t.patient.messagingClosed, t.patient.messagingCancelled, t.patient.messagingPermissionDenied]);
+
+  const canConsultationBePaid = consultation
+    ? ["accepted", "doctor_responded", "closed"].includes(consultation.status)
+    : false;
+  const showPayButton = consultation
+    ? canConsultationBePaid && ["unpaid", "failed"].includes((consultation.payment_status ?? "unpaid").toLowerCase())
+    : false;
 
   useEffect(() => {
     let active = true;
@@ -326,6 +335,25 @@ export default function ConsultationDetailPage() {
       />
 
       <ConsultationDetailPanel consultation={consultation} />
+      <div className="rounded-3xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5 shadow-[var(--card-shadow)]">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h3 className="text-base font-semibold text-[var(--color-text)]">Consultation payment</h3>
+          <PaymentStatusBadge status={consultation.payment_status} />
+        </div>
+        <p className="mt-2 text-sm text-[var(--color-muted)]">
+          Consultation fee is fixed from the acceptance snapshot and resolved by backend.
+        </p>
+        {showPayButton ? (
+          <div className="mt-3">
+            <PaymentIntentCheckout
+              serviceType="consultation"
+              referenceId={consultation.id}
+              disabled={!showPayButton}
+              onSuccess={handleRefresh}
+            />
+          </div>
+        ) : null}
+      </div>
       <ConsultationLifecycleCard status={status} />
       <ConsultationMessagesPanel
         canSend={messagingAllowed}

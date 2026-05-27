@@ -85,6 +85,26 @@ export default function PharmacistPortalPage() {
       href: hasHistoryEndpoint && canStartWorkflow ? "/app/pharmacist/history" : undefined,
       disabled: !hasHistoryEndpoint || !canStartWorkflow,
     },
+    {
+      title: "Inventory",
+      subtitle: "Manage catalog and custom stock",
+      status: t.common.liveBadge,
+      statusTone: "primary",
+      actionLabel: "Open inventory",
+      icon: PharmacyIcon,
+      href: "/app/pharmacist/inventory",
+      disabled: !canStartWorkflow,
+    },
+    {
+      title: "Request quotes",
+      subtitle: "Quote prescription requests",
+      status: t.common.liveBadge,
+      statusTone: "primary",
+      actionLabel: "Open requests",
+      icon: FileTextIcon,
+      href: "/app/pharmacist/requests",
+      disabled: !canStartWorkflow,
+    },
   ];
 
   return (

@@ -1,4 +1,5 @@
 import type { PaginatedResponse } from "@/types/api";
+import type { PaymentIntent, PaymentStatus } from "@/types/payments";
 
 export type ConsultationStatus =
   | "submitted"
@@ -113,6 +114,14 @@ export interface ConsultationListItem {
   updated_at?: string;
   accepted_at?: string | null;
   closed_at?: string | null;
+  consultation_fee?: string | null;
+  consultation_currency?: string | null;
+  fee_snapshot_at?: string | null;
+  payment_status?: PaymentStatus | string;
+  payment_intent?: string | PaymentIntent | null;
+  paid_at?: string | null;
+  payment_failed_at?: string | null;
+  refunded_at?: string | null;
 }
 
 export interface ConsultationResponse {
@@ -180,6 +189,11 @@ export interface PatientPrescriptionListItem {
   issued_at?: string;
   expires_at?: string | null;
   fully_dispensed_at?: string | null;
+  payment_status?: PaymentStatus | string;
+  payment_intent?: string | PaymentIntent | null;
+  paid_at?: string | null;
+  payment_failed_at?: string | null;
+  refunded_at?: string | null;
 }
 
 export type PatientPrescriptionDetail = PatientPrescriptionListItem;
@@ -196,6 +210,11 @@ export interface PatientLabOrderListItem {
   expires_at?: string | null;
   fully_completed_at?: string | null;
   guidance?: string;
+  payment_status?: PaymentStatus | string;
+  payment_intent?: string | PaymentIntent | null;
+  paid_at?: string | null;
+  payment_failed_at?: string | null;
+  refunded_at?: string | null;
 }
 
 export type PatientLabOrderDetail = PatientLabOrderListItem;

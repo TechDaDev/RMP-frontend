@@ -26,6 +26,8 @@ export function DoctorProfileForm({ profile }: DoctorProfileFormProps) {
   const [yearsOfExperience, setYearsOfExperience] = useState("");
   const [bio, setBio] = useState("");
   const [workAddress, setWorkAddress] = useState("");
+  const [consultationFee, setConsultationFee] = useState("");
+  const [consultationCurrency, setConsultationCurrency] = useState("IQD");
   const [licenseImage, setLicenseImage] = useState<File | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const [saving, setSaving] = useState(false);
@@ -46,6 +48,8 @@ export function DoctorProfileForm({ profile }: DoctorProfileFormProps) {
     );
     setBio(profile?.bio ?? "");
     setWorkAddress(profile?.work_address ?? "");
+    setConsultationFee(profile?.consultation_fee ? String(profile.consultation_fee) : "");
+    setConsultationCurrency(profile?.consultation_currency ?? "IQD");
     setLicenseImage(null);
   }, [profile]);
 
@@ -69,6 +73,8 @@ export function DoctorProfileForm({ profile }: DoctorProfileFormProps) {
         years_of_experience: yearsOfExperience ? Number(yearsOfExperience) : null,
         bio,
         work_address: workAddress,
+        consultation_fee: consultationFee ? consultationFee : null,
+        consultation_currency: consultationCurrency,
       });
       await refreshProfile();
       setSuccessMessage(t.profile.savedSuccessfully);
@@ -146,6 +152,23 @@ export function DoctorProfileForm({ profile }: DoctorProfileFormProps) {
           value={yearsOfExperience}
           onChange={(event) => setYearsOfExperience(event.target.value)}
           errorText={fieldErrors.years_of_experience?.[0]}
+        />
+        <Input
+          id="doctor-consultation-fee"
+          name="consultation_fee"
+          type="number"
+          label="Consultation fee"
+          value={consultationFee}
+          onChange={(event) => setConsultationFee(event.target.value)}
+          errorText={fieldErrors.consultation_fee?.[0]}
+        />
+        <Input
+          id="doctor-consultation-currency"
+          name="consultation_currency"
+          label="Consultation currency"
+          value={consultationCurrency}
+          onChange={(event) => setConsultationCurrency(event.target.value)}
+          errorText={fieldErrors.consultation_currency?.[0]}
         />
 
         <label className="block space-y-2" htmlFor="doctor-bio">

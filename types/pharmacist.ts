@@ -1,3 +1,6 @@
+import type { DrugCatalogItem } from "@/types/catalog";
+import type { PaymentIntent, PaymentStatus } from "@/types/payments";
+
 /**
  * Pharmacist Portal Types
  *
@@ -47,6 +50,10 @@ export interface PharmacistPrescriptionScanRequest {
  */
 export interface PharmacistPrescriptionItem {
   id: string;
+  drug?: string | DrugCatalogItem | null;
+  custom_drug_name?: string | null;
+  display_drug_name?: string | null;
+  drug_name?: string | null;
   medication_name?: string;
   strength?: string | null;
   dosage?: string | null;
@@ -83,6 +90,11 @@ export interface PharmacistPrescriptionDetail {
   qr_token?: string;
   created_at?: string;
   updated_at?: string;
+  payment_status?: PaymentStatus | string;
+  payment_intent?: string | PaymentIntent | null;
+  paid_at?: string | null;
+  payment_failed_at?: string | null;
+  refunded_at?: string | null;
 }
 
 /**
@@ -256,4 +268,79 @@ export interface PharmacistDispensingHistoryResponse {
   next: string | null;
   previous: string | null;
   results: PharmacistDispensingHistoryItem[];
+}
+
+export interface PharmacyInventoryItem {
+  id: string;
+  drug?: string | DrugCatalogItem | null;
+  custom_drug_name?: string | null;
+  display_name?: string | null;
+  brand_name?: string | null;
+  form?: string | null;
+  strength?: string | null;
+  route?: string | null;
+  price: string;
+  currency?: string;
+  stock_status?: "in_stock" | "low_stock" | "out_of_stock" | "unavailable" | string;
+  quantity?: number | null;
+  is_available?: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface PharmacyInventoryCreateRequest {
+  drug?: string;
+  custom_drug_name?: string;
+  brand_name?: string;
+  form?: string;
+  strength?: string;
+  route?: string;
+  price: string | number;
+  currency?: string;
+  stock_status?: "in_stock" | "low_stock" | "out_of_stock" | "unavailable" | string;
+  quantity?: number;
+  is_available?: boolean;
+}
+
+export type PharmacyInventoryUpdateRequest = Partial<PharmacyInventoryCreateRequest>;
+
+export interface PharmacyQuoteItemPayload {
+  prescription_item: string;
+  inventory_item?: string;
+  availability_status: string;
+  quoted_name?: string;
+  quantity?: string | number;
+  unit_price?: string | number;
+  pharmacy_note?: string;
+  substitution_note?: string;
+}
+
+export interface PharmacyQuotePayload {
+  items: PharmacyQuoteItemPayload[];
+  note?: string;
+}
+
+export interface PharmacyPrescriptionRequest {
+  id: string;
+  patient?: PharmacistPersonSummary | null;
+  doctor?: PharmacistPersonSummary | null;
+  consultation?: string | null;
+  prescription?: string | PharmacistPrescriptionDetail | null;
+  status?: string;
+  quote_status?: string;
+  quoted_total?: string | null;
+  currency?: string | null;
+  payment_status?: PaymentStatus | string;
+  payment_intent?: string | PaymentIntent | null;
+  paid_at?: string | null;
+  payment_failed_at?: string | null;
+  refunded_at?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface PharmacyPrescriptionRequestCreate {
+  prescription?: string;
+  target_pharmacy?: string;
+  notes?: string;
 }

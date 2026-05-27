@@ -19,7 +19,11 @@ interface DoctorLabOrderFormProps {
 }
 
 const EMPTY_ITEM: DoctorLabOrderItemDraft = {
+  lab_test: "",
+  custom_test_name: "",
   test_name: "",
+  notes: "",
+  priority: "routine",
   category: "",
   sample_type: "",
   instructions: "",
@@ -62,12 +66,10 @@ export function DoctorLabOrderForm({ onSubmit }: DoctorLabOrderFormProps) {
 
     items.forEach((item, index) => {
       const itemErrors: ItemErrors = {};
-      // Backend accepts either catalog test UUID or test_name+category; this form uses name+category.
-      if (!item.test_name?.trim()) {
-        itemErrors.test_name = t.doctor.testName;
-      }
-      if (!item.category?.trim()) {
-        itemErrors.category = t.doctor.testCategory;
+      const hasCatalog = Boolean(item.lab_test?.trim());
+      const hasManual = Boolean(item.custom_test_name?.trim() || item.test_name?.trim());
+      if (!hasCatalog && !hasManual) {
+        itemErrors.custom_test_name = t.doctor.testName;
       }
       if (Object.keys(itemErrors).length > 0) {
         nextErrors[index] = itemErrors;
@@ -94,17 +96,31 @@ export function DoctorLabOrderForm({ onSubmit }: DoctorLabOrderFormProps) {
 
     const payloadItems: CreateDoctorLabOrderItemRequest[] = items.map((item) => {
       const payload: CreateDoctorLabOrderItemRequest = {
-        test_name: item.test_name?.trim(),
-        category: item.category?.trim(),
+        priority: item.priority,
       };
+
+      const labTest = item.lab_test?.trim();
+      const customTestName = item.custom_test_name?.trim();
+      const legacyTestName = item.test_name?.trim();
 
       const test = item.test?.trim();
       const sampleType = item.sample_type?.trim();
-      const instructions = item.instructions?.trim();
+      const notes = item.notes?.trim() ?? item.instructions?.trim();
+
+      if (labTest) {
+        payload.lab_test = labTest;
+      } else if (customTestName) {
+        payload.custom_test_name = customTestName;
+      } else if (legacyTestName) {
+        payload.test_name = legacyTestName;
+      }
 
       if (test) payload.test = test;
       if (sampleType) payload.sample_type = sampleType;
-      if (instructions) payload.instructions = instructions;
+      if (notes) {
+        payload.notes = notes;
+        payload.instructions = notes;
+      }
 
       return payload;
     });

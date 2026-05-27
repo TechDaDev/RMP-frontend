@@ -1,3 +1,6 @@
+import type { DrugCatalogItem, LabTestCatalogItem } from "@/types/catalog";
+import type { PaymentIntent, PaymentStatus } from "@/types/payments";
+
 export type DoctorConsultationStatus =
   | "submitted"
   | "accepted"
@@ -59,6 +62,14 @@ export interface DoctorConsultationListItem {
   has_fever?: boolean;
   has_pain?: boolean;
   created_at?: string;
+  consultation_fee?: string | null;
+  consultation_currency?: string | null;
+  fee_snapshot_at?: string | null;
+  payment_status?: PaymentStatus | string;
+  payment_intent?: string | PaymentIntent | null;
+  paid_at?: string | null;
+  payment_failed_at?: string | null;
+  refunded_at?: string | null;
   patient?: DoctorPatientUser | null;
   symptoms?: DoctorConsultationSymptom[];
 }
@@ -194,7 +205,10 @@ export type MedicationRoute =
   | "other";
 
 export interface DoctorPrescriptionItemCreateRequest {
-  medication_name: string;
+  drug?: string;
+  custom_drug_name?: string;
+  medication_name?: string;
+  drug_name?: string;
   dosage: string;
   frequency: string;
   duration: string;
@@ -208,9 +222,23 @@ export interface CreateDoctorPrescriptionRequest {
   items: DoctorPrescriptionItemCreateRequest[];
 }
 
+export interface PrescriptionDrugDetail {
+  id?: string;
+  display_name?: string;
+  generic_name?: string | null;
+  strength?: string | null;
+  form?: string | null;
+  route?: string | null;
+}
+
 export interface DoctorPrescriptionItem {
   id: string;
-  medication_name: string;
+  drug?: string | DrugCatalogItem | null;
+  drug_detail?: PrescriptionDrugDetail | DrugCatalogItem | null;
+  custom_drug_name?: string | null;
+  display_drug_name?: string | null;
+  drug_name?: string | null;
+  medication_name?: string | null;
   strength?: string;
   dosage: string;
   frequency: string;
@@ -245,6 +273,11 @@ export interface DoctorPrescriptionDetail {
   expires_at?: string | null;
   cancelled_at?: string | null;
   fully_dispensed_at?: string | null;
+  payment_status?: PaymentStatus | string;
+  payment_intent?: string | PaymentIntent | null;
+  paid_at?: string | null;
+  payment_failed_at?: string | null;
+  refunded_at?: string | null;
   items?: DoctorPrescriptionItem[];
   dispensing_records?: DoctorDispensingRecord[];
 }
@@ -266,12 +299,18 @@ export type DoctorLabOrderStatus =
 export type DoctorLabOrderItemStatus = "pending" | "completed" | "cancelled" | string;
 
 export interface CreateDoctorLabOrderItemRequest {
-  test?: string;
+  lab_test?: string;
+  custom_test_name?: string;
   test_name?: string;
+  notes?: string;
+  priority?: "routine" | "urgent" | string;
+  test?: string;
   category?: string;
   sample_type?: string;
   instructions?: string;
 }
+
+export type DoctorLabOrderItemCreateRequest = CreateDoctorLabOrderItemRequest;
 
 export interface CreateDoctorLabOrderRequest {
   items: CreateDoctorLabOrderItemRequest[];
@@ -279,8 +318,14 @@ export interface CreateDoctorLabOrderRequest {
 
 export interface DoctorLabOrderItem {
   id?: string;
+  lab_test?: string | LabTestCatalogItem | null;
+  lab_test_detail?: LabTestCatalogItem | null;
+  custom_test_name?: string | null;
+  display_test_name?: string | null;
   test?: string | null;
   test_name?: string;
+  notes?: string | null;
+  priority?: "routine" | "urgent" | string | null;
   category?: string;
   sample_type?: string;
   instructions?: string;
@@ -312,6 +357,11 @@ export interface DoctorLabOrderDetail {
   expires_at?: string | null;
   cancelled_at?: string | null;
   fully_completed_at?: string | null;
+  payment_status?: PaymentStatus | string;
+  payment_intent?: string | PaymentIntent | null;
+  paid_at?: string | null;
+  payment_failed_at?: string | null;
+  refunded_at?: string | null;
   items?: DoctorLabOrderItem[];
   completion_records?: DoctorLabOrderCompletionRecord[];
 }

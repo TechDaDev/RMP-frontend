@@ -1,3 +1,6 @@
+import type { LabTestCatalogItem } from "@/types/catalog";
+import type { PaymentIntent, PaymentStatus } from "@/types/payments";
+
 export type LaboratoryOrderStatus =
   | "issued"
   | "partially_completed"
@@ -38,16 +41,10 @@ export interface LaboratorySafeUser {
   full_name?: string;
 }
 
-export interface LaboratoryTestCatalogItem {
-  id: string;
-  name: string;
-  category?: string;
-  code?: string;
-  description?: string;
-  default_sample_type?: string | null;
+export interface LaboratoryTestCatalogItem extends LabTestCatalogItem {
   default_instructions?: string | null;
   display_order?: number;
-  is_active?: boolean;
+  description?: string;
 }
 
 export interface LaboratoryOrderItem {
@@ -79,6 +76,11 @@ export interface LaboratoryOrderDetail {
   completed_items?: LaboratoryOrderItem[];
   expires_at?: string | null;
   created_at?: string;
+  payment_status?: PaymentStatus | string;
+  payment_intent?: string | PaymentIntent | null;
+  paid_at?: string | null;
+  payment_failed_at?: string | null;
+  refunded_at?: string | null;
 }
 
 export interface LaboratoryOrderScanResponse {
@@ -165,4 +167,75 @@ export interface LaboratoryResultDetail {
   linked_blood_group_record?: string | null;
   created_at?: string;
   updated_at?: string;
+}
+
+export interface LabOfferingItem {
+  id: string;
+  lab_test?: string | LabTestCatalogItem | null;
+  custom_test_name?: string | null;
+  local_name?: string | null;
+  display_name?: string | null;
+  sample_type_override?: string | null;
+  preparation_notes?: string | null;
+  estimated_turnaround_time?: string | null;
+  price: string;
+  currency?: string;
+  is_available?: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface LabOfferingCreateRequest {
+  lab_test?: string;
+  custom_test_name?: string;
+  local_name?: string;
+  sample_type_override?: string;
+  preparation_notes?: string;
+  estimated_turnaround_time?: string;
+  price: string | number;
+  currency?: string;
+  is_available?: boolean;
+}
+
+export type LabOfferingUpdateRequest = Partial<LabOfferingCreateRequest>;
+
+export interface LabQuoteItemPayload {
+  lab_order_item: string;
+  offering?: string;
+  availability_status: string;
+  quoted_name?: string;
+  quantity?: string | number;
+  unit_price?: string | number;
+  lab_note?: string;
+  substitution_note?: string;
+}
+
+export interface LabQuotePayload {
+  items: LabQuoteItemPayload[];
+  note?: string;
+}
+
+export interface LabServiceRequest {
+  id: string;
+  patient?: LaboratorySafeUser | null;
+  doctor?: LaboratorySafeUser | null;
+  consultation?: string | null;
+  lab_order?: string | LaboratoryOrderDetail | null;
+  status?: string;
+  quote_status?: string;
+  quoted_total?: string | null;
+  currency?: string | null;
+  payment_status?: PaymentStatus | string;
+  payment_intent?: string | PaymentIntent | null;
+  paid_at?: string | null;
+  payment_failed_at?: string | null;
+  refunded_at?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface LabServiceRequestCreate {
+  lab_order?: string;
+  target_laboratory?: string;
+  notes?: string;
 }

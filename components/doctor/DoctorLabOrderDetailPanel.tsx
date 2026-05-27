@@ -6,7 +6,7 @@ import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
 import { DoctorInfoRow } from "@/components/doctor/ui/DoctorInfoRow";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
-import type { DoctorLabOrderDetail } from "@/types/doctor";
+import type { DoctorLabOrderDetail, DoctorLabOrderItem } from "@/types/doctor";
 
 function formatDate(value?: string | null) {
   if (!value) {
@@ -17,6 +17,16 @@ function formatDate(value?: string | null) {
 
 interface DoctorLabOrderDetailPanelProps {
   labOrder: DoctorLabOrderDetail;
+}
+
+function getLabTestDisplayName(item: DoctorLabOrderItem) {
+  return (
+    item.display_test_name
+    || item.lab_test_detail?.display_name
+    || item.custom_test_name
+    || item.test_name
+    || "-"
+  );
 }
 
 export function DoctorLabOrderDetailPanel({ labOrder }: DoctorLabOrderDetailPanelProps) {
@@ -53,20 +63,20 @@ export function DoctorLabOrderDetailPanel({ labOrder }: DoctorLabOrderDetailPane
           <div className="space-y-3">
             {labOrder.items.map((item, index) => (
               <div
-                key={item.id ?? `${item.test_name}-${index}`}
+                key={item.id ?? `${getLabTestDisplayName(item)}-${index}`}
                 className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-4"
               >
                 <DashboardGrid columns="three">
-                  <DoctorInfoRow label={t.doctor.testName} value={item.test_name || "-"} />
-                  <DoctorInfoRow label={t.doctor.testCategory} value={item.category || "-"} muted />
+                  <DoctorInfoRow label={t.doctor.testName} value={getLabTestDisplayName(item)} />
+                  <DoctorInfoRow label={t.doctor.testCategory} value={item.lab_test_detail?.category || item.category || "-"} muted />
                   <DoctorInfoRow label={t.doctor.testCode} value={item.test || "-"} muted />
-                  <DoctorInfoRow label={t.doctor.sampleType} value={item.sample_type || "-"} muted />
+                  <DoctorInfoRow label={t.doctor.sampleType} value={item.lab_test_detail?.sample_type || item.sample_type || "-"} muted />
                   <DoctorInfoRow label={t.doctor.labOrderStatus} value={t.patient.statusLabels[item.status ?? "pending"] ?? item.status ?? "-"} muted />
                   <DoctorInfoRow label={t.doctor.labOrderStatus} value={formatDate(item.completed_at)} muted />
                 </DashboardGrid>
 
                 <div className="mt-3">
-                  <DoctorInfoRow label={t.doctor.testInstructions} value={item.instructions || "-"} muted />
+                  <DoctorInfoRow label={t.doctor.testInstructions} value={item.notes || item.instructions || "-"} muted />
                 </div>
               </div>
             ))}

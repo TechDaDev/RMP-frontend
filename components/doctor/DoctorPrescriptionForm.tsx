@@ -13,7 +13,10 @@ interface DoctorPrescriptionFormProps {
 }
 
 const EMPTY_ITEM: PrescriptionItemDraft = {
+  drug: "",
+  custom_drug_name: "",
   medication_name: "",
+  drug_name: "",
   dosage: "",
   frequency: "",
   duration: "",
@@ -60,8 +63,10 @@ export function DoctorPrescriptionForm({ onSubmit }: DoctorPrescriptionFormProps
 
     items.forEach((item, index) => {
       const itemErrors: ItemErrors = {};
-      if (!item.medication_name.trim()) {
-        itemErrors.medication_name = t.doctor.medicationName;
+      const hasDrug = Boolean(item.drug?.trim());
+      const hasCustom = Boolean(item.custom_drug_name?.trim() || item.medication_name?.trim() || item.drug_name?.trim());
+      if (!hasDrug && !hasCustom) {
+        itemErrors.custom_drug_name = t.doctor.medicationName;
       }
       if (!item.dosage.trim()) {
         itemErrors.dosage = t.doctor.dosage;
@@ -100,12 +105,21 @@ export function DoctorPrescriptionForm({ onSubmit }: DoctorPrescriptionFormProps
 
     const payloadItems = items.map((item) => {
       const base: DoctorPrescriptionItemCreateRequest = {
-        medication_name: item.medication_name.trim(),
         dosage: item.dosage.trim(),
         frequency: item.frequency.trim(),
         duration: item.duration.trim(),
         route: item.route as MedicationRoute,
       };
+      if (item.drug?.trim()) {
+        base.drug = item.drug.trim();
+      } else if (item.custom_drug_name?.trim()) {
+        base.custom_drug_name = item.custom_drug_name.trim();
+      } else if (item.medication_name?.trim()) {
+        // Keep legacy compatibility for historical payload consumers.
+        base.medication_name = item.medication_name.trim();
+      } else if (item.drug_name?.trim()) {
+        base.drug_name = item.drug_name.trim();
+      }
       const strength = item.strength?.trim();
       const quantity = item.quantity?.trim();
       const instructions = item.instructions?.trim();
@@ -155,7 +169,7 @@ export function DoctorPrescriptionForm({ onSubmit }: DoctorPrescriptionFormProps
       <form className="space-y-4" onSubmit={handleSubmit} noValidate>
         {items.map((item, index) => (
           <DoctorPrescriptionItemEditor
-            key={`${index}-${item.medication_name}`}
+            key={`${index}-${item.drug ?? item.custom_drug_name ?? item.medication_name}`}
             index={index}
             item={item}
             canRemove={items.length > 1}
