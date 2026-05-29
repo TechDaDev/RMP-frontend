@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { MoneyDisplay } from "@/components/payments/MoneyDisplay";
 import { PaymentIntentStatusBadge } from "@/components/payments/PaymentIntentStatusBadge";
 import { Badge } from "@/components/ui/Badge";
@@ -11,6 +12,7 @@ import { getPaymentIntentDetail, getPaymentIntents } from "@/lib/payments/paymen
 import type { PaymentIntent } from "@/types/payments";
 
 export default function FinancialPaymentIntentsPage() {
+  const { t } = useAppPreferences();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [intents, setIntents] = useState<PaymentIntent[]>([]);
@@ -30,7 +32,7 @@ export default function FinancialPaymentIntentsPage() {
         setIntents(data);
       } catch {
         if (active) {
-          setError("Failed to load payment intents.");
+          setError(t.admin.financePaymentIntentsLoadFailed);
         }
       } finally {
         if (active) {
@@ -44,11 +46,11 @@ export default function FinancialPaymentIntentsPage() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [t.admin.financePaymentIntentsLoadFailed]);
 
   const selectedOptions = useMemo(
-    () => intents.map((item) => ({ id: item.id, label: `${item.id} (${item.status ?? "unknown"})` })),
-    [intents],
+    () => intents.map((item) => ({ id: item.id, label: `${item.id} (${item.status ?? t.admin.walletUnknown})` })),
+    [intents, t.admin.walletUnknown],
   );
 
   async function handleLoadDetail() {
@@ -61,16 +63,16 @@ export default function FinancialPaymentIntentsPage() {
       setDetail(item);
     } catch {
       setDetail(null);
-      setError("Failed to load selected intent details.");
+      setError(t.admin.financePaymentIntentDetailLoadFailed);
     }
   }
 
   return (
     <div className="space-y-6">
       <PageHeader
-        badge={<Badge tone="primary">Financial</Badge>}
-        title="Payment Intents"
-        description="Inspect payment intents and verify status transitions."
+        badge={<Badge tone="primary">{t.admin.financeRoleBadge}</Badge>}
+        title={t.admin.financePaymentIntentsTitle}
+        description={t.admin.financePaymentIntentsSubtitle}
       />
 
       {error ? <Card className="text-sm text-red-600 dark:text-red-300">{error}</Card> : null}
@@ -78,20 +80,20 @@ export default function FinancialPaymentIntentsPage() {
       <Card className="space-y-4">
         <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
           <label className="block space-y-2" htmlFor="intent-id">
-            <span className="text-sm font-semibold text-[var(--color-text)]">Load by intent ID</span>
+            <span className="text-sm font-semibold text-[var(--color-text)]">{t.admin.financePaymentIntentLoadById}</span>
             <select
               id="intent-id"
               className="min-h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm text-[var(--color-text)]"
               value={selectedId}
               onChange={(event) => setSelectedId(event.target.value)}
             >
-              <option value="">Select an intent</option>
+              <option value="">{t.admin.financePaymentIntentSelectPlaceholder}</option>
               {selectedOptions.map((option) => (
                 <option key={option.id} value={option.id}>{option.label}</option>
               ))}
             </select>
           </label>
-          <Button variant="secondary" onClick={() => void handleLoadDetail()} disabled={!selectedId}>Load details</Button>
+          <Button variant="secondary" onClick={() => void handleLoadDetail()} disabled={!selectedId}>{t.admin.financePaymentIntentLoadDetails}</Button>
         </div>
 
         {detail ? (
@@ -101,31 +103,31 @@ export default function FinancialPaymentIntentsPage() {
               <PaymentIntentStatusBadge status={detail.status} />
             </div>
             <div className="mt-3 grid gap-2 text-sm text-[var(--color-muted)] sm:grid-cols-2">
-              <p>Service type: {detail.service_type ?? "-"}</p>
-              <p>Reference: {detail.reference_id ?? "-"}</p>
-              <p>Method: {detail.payment_method ?? "-"}</p>
-              <p>Amount: <MoneyDisplay amount={detail.amount} currency={detail.currency} /></p>
-              <p>Provider txn: {detail.provider_transaction_id ?? "-"}</p>
-              <p>Created: {detail.created_at ? new Date(detail.created_at).toLocaleString() : "-"}</p>
+              <p>{t.admin.financePaymentIntentService}: {detail.service_type ?? "-"}</p>
+              <p>{t.admin.financePaymentIntentReference}: {detail.reference_id ?? "-"}</p>
+              <p>{t.admin.financePaymentIntentPaymentMethod}: {detail.payment_method ?? "-"}</p>
+              <p>{t.admin.financeManualRechargeAmountLabel}: <MoneyDisplay amount={detail.amount} currency={detail.currency} /></p>
+              <p>{t.admin.financePaymentIntentProviderTxn}: {detail.provider_transaction_id ?? "-"}</p>
+              <p>{t.admin.financePaymentIntentCreated}: {detail.created_at ? new Date(detail.created_at).toLocaleString() : "-"}</p>
             </div>
           </div>
         ) : null}
       </Card>
 
       <Card className="space-y-3 overflow-x-auto">
-        {loading ? <p className="text-sm text-[var(--color-muted)]">Loading intents...</p> : null}
-        {!loading && intents.length === 0 ? <p className="text-sm text-[var(--color-muted)]">No payment intents found.</p> : null}
+        {loading ? <p className="text-sm text-[var(--color-muted)]">{t.admin.financePaymentIntentsLoading}</p> : null}
+        {!loading && intents.length === 0 ? <p className="text-sm text-[var(--color-muted)]">{t.admin.financePaymentIntentsEmpty}</p> : null}
 
         {!loading && intents.length > 0 ? (
           <table className="w-full min-w-[760px] text-left text-sm">
             <thead>
               <tr className="border-b border-[var(--color-border)] text-[var(--color-muted)]">
                 <th className="px-2 py-2">ID</th>
-                <th className="px-2 py-2">Service</th>
-                <th className="px-2 py-2">Amount</th>
-                <th className="px-2 py-2">Status</th>
-                <th className="px-2 py-2">Payment Method</th>
-                <th className="px-2 py-2">Created</th>
+                <th className="px-2 py-2">{t.admin.financePaymentIntentService}</th>
+                <th className="px-2 py-2">{t.admin.financeManualRechargeAmountLabel}</th>
+                <th className="px-2 py-2">{t.admin.walletStatusLabel}</th>
+                <th className="px-2 py-2">{t.admin.financePaymentIntentPaymentMethod}</th>
+                <th className="px-2 py-2">{t.admin.financePaymentIntentCreated}</th>
               </tr>
             </thead>
             <tbody>

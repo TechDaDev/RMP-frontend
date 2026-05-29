@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { AdminWalletSelector } from "@/components/payments/AdminWalletSelector";
 import { MoneyDisplay } from "@/components/payments/MoneyDisplay";
+import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -10,6 +11,7 @@ import { getWalletTransactions } from "@/lib/payments/paymentsService";
 import type { AdminWalletSearchResult, WalletTransaction } from "@/types/payments";
 
 export default function FinancialWalletTransactionsPage() {
+  const { t } = useAppPreferences();
   const [selectedWallet, setSelectedWallet] = useState<AdminWalletSearchResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -35,7 +37,7 @@ export default function FinancialWalletTransactionsPage() {
         setTransactions(data);
       } catch {
         if (active) {
-          setError("Failed to load wallet transactions.");
+          setError(t.admin.financeWalletTransactionsLoadFailed);
         }
       } finally {
         if (active) {
@@ -49,21 +51,21 @@ export default function FinancialWalletTransactionsPage() {
     return () => {
       active = false;
     };
-  }, [selectedWallet?.id]);
+  }, [selectedWallet?.id, t.admin.financeWalletTransactionsLoadFailed]);
 
   return (
     <div className="space-y-6">
       <PageHeader
-        badge={<Badge tone="primary">Financial</Badge>}
-        title="Wallet Transactions"
-        description="Track incoming and outgoing wallet operations across the platform."
+        badge={<Badge tone="primary">{t.admin.financeRoleBadge}</Badge>}
+        title={t.admin.financeWalletTransactionsTitle}
+        description={t.admin.financeWalletTransactionsSubtitle}
       />
 
       <AdminWalletSelector
         selectedWallet={selectedWallet}
         onSelect={setSelectedWallet}
-        title="Select a wallet"
-        description="Search for a wallet by patient email or name, then load transactions for that wallet only."
+        title={t.admin.financeWalletTransactionsSelectWallet}
+        description={t.admin.financeWalletTransactionsSelectWalletDescription}
       />
 
       <Card className="space-y-3 overflow-x-auto">
@@ -71,28 +73,28 @@ export default function FinancialWalletTransactionsPage() {
           <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-4 text-sm text-[var(--color-muted)]">
             <p className="font-semibold text-[var(--color-text)]">{selectedWallet.user_full_name || selectedWallet.user_email || selectedWallet.user}</p>
             <p dir="ltr">{selectedWallet.user_email || "-"}</p>
-            <p>Wallet ID: {selectedWallet.id}</p>
+            <p>{t.admin.walletIdLabel}: {selectedWallet.id}</p>
           </div>
         ) : (
-          <p className="text-sm text-[var(--color-muted)]">Search and select a wallet to view wallet-specific transactions.</p>
+          <p className="text-sm text-[var(--color-muted)]">{t.admin.financeWalletTransactionsSelectWalletHint}</p>
         )}
 
-        {loading ? <p className="text-sm text-[var(--color-muted)]">Loading transactions...</p> : null}
+        {loading ? <p className="text-sm text-[var(--color-muted)]">{t.common.loading}</p> : null}
         {error ? <p className="text-sm font-medium text-red-600 dark:text-red-300">{error}</p> : null}
         {!loading && !error && selectedWallet && transactions.length === 0 ? (
-          <p className="text-sm text-[var(--color-muted)]">No wallet transactions found.</p>
+          <p className="text-sm text-[var(--color-muted)]">{t.admin.financeWalletTransactionsNotFound}</p>
         ) : null}
 
         {!loading && !error && selectedWallet && transactions.length > 0 ? (
           <table className="w-full min-w-[760px] text-left text-sm">
             <thead>
               <tr className="border-b border-[var(--color-border)] text-[var(--color-muted)]">
-                <th className="px-2 py-2">Date</th>
-                <th className="px-2 py-2">Type</th>
-                <th className="px-2 py-2">Amount</th>
-                <th className="px-2 py-2">Status</th>
-                <th className="px-2 py-2">Reference</th>
-                <th className="px-2 py-2">External Ref</th>
+                <th className="px-2 py-2">{t.admin.financePaymentIntentCreated}</th>
+                <th className="px-2 py-2">{t.admin.financePaymentIntentService}</th>
+                <th className="px-2 py-2">{t.admin.financeManualRechargeAmountLabel}</th>
+                <th className="px-2 py-2">{t.admin.walletStatusLabel}</th>
+                <th className="px-2 py-2">{t.admin.financePaymentIntentReference}</th>
+                <th className="px-2 py-2">{t.admin.financeWalletTransactionsExternalRef}</th>
               </tr>
             </thead>
             <tbody>

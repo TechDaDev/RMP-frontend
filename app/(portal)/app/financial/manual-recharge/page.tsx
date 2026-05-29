@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { AdminWalletSelector } from "@/components/payments/AdminWalletSelector";
 import { MoneyDisplay } from "@/components/payments/MoneyDisplay";
 import { Badge } from "@/components/ui/Badge";
@@ -20,6 +21,7 @@ function canRechargeWallet(wallet: AdminWalletSearchResult | null): boolean {
 }
 
 export default function FinancialManualRechargePage() {
+  const { t } = useAppPreferences();
   const [selectedWallet, setSelectedWallet] = useState<AdminWalletSearchResult | null>(null);
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
@@ -33,17 +35,17 @@ export default function FinancialManualRechargePage() {
     setSuccess(null);
 
     if (!selectedWallet?.user) {
-      setError("Select a wallet before creating a recharge.");
+      setError(t.admin.financeManualRechargeSelectWalletError);
       return;
     }
 
     if (!canRechargeWallet(selectedWallet)) {
-      setError("Selected wallet cannot be recharged while it is frozen or closed.");
+      setError(t.admin.financeManualRechargeWalletStatusError);
       return;
     }
 
     if (!amount.trim() || Number(amount) <= 0) {
-      setError("Amount must be greater than zero.");
+      setError(t.admin.financeManualRechargeAmountError);
       return;
     }
 
@@ -66,13 +68,13 @@ export default function FinancialManualRechargePage() {
         description: description.trim() || undefined,
       });
 
-      setSuccess(`Manual recharge completed. Transaction: ${result.id}`);
+      setSuccess(t.admin.financeManualRechargeSuccess.replace("{id}", result.id));
       window.dispatchEvent(new Event(WALLET_UPDATED_EVENT));
       setConfirmOpen(false);
       setAmount("");
       setDescription("");
     } catch {
-      setError("Manual recharge failed. Please verify details and try again.");
+      setError(t.admin.financeManualRechargeFailed);
     } finally {
       setSubmitting(false);
     }
@@ -81,16 +83,16 @@ export default function FinancialManualRechargePage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        badge={<Badge tone="primary">Financial</Badge>}
-        title="Manual Wallet Recharge"
-        description="Create controlled manual credits for user wallets with confirmation."
+        badge={<Badge tone="primary">{t.admin.financeRoleBadge}</Badge>}
+        title={t.admin.financeManualRechargeTitle}
+        description={t.admin.financeManualRechargeSubtitle}
       />
 
       <AdminWalletSelector
         selectedWallet={selectedWallet}
         onSelect={setSelectedWallet}
-        title="Select wallet owner"
-        description="Search by email or name, then use the selected wallet owner for the manual recharge payload."
+        title={t.admin.financeManualRechargeSelectWallet}
+        description={t.admin.financeManualRechargeSelectWalletDescription}
       />
 
       <Card className="space-y-4">
@@ -98,16 +100,16 @@ export default function FinancialManualRechargePage() {
           <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-4 text-sm text-[var(--color-muted)]">
             <p className="font-semibold text-[var(--color-text)]">{selectedWallet.user_full_name || selectedWallet.user_email || selectedWallet.user}</p>
             <p dir="ltr">{selectedWallet.user_email || "-"}</p>
-            <p>Wallet ID: {selectedWallet.id}</p>
-            <p>User ID: {selectedWallet.user}</p>
-            <p>Balance: <MoneyDisplay amount={selectedWallet.cached_balance} currency={selectedWallet.currency} /></p>
-            <p>Status: {selectedWallet.status || "unknown"}</p>
+            <p>{t.admin.walletIdLabel}: {selectedWallet.id}</p>
+            <p>{t.admin.walletOwnerIdLabel}: {selectedWallet.user}</p>
+            <p>{t.admin.financeManualRechargeAmountLabel}: <MoneyDisplay amount={selectedWallet.cached_balance} currency={selectedWallet.currency} /></p>
+            <p>{t.admin.walletStatusLabel}: {selectedWallet.status || t.admin.walletUnknown}</p>
           </div>
         ) : null}
 
         <Input
           id="recharge-amount"
-          label="Amount"
+          label={t.admin.financeManualRechargeAmountLabel}
           type="number"
           inputMode="decimal"
           min="0"
@@ -119,23 +121,24 @@ export default function FinancialManualRechargePage() {
 
         <Input
           id="recharge-description"
-          label="Description"
+          label={t.admin.financeManualRechargeDescriptionLabel}
           value={description}
           onChange={(event) => setDescription(event.target.value)}
-          placeholder="Reason for manual recharge"
+          placeholder={t.admin.financeManualRechargeDescriptionPlaceholder}
         />
 
         {error ? <p className="text-sm font-medium text-red-600 dark:text-red-300">{error}</p> : null}
         {success ? <p className="text-sm font-medium text-green-700 dark:text-green-300">{success}</p> : null}
 
-        <Button onClick={handleOpenConfirm} disabled={submitting || !canRechargeWallet(selectedWallet)}>Review and submit</Button>
+        <Button onClick={handleOpenConfirm} disabled={submitting || !canRechargeWallet(selectedWallet)}>{t.admin.financeManualRechargeReviewSubmit}</Button>
       </Card>
 
       <ConfirmActionModal
         open={confirmOpen}
-        title="Confirm manual recharge"
+        title={t.admin.financeManualRechargeConfirmTitle}
         message={`Recharge wallet owner ${selectedWallet?.user_email || selectedWallet?.user || "-"} with amount ${amount || "0"}?`}
-        confirmLabel="Confirm recharge"
+        confirmLabel={t.admin.financeManualRechargeConfirmLabel}
+        cancelLabel={t.common.cancel}
         busy={submitting}
         onCancel={() => setConfirmOpen(false)}
         onConfirm={handleConfirmRecharge}

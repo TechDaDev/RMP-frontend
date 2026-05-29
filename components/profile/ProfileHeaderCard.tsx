@@ -17,7 +17,7 @@ export function ProfileHeaderCard() {
   const profileImage = profile?.user_profile?.profile_image;
   const resolvedProfileImage = profileImage ? mediaUrl(profileImage) : null;
   const roleLabel = effectiveRole === "financial"
-    ? "Financial"
+    ? t.admin.financeRoleBadge
     : effectiveRole === "admin"
       ? t.roles.admin
       : user.user_type === "laboratorian"
