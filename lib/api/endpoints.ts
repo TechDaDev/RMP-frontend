@@ -153,6 +153,7 @@ export const API_ENDPOINTS = {
   payments: {
     wallet: "/api/payments/wallet/",
     walletTransactions: "/api/payments/wallet/transactions/",
+    adminWallets: "/api/payments/admin/wallets/",
     adminManualRecharge: "/api/payments/admin/manual-recharge/",
     intents: "/api/payments/intents/",
     intentDetail: (id: string) => `/api/payments/intents/${id}/`,

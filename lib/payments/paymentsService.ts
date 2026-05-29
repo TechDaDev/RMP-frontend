@@ -2,6 +2,7 @@ import { apiRequest } from "@/lib/api/client";
 import { API_ENDPOINTS } from "@/lib/api/endpoints";
 import type { ApiEnvelope, PaginatedResponse } from "@/types/api";
 import type {
+  AdminWalletSearchResult,
   AdminManualRechargeRequest,
   PaymentIntent,
   PaymentIntentCreateRequest,
@@ -84,6 +85,19 @@ export async function getWallet(): Promise<Wallet> {
 export async function getWalletTransactions(params?: QueryParams): Promise<WalletTransaction[]> {
   const response = await apiRequest<ListResponse<WalletTransaction> | ApiEnvelope<ListResponse<WalletTransaction>>>(
     withQuery(API_ENDPOINTS.payments.walletTransactions, params),
+    {
+      auth: true,
+    },
+  );
+
+  return normalizeList(unwrapData(response));
+}
+
+export async function getAdminWallets(params?: QueryParams): Promise<AdminWalletSearchResult[]> {
+  const response = await apiRequest<
+    ListResponse<AdminWalletSearchResult> | ApiEnvelope<ListResponse<AdminWalletSearchResult>>
+  >(
+    withQuery(API_ENDPOINTS.payments.adminWallets, params),
     {
       auth: true,
     },

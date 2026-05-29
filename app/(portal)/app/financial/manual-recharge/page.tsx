@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { AdminWalletSelector } from "@/components/payments/AdminWalletSelector";
+import { MoneyDisplay } from "@/components/payments/MoneyDisplay";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -8,9 +10,15 @@ import { Input } from "@/components/ui/Input";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { ConfirmActionModal } from "@/components/ui/ConfirmActionModal";
 import { adminManualRecharge } from "@/lib/payments/paymentsService";
+import type { AdminWalletSearchResult } from "@/types/payments";
+
+function canRechargeWallet(wallet: AdminWalletSearchResult | null): boolean {
+  const status = (wallet?.status ?? "").toLowerCase();
+  return Boolean(wallet) && status !== "frozen" && status !== "closed";
+}
 
 export default function FinancialManualRechargePage() {
-  const [userId, setUserId] = useState("");
+  const [selectedWallet, setSelectedWallet] = useState<AdminWalletSearchResult | null>(null);
   const [amount, setAmount] = useState("");
   const [description, setDescription] = useState("");
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -22,8 +30,13 @@ export default function FinancialManualRechargePage() {
     setError(null);
     setSuccess(null);
 
-    if (!userId.trim()) {
-      setError("User ID is required.");
+    if (!selectedWallet?.user) {
+      setError("Select a wallet before creating a recharge.");
+      return;
+    }
+
+    if (!canRechargeWallet(selectedWallet)) {
+      setError("Selected wallet cannot be recharged while it is frozen or closed.");
       return;
     }
 
@@ -46,7 +59,7 @@ export default function FinancialManualRechargePage() {
 
     try {
       const result = await adminManualRecharge({
-        user: userId.trim(),
+        user: selectedWallet?.user,
         amount,
         description: description.trim() || undefined,
       });
@@ -70,14 +83,24 @@ export default function FinancialManualRechargePage() {
         description="Create controlled manual credits for user wallets with confirmation."
       />
 
+      <AdminWalletSelector
+        selectedWallet={selectedWallet}
+        onSelect={setSelectedWallet}
+        title="Select wallet owner"
+        description="Search by email or name, then use the selected wallet owner for the manual recharge payload."
+      />
+
       <Card className="space-y-4">
-        <Input
-          id="recharge-user"
-          label="User ID"
-          value={userId}
-          onChange={(event) => setUserId(event.target.value)}
-          placeholder="UUID or user identifier"
-        />
+        {selectedWallet ? (
+          <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-4 text-sm text-[var(--color-muted)]">
+            <p className="font-semibold text-[var(--color-text)]">{selectedWallet.user_full_name || selectedWallet.user_email || selectedWallet.user}</p>
+            <p dir="ltr">{selectedWallet.user_email || "-"}</p>
+            <p>Wallet ID: {selectedWallet.id}</p>
+            <p>User ID: {selectedWallet.user}</p>
+            <p>Balance: <MoneyDisplay amount={selectedWallet.cached_balance} currency={selectedWallet.currency} /></p>
+            <p>Status: {selectedWallet.status || "unknown"}</p>
+          </div>
+        ) : null}
 
         <Input
           id="recharge-amount"
@@ -102,13 +125,13 @@ export default function FinancialManualRechargePage() {
         {error ? <p className="text-sm font-medium text-red-600 dark:text-red-300">{error}</p> : null}
         {success ? <p className="text-sm font-medium text-green-700 dark:text-green-300">{success}</p> : null}
 
-        <Button onClick={handleOpenConfirm} disabled={submitting}>Review and submit</Button>
+        <Button onClick={handleOpenConfirm} disabled={submitting || !canRechargeWallet(selectedWallet)}>Review and submit</Button>
       </Card>
 
       <ConfirmActionModal
         open={confirmOpen}
         title="Confirm manual recharge"
-        message={`Recharge user ${userId || "-"} with amount ${amount || "0"}?`}
+        message={`Recharge wallet owner ${selectedWallet?.user_email || selectedWallet?.user || "-"} with amount ${amount || "0"}?`}
         confirmLabel="Confirm recharge"
         busy={submitting}
         onCancel={() => setConfirmOpen(false)}

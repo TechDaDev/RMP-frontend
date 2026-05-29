@@ -19,6 +19,17 @@ export interface Wallet {
   updated_at?: string;
 }
 
+export interface AdminWalletSearchResult {
+  id: string;
+  user: string;
+  user_email?: string | null;
+  user_full_name?: string | null;
+  cached_balance?: string | null;
+  currency?: string | null;
+  status?: string | null;
+  updated_at?: string;
+}
+
 export interface WalletTransaction {
   id: string;
   wallet?: string;
