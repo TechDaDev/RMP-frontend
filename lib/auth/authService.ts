@@ -17,6 +17,7 @@ import type {
   DoctorProfileData,
   PharmacistProfileData,
   LaboratorianProfileData,
+  StaffProfileData,
 } from "@/types/backend";
 import type { ProfilesMeResponse } from "@/types/backend";
 
@@ -40,6 +41,7 @@ type RoleProfile =
   | DoctorProfileData
   | PharmacistProfileData
   | LaboratorianProfileData
+  | StaffProfileData
   | null;
 
 interface RawProfilesMeResponse {
@@ -49,6 +51,7 @@ interface RawProfilesMeResponse {
   doctor_profile?: DoctorProfileData | null;
   pharmacist_profile?: PharmacistProfileData | null;
   laboratorian_profile?: LaboratorianProfileData | null;
+  staff_profile?: StaffProfileData | null;
   role_profile?: RoleProfile;
   completion?: ProfileCompletion & {
     is_complete?: boolean;
@@ -137,6 +140,8 @@ function normalizeRoleProfile(raw: RawProfilesMeResponse): RoleProfile {
       return raw.pharmacist_profile ?? null;
     case "laboratorian":
       return raw.laboratorian_profile ?? null;
+    case "staff":
+      return raw.staff_profile ?? null;
     default:
       return null;
   }

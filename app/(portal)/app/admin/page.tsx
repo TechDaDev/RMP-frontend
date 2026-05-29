@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { useAuth } from "@/components/auth/AuthProvider";
-import { PermissionGuard } from "@/components/auth/PermissionGuard";
 import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
 import { DashboardSection } from "@/components/dashboard/DashboardSection";
 import { DashboardStatCard } from "@/components/dashboard/DashboardStatCard";
@@ -14,6 +13,10 @@ import { FileTextIcon, GridIcon, PulseIcon, ShieldIcon } from "@/components/icon
 import { Badge } from "@/components/ui/Badge";
 import { Button, buttonClassName } from "@/components/ui/Button";
 import { PageHeader } from "@/components/ui/PageHeader";
+import {
+  getAllowedAdminSections,
+  hasAdminSection,
+} from "@/lib/admin/adminSections";
 import {
   exportAdminRagDatasetJson,
   getAdminKnowledgeDocuments,
@@ -50,7 +53,7 @@ function formatDateOnly(value?: string | null, localeTag = "en-US") {
 
 export default function AdminPortalPage() {
   const { t, locale } = useAppPreferences();
-  const { profile } = useAuth();
+  const { profile, user, effectiveRole } = useAuth();
   const localeTag = resolveLocaleTag(locale);
   const roleProfile = profile?.role_profile as {
     role_display?: string;
@@ -58,7 +61,22 @@ export default function AdminPortalPage() {
     hire_date?: string;
     last_active?: string;
     has_completed_training?: boolean;
+    allowed_admin_sections?: string[];
   } | null;
+  const allowedSections = getAllowedAdminSections({ user, profile, role: effectiveRole });
+  const canViewKnowledgeBase = hasAdminSection(allowedSections, "knowledge_base");
+  const canViewRagFeedback = hasAdminSection(allowedSections, "rag_feedback");
+  const canViewVerification = hasAdminSection(allowedSections, "verification");
+  const canViewAnalytics = hasAdminSection(allowedSections, "analytics");
+  const canExport = hasAdminSection(allowedSections, "export");
+  const canViewAuditLogs = hasAdminSection(allowedSections, "audit_logs");
+  const visibleFeatureCount = [
+    canViewKnowledgeBase,
+    canViewRagFeedback,
+    canViewVerification,
+    canViewAnalytics || canExport,
+    canViewAuditLogs,
+  ].filter(Boolean).length;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [analytics, setAnalytics] = useState<AdminRagAnalyticsSummary | null>(null);
@@ -71,14 +89,27 @@ export default function AdminPortalPage() {
     let cancelled = false;
 
     async function loadDashboard() {
+      const shouldLoadKnowledge = canViewKnowledgeBase;
+      const shouldLoadFeedback = canViewRagFeedback;
+      const shouldLoadAnalytics = canViewAnalytics;
+
+      if (!shouldLoadKnowledge && !shouldLoadFeedback && !shouldLoadAnalytics) {
+        setLoading(false);
+        setError(null);
+        setAnalytics(null);
+        setKnowledgeCount(0);
+        setPendingFeedbackCount(0);
+        return;
+      }
+
       setLoading(true);
       setError(null);
 
       try {
         const [analyticsData, documents, pendingFeedback] = await Promise.all([
-          getAdminRagAnalyticsSummary(),
-          getAdminKnowledgeDocuments(),
-          getAdminRagFeedback({ review_status: "pending" }),
+          shouldLoadAnalytics ? getAdminRagAnalyticsSummary() : Promise.resolve(null),
+          shouldLoadKnowledge ? getAdminKnowledgeDocuments() : Promise.resolve([]),
+          shouldLoadFeedback ? getAdminRagFeedback({ review_status: "pending" }) : Promise.resolve([]),
         ]);
 
         if (cancelled) {
@@ -104,7 +135,7 @@ export default function AdminPortalPage() {
     return () => {
       cancelled = true;
     };
-  }, [t.admin.loadFailedDescription]);
+  }, [canViewAnalytics, canViewKnowledgeBase, canViewRagFeedback, t.admin.loadFailedDescription]);
 
   async function handleExportDataset() {
     if (exporting) {
@@ -171,12 +202,14 @@ export default function AdminPortalPage() {
         title={t.admin.platformStats}
         description={t.admin.platformStatsDescription}
         actions={
-          <Button variant="secondary" className="w-full sm:w-auto" onClick={() => void handleExportDataset()} disabled={exporting}>
+          <Button variant="secondary" className="w-full sm:w-auto" onClick={() => void handleExportDataset()} disabled={exporting || !canExport}>
             {exporting ? t.admin.datasetExporting : t.admin.datasetExportAction}
           </Button>
         }
       >
-        {loading ? (
+        {visibleFeatureCount === 0 ? (
+          <DashboardStateCard state="empty" title={t.admin.staffProfileTitle} description={t.admin.backendLimitedDescription} />
+        ) : loading ? (
           <DashboardStateCard state="loading" description={t.common.loading} />
         ) : error ? (
           <DashboardStateCard
@@ -187,99 +220,129 @@ export default function AdminPortalPage() {
           />
         ) : (
           <DashboardGrid columns="four">
-            <DashboardStatCard
-              label={t.admin.totalKnowledgeDocuments}
-              value={knowledgeCount}
-              description={t.admin.totalKnowledgeDocumentsDescription}
-              icon={<FileTextIcon size={18} />}
-              tone="info"
-            />
-            <DashboardStatCard
-              label={t.admin.pendingFeedbackReviews}
-              value={pendingFeedbackCount}
-              description={t.admin.pendingFeedbackReviewsDescription}
-              icon={<ShieldIcon size={18} />}
-              tone="warning"
-            />
-            <DashboardStatCard
-              label={t.admin.totalRagQueries}
-              value={analytics?.usage?.total_queries ?? "-"}
-              description={t.admin.totalRagQueriesDescription}
-              icon={<PulseIcon size={18} />}
-              tone="primary"
-            />
-            <DashboardStatCard
-              label={t.admin.feedbackCoverage}
-              value={analytics?.feedback?.feedback_coverage_rate !== undefined
-                ? `${Math.round((analytics.feedback.feedback_coverage_rate ?? 0) * 100)}%`
-                : "-"}
-              description={t.admin.feedbackCoverageDescription}
-              icon={<GridIcon size={18} />}
-              tone="success"
-            />
+            {canViewKnowledgeBase ? (
+              <DashboardStatCard
+                label={t.admin.totalKnowledgeDocuments}
+                value={knowledgeCount}
+                description={t.admin.totalKnowledgeDocumentsDescription}
+                icon={<FileTextIcon size={18} />}
+                tone="info"
+              />
+            ) : null}
+            {canViewRagFeedback ? (
+              <DashboardStatCard
+                label={t.admin.pendingFeedbackReviews}
+                value={pendingFeedbackCount}
+                description={t.admin.pendingFeedbackReviewsDescription}
+                icon={<ShieldIcon size={18} />}
+                tone="warning"
+              />
+            ) : null}
+            {canViewAnalytics ? (
+              <DashboardStatCard
+                label={t.admin.totalRagQueries}
+                value={analytics?.usage?.total_queries ?? "-"}
+                description={t.admin.totalRagQueriesDescription}
+                icon={<PulseIcon size={18} />}
+                tone="primary"
+              />
+            ) : null}
+            {canViewAnalytics ? (
+              <DashboardStatCard
+                label={t.admin.feedbackCoverage}
+                value={analytics?.feedback?.feedback_coverage_rate !== undefined
+                  ? `${Math.round((analytics.feedback.feedback_coverage_rate ?? 0) * 100)}%`
+                  : "-"}
+                description={t.admin.feedbackCoverageDescription}
+                icon={<GridIcon size={18} />}
+                tone="success"
+              />
+            ) : null}
           </DashboardGrid>
         )}
         {exportMessage ? <p className="text-sm text-[var(--color-muted)]">{exportMessage}</p> : null}
       </DashboardSection>
 
-      {/* Permission-gated admin features */}
-      <DashboardSection title={t.admin.adminFeaturesTitle}>
-        <div className="flex flex-wrap gap-4">
-          <PermissionGuard permission="can_approve_professionals">
-            <Link href="/app/admin/verifications" className={buttonClassName({ variant: "primary" })}>{t.admin.adminFeatureVerifications}</Link>
-          </PermissionGuard>
-          <PermissionGuard permission="can_manage_knowledge_base">
-            <Link href="/app/admin/knowledge-base" className={buttonClassName({ variant: "primary" })}>{t.admin.adminFeatureKnowledgeBase}</Link>
-          </PermissionGuard>
-          <PermissionGuard permission="can_export_datasets">
-            <Link href="/app/admin/analytics" className={buttonClassName({ variant: "primary" })}>{t.admin.adminFeatureAnalyticsExport}</Link>
-          </PermissionGuard>
-          <PermissionGuard permission="can_view_audit_logs">
-            <Link href="/app/admin/audit-logs" className={buttonClassName({ variant: "primary" })}>{t.admin.adminFeatureAuditLogs}</Link>
-          </PermissionGuard>
-        </div>
-      </DashboardSection>
+      {visibleFeatureCount > 0 ? (
+        <DashboardSection title={t.admin.adminFeaturesTitle}>
+          <div className="flex flex-wrap gap-4">
+            {canViewVerification ? (
+              <Link href="/app/admin/verifications" className={buttonClassName({ variant: "primary" })}>{t.admin.adminFeatureVerifications}</Link>
+            ) : null}
+            {canViewKnowledgeBase ? (
+              <Link href="/app/admin/knowledge-base" className={buttonClassName({ variant: "primary" })}>{t.admin.adminFeatureKnowledgeBase}</Link>
+            ) : null}
+            {canViewAnalytics || canExport ? (
+              <Link href="/app/admin/analytics" className={buttonClassName({ variant: "primary" })}>{t.admin.adminFeatureAnalyticsExport}</Link>
+            ) : null}
+            {canViewAuditLogs ? (
+              <Link href="/app/admin/audit-logs" className={buttonClassName({ variant: "primary" })}>{t.admin.adminFeatureAuditLogs}</Link>
+            ) : null}
+          </div>
+        </DashboardSection>
+      ) : null}
 
-      <DashboardSection title={t.admin.supportedWorkflows} description={t.admin.supportedWorkflowsDescription}>
-        <DashboardGrid columns="three">
-          <DashboardWorkflowCard
-            title={t.admin.knowledgeBaseTitle}
-            description={t.admin.knowledgeBaseDescription}
-            icon={<FileTextIcon size={18} />}
-            status={t.common.liveBadge}
-            statusTone="primary"
-            actionLabel={t.admin.viewKnowledgeDocuments}
-            href="/app/admin/knowledge-base"
-          />
-          <DashboardWorkflowCard
-            title={t.admin.ragFeedbackTitle}
-            description={t.admin.ragFeedbackDescription}
-            icon={<ShieldIcon size={18} />}
-            status={t.common.liveBadge}
-            statusTone="primary"
-            actionLabel={t.admin.viewRagFeedback}
-            href="/app/admin/rag-feedback"
-          />
-          <DashboardWorkflowCard
-            title={t.admin.verificationReviewTitle}
-            description={t.admin.verificationReviewDescription}
-            icon={<ShieldIcon size={18} />}
-            status={t.common.liveBadge}
-            statusTone="primary"
-            actionLabel={t.admin.adminFeatureVerifications}
-            href="/app/admin/verifications"
-          />
-          <DashboardWorkflowCard
-            title={t.admin.datasetExportTitle}
-            description={t.admin.datasetExportDescription}
-            icon={<PulseIcon size={18} />}
-            status={t.common.liveBadge}
-            statusTone="success"
-            actionLabel={t.admin.datasetExportAction}
-            disabled
-          />
-        </DashboardGrid>
-      </DashboardSection>
+      {visibleFeatureCount > 0 ? (
+        <DashboardSection title={t.admin.supportedWorkflows} description={t.admin.supportedWorkflowsDescription}>
+          <DashboardGrid columns="three">
+            {canViewKnowledgeBase ? (
+              <DashboardWorkflowCard
+                title={t.admin.knowledgeBaseTitle}
+                description={t.admin.knowledgeBaseDescription}
+                icon={<FileTextIcon size={18} />}
+                status={t.common.liveBadge}
+                statusTone="primary"
+                actionLabel={t.admin.viewKnowledgeDocuments}
+                href="/app/admin/knowledge-base"
+              />
+            ) : null}
+            {canViewRagFeedback ? (
+              <DashboardWorkflowCard
+                title={t.admin.ragFeedbackTitle}
+                description={t.admin.ragFeedbackDescription}
+                icon={<ShieldIcon size={18} />}
+                status={t.common.liveBadge}
+                statusTone="primary"
+                actionLabel={t.admin.viewRagFeedback}
+                href="/app/admin/rag-feedback"
+              />
+            ) : null}
+            {canViewVerification ? (
+              <DashboardWorkflowCard
+                title={t.admin.verificationReviewTitle}
+                description={t.admin.verificationReviewDescription}
+                icon={<ShieldIcon size={18} />}
+                status={t.common.liveBadge}
+                statusTone="primary"
+                actionLabel={t.admin.adminFeatureVerifications}
+                href="/app/admin/verifications"
+              />
+            ) : null}
+            {canExport ? (
+              <DashboardWorkflowCard
+                title={t.admin.datasetExportTitle}
+                description={t.admin.datasetExportDescription}
+                icon={<PulseIcon size={18} />}
+                status={t.common.liveBadge}
+                statusTone="success"
+                actionLabel={t.admin.adminFeatureAnalyticsExport}
+                href="/app/admin/analytics"
+              />
+            ) : null}
+            {canViewAuditLogs ? (
+              <DashboardWorkflowCard
+                title={t.admin.adminFeatureAuditLogs}
+                description={t.admin.backendLimitedDescription}
+                icon={<FileTextIcon size={18} />}
+                status={t.common.liveBadge}
+                statusTone="primary"
+                actionLabel={t.admin.adminFeatureAuditLogs}
+                href="/app/admin/audit-logs"
+              />
+            ) : null}
+          </DashboardGrid>
+        </DashboardSection>
+      ) : null}
 
       <DashboardSection title={t.admin.backendLimitedTitle} description={t.admin.backendLimitedDescription}>
         <DashboardStateCard state="empty" description={t.admin.backendLimitedDescription} />

@@ -9,6 +9,8 @@ import {
   UserIcon,
   type IconProps,
 } from "@/components/icons";
+import { getAllowedAdminSections, hasAdminSection } from "@/lib/admin/adminSections";
+import type { ProfilesMeResponse, BackendUser } from "@/types/backend";
 import type { Translations } from "@/types/i18n";
 import type { ComponentType } from "react";
 
@@ -23,7 +25,17 @@ export type PortalNavItem = {
   badge?: string;
 };
 
-export function getPortalNavItems(userType: string | undefined | null, t: Translations): PortalNavItem[] {
+export function getPortalNavItems(
+  userType: string | undefined | null,
+  t: Translations,
+  options?: { user?: BackendUser | null; profile?: ProfilesMeResponse | null },
+): PortalNavItem[] {
+  const allowedAdminSections = getAllowedAdminSections({
+    user: options?.user ?? null,
+    profile: options?.profile ?? null,
+    role: userType === "financial" ? "financial" : userType === "admin" ? "admin" : null,
+  });
+
   switch (userType) {
     case "patient":
       return [
@@ -58,23 +70,55 @@ export function getPortalNavItems(userType: string | undefined | null, t: Transl
     case "admin":
       return [
         { href: "/app/admin", label: t.admin.dashboardTitle, icon: GridIcon, exact: true },
-        { href: "/app/admin/knowledge-base", label: t.admin.knowledgeBaseTitle, icon: FileTextIcon },
-        { href: "/app/admin/rag-feedback", label: t.admin.ragFeedbackTitle, icon: ShieldIcon },
-        { href: "/app/admin/verifications", label: t.admin.verificationReviewTitle, icon: ShieldIcon },
-        { href: "/app/financial", label: "Finance Dashboard", icon: GridIcon },
-        { href: "/app/financial/wallet-transactions", label: "Wallet Transactions", icon: FileTextIcon },
-        { href: "/app/financial/payment-intents", label: "Payment Intents", icon: FileTextIcon },
-        { href: "/app/financial/manual-recharge", label: "Manual Recharge", icon: ShieldIcon },
-        { href: "/app/financial/provider-earnings", label: "Provider Earnings", icon: FileTextIcon },
+        ...(hasAdminSection(allowedAdminSections, "knowledge_base")
+          ? [{ href: "/app/admin/knowledge-base", label: t.admin.knowledgeBaseTitle, icon: FileTextIcon }]
+          : []),
+        ...(hasAdminSection(allowedAdminSections, "rag_feedback")
+          ? [{ href: "/app/admin/rag-feedback", label: t.admin.ragFeedbackTitle, icon: ShieldIcon }]
+          : []),
+        ...(hasAdminSection(allowedAdminSections, "verification")
+          ? [{ href: "/app/admin/verifications", label: t.admin.verificationReviewTitle, icon: ShieldIcon }]
+          : []),
+        ...(hasAdminSection(allowedAdminSections, "analytics") || hasAdminSection(allowedAdminSections, "export")
+          ? [{ href: "/app/admin/analytics", label: t.admin.adminFeatureAnalyticsExport, icon: GridIcon }]
+          : []),
+        ...(hasAdminSection(allowedAdminSections, "audit_logs")
+          ? [{ href: "/app/admin/audit-logs", label: t.admin.adminFeatureAuditLogs, icon: FileTextIcon }]
+          : []),
+        ...(hasAdminSection(allowedAdminSections, "finance_dashboard")
+          ? [{ href: "/app/financial", label: "Finance Dashboard", icon: GridIcon }]
+          : []),
+        ...(hasAdminSection(allowedAdminSections, "wallet_transactions")
+          ? [{ href: "/app/financial/wallet-transactions", label: "Wallet Transactions", icon: FileTextIcon }]
+          : []),
+        ...(hasAdminSection(allowedAdminSections, "payment_intents")
+          ? [{ href: "/app/financial/payment-intents", label: "Payment Intents", icon: FileTextIcon }]
+          : []),
+        ...(hasAdminSection(allowedAdminSections, "manual_recharge")
+          ? [{ href: "/app/financial/manual-recharge", label: "Manual Recharge", icon: ShieldIcon }]
+          : []),
+        ...(hasAdminSection(allowedAdminSections, "provider_earnings")
+          ? [{ href: "/app/financial/provider-earnings", label: "Provider Earnings", icon: FileTextIcon }]
+          : []),
         { href: "/app/profile", label: t.portal.profile, icon: UserIcon, exact: true },
       ];
     case "financial":
       return [
-        { href: "/app/financial", label: "Finance Dashboard", icon: GridIcon, exact: true },
-        { href: "/app/financial/wallet-transactions", label: "Wallet Transactions", icon: FileTextIcon },
-        { href: "/app/financial/payment-intents", label: "Payment Intents", icon: FileTextIcon },
-        { href: "/app/financial/manual-recharge", label: "Manual Recharge", icon: ShieldIcon },
-        { href: "/app/financial/provider-earnings", label: "Provider Earnings", icon: FileTextIcon },
+        ...(hasAdminSection(allowedAdminSections, "finance_dashboard")
+          ? [{ href: "/app/financial", label: "Finance Dashboard", icon: GridIcon, exact: true }]
+          : []),
+        ...(hasAdminSection(allowedAdminSections, "wallet_transactions")
+          ? [{ href: "/app/financial/wallet-transactions", label: "Wallet Transactions", icon: FileTextIcon }]
+          : []),
+        ...(hasAdminSection(allowedAdminSections, "payment_intents")
+          ? [{ href: "/app/financial/payment-intents", label: "Payment Intents", icon: FileTextIcon }]
+          : []),
+        ...(hasAdminSection(allowedAdminSections, "manual_recharge")
+          ? [{ href: "/app/financial/manual-recharge", label: "Manual Recharge", icon: ShieldIcon }]
+          : []),
+        ...(hasAdminSection(allowedAdminSections, "provider_earnings")
+          ? [{ href: "/app/financial/provider-earnings", label: "Provider Earnings", icon: FileTextIcon }]
+          : []),
         { href: "/app/profile", label: t.portal.profile, icon: UserIcon, exact: true },
       ];
     default:

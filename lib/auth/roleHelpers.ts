@@ -30,13 +30,13 @@ export function resolveEffectiveRole(args: {
 }): EffectiveRole {
   const { user, profile, adminAccess } = args;
 
-  if (adminAccess) {
-    return "admin";
-  }
-
   const staffRole = extractStaffRole(user, profile);
   if (staffRole === "financial") {
     return "financial";
+  }
+
+  if (adminAccess) {
+    return "admin";
   }
 
   const userType = user?.user_type;

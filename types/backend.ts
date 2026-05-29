@@ -11,6 +11,12 @@ export interface StaffProfileData {
   staff_role?: string | null;
   title?: string | null;
   department?: string | null;
+  role_display?: string | null;
+  allowed_admin_sections?: string[] | null;
+  can_approve_professionals?: boolean | null;
+  can_manage_knowledge_base?: boolean | null;
+  can_export_datasets?: boolean | null;
+  can_view_audit_logs?: boolean | null;
 }
 
 export type VerificationStatus =
