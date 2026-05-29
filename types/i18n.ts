@@ -307,6 +307,15 @@ export interface Translations {
     viewPrescriptions: string;
     viewLabOrders: string;
     viewLabResults: string;
+    labServiceRequestsTitle: string;
+    labServiceRequestsSubtitle: string;
+    viewLabServiceRequests: string;
+    pharmacyServiceRequestsTitle: string;
+    pharmacyServiceRequestsSubtitle: string;
+    viewPharmacyServiceRequests: string;
+    walletTitle: string;
+    walletSubtitle: string;
+    openWallet: string;
     viewMedicalRecord: string;
     consultationsTitle: string;
     consultationsSubtitle: string;
