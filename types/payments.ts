@@ -13,7 +13,9 @@ export type PaymentStatus =
 
 export interface Wallet {
   id?: string;
-  balance: string;
+  cached_balance: string;
+  /** @deprecated backend canonical field is cached_balance */
+  balance?: string;
   currency?: string;
   user?: string;
   updated_at?: string;

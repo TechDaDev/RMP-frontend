@@ -12,6 +12,8 @@ import { ConfirmActionModal } from "@/components/ui/ConfirmActionModal";
 import { adminManualRecharge } from "@/lib/payments/paymentsService";
 import type { AdminWalletSearchResult } from "@/types/payments";
 
+const WALLET_UPDATED_EVENT = "payments:wallet-updated";
+
 function canRechargeWallet(wallet: AdminWalletSearchResult | null): boolean {
   const status = (wallet?.status ?? "").toLowerCase();
   return Boolean(wallet) && status !== "frozen" && status !== "closed";
@@ -65,6 +67,7 @@ export default function FinancialManualRechargePage() {
       });
 
       setSuccess(`Manual recharge completed. Transaction: ${result.id}`);
+      window.dispatchEvent(new Event(WALLET_UPDATED_EVENT));
       setConfirmOpen(false);
       setAmount("");
       setDescription("");

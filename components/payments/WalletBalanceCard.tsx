@@ -23,7 +23,7 @@ export function WalletBalanceCard({ wallet, loading = false, error = null }: Wal
 
       {!loading && !error ? (
         <p className="text-2xl font-bold text-[var(--color-text)]">
-          <PriceDisplay amount={wallet?.balance ?? "0"} currency={wallet?.currency} />
+          <PriceDisplay amount={wallet?.cached_balance ?? "0"} currency={wallet?.currency} />
         </p>
       ) : null}
     </Card>

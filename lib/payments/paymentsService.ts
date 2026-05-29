@@ -79,7 +79,13 @@ export async function getWallet(): Promise<Wallet> {
     auth: true,
   });
 
-  return unwrapData(response);
+  const wallet = unwrapData(response);
+  const cachedBalance = wallet.cached_balance ?? wallet.balance ?? "0";
+
+  return {
+    ...wallet,
+    cached_balance: String(cachedBalance),
+  };
 }
 
 export async function getWalletTransactions(params?: QueryParams): Promise<WalletTransaction[]> {
