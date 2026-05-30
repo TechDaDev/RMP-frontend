@@ -69,8 +69,6 @@ function ReceiptModal({ url, onClose }: { url: string; onClose: () => void }) {
           <a
             href={url}
             download
-            target="_blank"
-            rel="noopener noreferrer"
             className="text-sm text-primary underline"
           >
             Download

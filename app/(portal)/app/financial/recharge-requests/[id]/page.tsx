@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
@@ -27,6 +27,79 @@ function statusVariant(status: string): "neutral" | "success" | "warning" | "dan
   return "neutral";
 }
 
+function isImageUrl(url: string): boolean {
+  return /\.(jpe?g|png|webp|gif)(\?.*)?$/i.test(url);
+}
+
+function ReceiptModal({
+  url,
+  onClose,
+}: {
+  url: string;
+  onClose: () => void;
+}) {
+  const backdropRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") onClose();
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  function handleBackdropClick(e: React.MouseEvent<HTMLDivElement>) {
+    if (e.target === backdropRef.current) onClose();
+  }
+
+  return (
+    <div
+      ref={backdropRef}
+      onClick={handleBackdropClick}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
+    >
+      <div className="relative bg-background rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden">
+        <div className="flex items-center justify-between px-4 py-3 border-b shrink-0">
+          <span className="text-sm font-medium">Receipt</span>
+          <button
+            onClick={onClose}
+            aria-label="Close"
+            className="rounded p-1 hover:bg-muted transition-colors text-muted-foreground hover:text-foreground"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div className="flex-1 overflow-auto p-2 flex items-center justify-center min-h-0">
+          {isImageUrl(url) ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={url}
+              alt="Receipt"
+              className="max-w-full max-h-[75vh] object-contain rounded"
+            />
+          ) : (
+            <iframe
+              src={url}
+              title="Receipt"
+              className="w-full h-[75vh] rounded border-0"
+            />
+          )}
+        </div>
+        <div className="flex justify-end gap-2 px-4 py-3 border-t shrink-0">
+          <a
+            href={url}
+            download
+            className="text-sm text-primary underline"
+          >
+            Download
+          </a>
+          <Button variant="secondary" onClick={onClose}>Close</Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function FinancialRechargeRequestDetailPage() {
   const router = useRouter();
   const { t } = useAppPreferences();
@@ -43,6 +116,7 @@ export default function FinancialRechargeRequestDetailPage() {
   const [confirmAction, setConfirmAction] = useState<"approve" | "reject" | null>(null);
   const [permissionDenied, setPermissionDenied] = useState(false);
   const [showRetry, setShowRetry] = useState(false);
+  const [receiptOpen, setReceiptOpen] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -194,14 +268,13 @@ export default function FinancialRechargeRequestDetailPage() {
 
             {request.receipt_file_url ? (
               <div>
-                <a
-                  href={request.receipt_file_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-sm text-primary underline"
+                <button
+                  type="button"
+                  onClick={() => setReceiptOpen(true)}
+                  className="inline-flex items-center gap-1 text-sm text-primary underline hover:no-underline"
                 >
                   {t.admin.financeRechargeDetailReceiptLink}
-                </a>
+                </button>
               </div>
             ) : (
               <p className="text-sm text-muted-foreground">{t.admin.financeRechargeDetailReceiptMissing}</p>
@@ -300,6 +373,10 @@ export default function FinancialRechargeRequestDetailPage() {
           onCancel={() => setConfirmAction(null)}
           busy={submitting}
         />
+      )}
+
+      {receiptOpen && request?.receipt_file_url && (
+        <ReceiptModal url={request.receipt_file_url} onClose={() => setReceiptOpen(false)} />
       )}
     </div>
   );
