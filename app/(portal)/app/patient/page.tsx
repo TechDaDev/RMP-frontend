@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { DashboardGrid } from "@/components/dashboard/DashboardGrid";
 import { DashboardSection } from "@/components/dashboard/DashboardSection";
 import { DashboardStateCard } from "@/components/dashboard/DashboardStateCard";
+import { PriceDisplay } from "@/components/common/PriceDisplay";
 import { FileTextIcon, LabIcon, MessageIcon, PrescriptionIcon } from "@/components/icons";
 import { PatientSummaryCards } from "@/components/patient/PatientSummaryCards";
 import { PatientWorkflowCard } from "@/components/patient/PatientWorkflowCard";
@@ -15,7 +17,9 @@ import { Card } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { ProfilePromptCard } from "@/components/profile/ProfilePromptCard";
 import { getPatientDashboardSummary } from "@/lib/patient/patientService";
+import { getWallet } from "@/lib/payments/paymentsService";
 import type { PatientDashboardSummary } from "@/types/patient";
+import type { Wallet } from "@/types/payments";
 
 export default function PatientPortalPage() {
   const { t } = useAppPreferences();
@@ -23,6 +27,8 @@ export default function PatientPortalPage() {
   const [summary, setSummary] = useState<PatientDashboardSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [wallet, setWallet] = useState<Wallet | null>(null);
+  const [walletLoading, setWalletLoading] = useState(true);
 
   useEffect(() => {
     let active = true;
@@ -51,6 +57,34 @@ export default function PatientPortalPage() {
       active = false;
     };
   }, [t.patient.dashboardErrorDescription]);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadWallet() {
+      setWalletLoading(true);
+      try {
+        const data = await getWallet();
+        if (active) {
+          setWallet(data);
+        }
+      } catch {
+        if (active) {
+          setWallet(null);
+        }
+      } finally {
+        if (active) {
+          setWalletLoading(false);
+        }
+      }
+    }
+
+    void loadWallet();
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   async function handleRetry() {
     setLoading(true);
@@ -140,11 +174,29 @@ export default function PatientPortalPage() {
       />
 
       <Card>
-        <h2 className="text-lg font-bold text-[var(--color-text)]">{t.patient.welcomeTitle}</h2>
-        <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">{t.patient.welcomeDescription}</p>
-        {user ? (
-          <p className="mt-3 text-sm font-semibold text-[var(--color-text)]">{user.full_name ?? `${user.first_name} ${user.last_name}`.trim()}</p>
-        ) : null}
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div>
+            <h2 className="text-lg font-bold text-[var(--color-text)]">{t.patient.welcomeTitle}</h2>
+            <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">{t.patient.welcomeDescription}</p>
+            {user ? (
+              <p className="mt-3 text-sm font-semibold text-[var(--color-text)]">{user.full_name ?? `${user.first_name} ${user.last_name}`.trim()}</p>
+            ) : null}
+          </div>
+
+          <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-panel)] p-4 min-w-[220px]">
+            <p className="text-xs uppercase tracking-wide text-[var(--color-muted)]">{t.patient.walletBalanceTitle}</p>
+            {walletLoading ? (
+              <p className="mt-2 text-sm text-[var(--color-muted)]">{t.patient.walletBalanceLoading}</p>
+            ) : (
+              <p className="mt-2 text-2xl font-bold text-[var(--color-text)]">
+                <PriceDisplay amount={wallet?.cached_balance ?? "0"} currency={wallet?.currency} />
+              </p>
+            )}
+            <Link href="/app/patient/wallet" className="mt-2 inline-block text-sm text-primary underline">
+              {t.patient.openWallet}
+            </Link>
+          </div>
+        </div>
       </Card>
 
       <ProfilePromptCard />
