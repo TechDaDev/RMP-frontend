@@ -86,7 +86,7 @@ export const ADMIN_SECTION_ROUTE_RULES: Array<{ prefix: string; anyOf: AdminSect
   { prefix: "/app/financial/payment-intents", anyOf: ["payment_intents"] },
   { prefix: "/app/financial/manual-recharge", anyOf: ["manual_recharge"] },
   { prefix: "/app/financial/provider-earnings", anyOf: ["provider_earnings"] },
-  { prefix: "/app/financial/recharge-requests", anyOf: ["recharge_requests"] },
+  { prefix: "/app/financial/recharge-requests", anyOf: ["recharge_requests", "finance_dashboard"] },
   { prefix: "/app/financial", anyOf: ["finance_dashboard"] },
 ];
 

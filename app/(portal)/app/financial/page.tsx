@@ -2,20 +2,25 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/components/auth/AuthProvider";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { getAllowedAdminSections, hasAdminSection } from "@/lib/admin/adminSections";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { getPaymentIntents, getRechargeRequests, getWalletTransactions } from "@/lib/payments/paymentsService";
 import { requestRechargePendingCountRefresh } from "@/lib/payments/rechargeEvents";
 
 export default function FinancialDashboardPage() {
   const { t } = useAppPreferences();
+  const { user, profile, effectiveRole } = useAuth();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [paymentIntentCount, setPaymentIntentCount] = useState(0);
   const [walletTxCount, setWalletTxCount] = useState(0);
   const [pendingRechargeCount, setPendingRechargeCount] = useState(0);
+  const allowedSections = getAllowedAdminSections({ user, profile, role: effectiveRole });
+  const canOpenRechargeQueue = hasAdminSection(allowedSections, "recharge_requests") || hasAdminSection(allowedSections, "finance_dashboard");
 
   useEffect(() => {
     let active = true;
@@ -86,21 +91,33 @@ export default function FinancialDashboardPage() {
           <p className="text-xs uppercase tracking-[0.12em] text-[var(--color-muted)]">{t.admin.financeMetricWalletTransactions}</p>
           <p className="mt-2 text-2xl font-bold text-[var(--color-text)]">{loading ? "..." : walletTxCount}</p>
         </Card>
-        <Link
-          href="/app/financial/recharge-requests"
-          className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--card-shadow)]"
-        >
-          <p className="text-xs uppercase tracking-[0.12em] text-[var(--color-muted)]">{t.admin.financeViewRechargeRequests}</p>
-          <div className="mt-2 flex items-center gap-2">
-            <p className="text-2xl font-bold text-[var(--color-text)]">{loading ? "..." : pendingRechargeCount}</p>
-            {!loading && pendingRechargeCount > 0 ? (
-              <Badge tone="warning">{pendingRechargeCount}</Badge>
+        {canOpenRechargeQueue ? (
+          <Link
+            href="/app/financial/recharge-requests"
+            className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--card-shadow)]"
+          >
+            <p className="text-xs uppercase tracking-[0.12em] text-[var(--color-muted)]">{t.admin.financeViewRechargeRequests}</p>
+            <div className="mt-2 flex items-center gap-2">
+              <p className="text-2xl font-bold text-[var(--color-text)]">{loading ? "..." : pendingRechargeCount}</p>
+              {!loading && pendingRechargeCount > 0 ? (
+                <Badge tone="warning">{pendingRechargeCount}</Badge>
+              ) : null}
+            </div>
+            {!loading && pendingRechargeCount === 0 ? (
+              <p className="mt-2 text-xs text-[var(--color-muted)]">{t.admin.financeRechargeNoPending}</p>
             ) : null}
-          </div>
-          {!loading && pendingRechargeCount === 0 ? (
-            <p className="mt-2 text-xs text-[var(--color-muted)]">{t.admin.financeRechargeNoPending}</p>
-          ) : null}
-        </Link>
+          </Link>
+        ) : (
+          <Card>
+            <p className="text-xs uppercase tracking-[0.12em] text-[var(--color-muted)]">{t.admin.financeViewRechargeRequests}</p>
+            <div className="mt-2 flex items-center gap-2">
+              <p className="text-2xl font-bold text-[var(--color-text)]">{loading ? "..." : pendingRechargeCount}</p>
+              {!loading && pendingRechargeCount > 0 ? (
+                <Badge tone="warning">{pendingRechargeCount}</Badge>
+              ) : null}
+            </div>
+          </Card>
+        )}
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
