@@ -6,7 +6,8 @@ import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
-import { getPaymentIntents, getWalletTransactions } from "@/lib/payments/paymentsService";
+import { getPaymentIntents, getRechargeRequests, getWalletTransactions } from "@/lib/payments/paymentsService";
+import { requestRechargePendingCountRefresh } from "@/lib/payments/rechargeEvents";
 
 export default function FinancialDashboardPage() {
   const { t } = useAppPreferences();
@@ -14,6 +15,7 @@ export default function FinancialDashboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [paymentIntentCount, setPaymentIntentCount] = useState(0);
   const [walletTxCount, setWalletTxCount] = useState(0);
+  const [pendingRechargeCount, setPendingRechargeCount] = useState(0);
 
   useEffect(() => {
     let active = true;
@@ -23,15 +25,18 @@ export default function FinancialDashboardPage() {
       setError(null);
 
       try {
-        const [intents, transactions] = await Promise.all([
+        const [intents, transactions, pendingRecharges] = await Promise.all([
           getPaymentIntents(),
           getWalletTransactions(),
+          getRechargeRequests({ status: "pending_review", limit: 50 }),
         ]);
 
         if (!active) return;
 
         setPaymentIntentCount(intents.length);
         setWalletTxCount(transactions.length);
+        setPendingRechargeCount(pendingRecharges.length);
+        requestRechargePendingCountRefresh();
       } catch {
         if (active) {
           setError(t.admin.financeDashboardLoadFailed);
@@ -45,8 +50,20 @@ export default function FinancialDashboardPage() {
 
     void load();
 
+    const pollId = window.setInterval(() => {
+      void load();
+    }, 25000);
+
+    function handleFocus() {
+      void load();
+    }
+
+    window.addEventListener("focus", handleFocus);
+
     return () => {
       active = false;
+      window.clearInterval(pollId);
+      window.removeEventListener("focus", handleFocus);
     };
   }, [t.admin.financeDashboardLoadFailed]);
 
@@ -69,6 +86,21 @@ export default function FinancialDashboardPage() {
           <p className="text-xs uppercase tracking-[0.12em] text-[var(--color-muted)]">{t.admin.financeMetricWalletTransactions}</p>
           <p className="mt-2 text-2xl font-bold text-[var(--color-text)]">{loading ? "..." : walletTxCount}</p>
         </Card>
+        <Link
+          href="/app/financial/recharge-requests"
+          className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4 shadow-[var(--card-shadow)]"
+        >
+          <p className="text-xs uppercase tracking-[0.12em] text-[var(--color-muted)]">{t.admin.financeViewRechargeRequests}</p>
+          <div className="mt-2 flex items-center gap-2">
+            <p className="text-2xl font-bold text-[var(--color-text)]">{loading ? "..." : pendingRechargeCount}</p>
+            {!loading && pendingRechargeCount > 0 ? (
+              <Badge tone="warning">{pendingRechargeCount}</Badge>
+            ) : null}
+          </div>
+          {!loading && pendingRechargeCount === 0 ? (
+            <p className="mt-2 text-xs text-[var(--color-muted)]">{t.admin.financeRechargeNoPending}</p>
+          ) : null}
+        </Link>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">

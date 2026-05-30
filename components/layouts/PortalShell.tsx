@@ -1,10 +1,12 @@
 "use client";
 
-import { useCallback, useMemo, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { Badge } from "@/components/ui/Badge";
+import { getRechargeRequests } from "@/lib/payments/paymentsService";
+import { RECHARGE_PENDING_COUNT_REFRESH_EVENT } from "@/lib/payments/rechargeEvents";
 import { roleMetadata } from "@/lib/roles";
 import type { UserRole } from "@/types/roles";
 import { PortalMobileDrawer } from "./PortalMobileDrawer";
@@ -30,12 +32,63 @@ export function PortalShell({ children }: PortalShellProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [rechargePendingCount, setRechargePendingCount] = useState<number | null>(null);
   const { locale, theme, t, setLocale, toggleTheme } = useAppPreferences();
   const { user, logout, verification, effectiveRole, profile } = useAuth();
   const activeRole = activeRoleFromPath(pathname);
   const currentRoleLabel = activeRole ? roleMetadata[activeRole].labels[locale] : t.portal.chooseRole;
+  const isFinanceDashboard = pathname === "/app/financial";
+  const canSeeFinance = effectiveRole === "financial" || effectiveRole === "admin";
 
-  const navItems = useMemo(() => getPortalNavItems(effectiveRole, t, { user, profile }), [effectiveRole, profile, t, user]);
+  const refreshRechargePendingCount = useCallback(async () => {
+    if (!canSeeFinance) return;
+    try {
+      const pending = await getRechargeRequests({ status: "pending_review", limit: 50 });
+      setRechargePendingCount(pending.length);
+    } catch {
+      // Keep the existing badge value on transient failures.
+    }
+  }, [canSeeFinance]);
+
+  useEffect(() => {
+    if (!canSeeFinance) return;
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void refreshRechargePendingCount();
+
+    function handleRefreshRequest() {
+      void refreshRechargePendingCount();
+    }
+
+    window.addEventListener(RECHARGE_PENDING_COUNT_REFRESH_EVENT, handleRefreshRequest);
+    return () => {
+      window.removeEventListener(RECHARGE_PENDING_COUNT_REFRESH_EVENT, handleRefreshRequest);
+    };
+  }, [canSeeFinance, refreshRechargePendingCount]);
+
+  useEffect(() => {
+    if (!isFinanceDashboard || !canSeeFinance) return;
+
+    const intervalId = window.setInterval(() => {
+      void refreshRechargePendingCount();
+    }, 25000);
+
+    function handleFocus() {
+      void refreshRechargePendingCount();
+    }
+
+    window.addEventListener("focus", handleFocus);
+
+    return () => {
+      window.clearInterval(intervalId);
+      window.removeEventListener("focus", handleFocus);
+    };
+  }, [canSeeFinance, isFinanceDashboard, refreshRechargePendingCount]);
+
+  const navItems = useMemo(
+    () => getPortalNavItems(effectiveRole, t, { user, profile, rechargePendingCount: rechargePendingCount ?? undefined }),
+    [effectiveRole, profile, rechargePendingCount, t, user],
+  );
   const activeHref = useMemo(() => getActivePortalNavHref(pathname, navItems), [navItems, pathname]);
 
   const closeMenu = useCallback(() => {

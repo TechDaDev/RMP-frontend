@@ -2,13 +2,16 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { ApiError } from "@/lib/api/errors";
 import { getRechargeRequests } from "@/lib/payments/paymentsService";
+import { RECHARGE_PENDING_COUNT_REFRESH_EVENT, requestRechargePendingCountRefresh } from "@/lib/payments/rechargeEvents";
 import type { RechargeRequest, RechargeRequestListParams } from "@/types/payments";
 
 function statusVariant(status: string): "neutral" | "success" | "warning" | "danger" {
@@ -19,14 +22,19 @@ function statusVariant(status: string): "neutral" | "success" | "warning" | "dan
 }
 
 export default function FinancialRechargeRequestsPage() {
+  const router = useRouter();
   const { t } = useAppPreferences();
   const [requests, setRequests] = useState<RechargeRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filterStatus, setFilterStatus] = useState("");
+  const [permissionDenied, setPermissionDenied] = useState(false);
+  const [showRetry, setShowRetry] = useState(false);
+  const [filterStatus, setFilterStatus] = useState("pending_review");
   const [filterEmail, setFilterEmail] = useState("");
+  const [filterUserId, setFilterUserId] = useState("");
   const [appliedEmail, setAppliedEmail] = useState("");
-  const [appliedStatus, setAppliedStatus] = useState("");
+  const [appliedUserId, setAppliedUserId] = useState("");
+  const [appliedStatus, setAppliedStatus] = useState("pending_review");
 
   const statusOptions = [
     { value: "", label: t.admin.financeRechargeQueueFilterAll },
@@ -38,24 +46,69 @@ export default function FinancialRechargeRequestsPage() {
   const load = useCallback(async (params: RechargeRequestListParams) => {
     setLoading(true);
     setError(null);
+    setShowRetry(false);
     try {
       const data = await getRechargeRequests(params);
       setRequests(data);
-    } catch {
+      setPermissionDenied(false);
+      requestRechargePendingCountRefresh();
+    } catch (err: unknown) {
+      if (err instanceof ApiError && err.status === 401) {
+        router.push("/login");
+        return;
+      }
+
+      if (err instanceof ApiError && err.status === 403) {
+        setPermissionDenied(true);
+        setRequests([]);
+        setError(t.admin.financeRechargePermissionDenied);
+        return;
+      }
+
+      if (err instanceof ApiError && err.status >= 500) {
+        setShowRetry(true);
+      }
+
       setError(t.admin.financeRechargeQueueLoadFailed);
     } finally {
       setLoading(false);
     }
-  }, [t.admin.financeRechargeQueueLoadFailed]);
+  }, [
+    router,
+    t.admin.financeRechargePermissionDenied,
+    t.admin.financeRechargeQueueLoadFailed,
+  ]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    void load({ status: appliedStatus || undefined, email: appliedEmail || undefined });
-  }, [load, appliedStatus, appliedEmail]);
+    void load({
+      status: appliedStatus || undefined,
+      email: appliedEmail || undefined,
+      user_id: appliedUserId || undefined,
+      limit: 50,
+    });
+  }, [load, appliedStatus, appliedEmail, appliedUserId]);
+
+  useEffect(() => {
+    function handleRefresh() {
+      void load({
+        status: appliedStatus || undefined,
+        email: appliedEmail || undefined,
+        user_id: appliedUserId || undefined,
+        limit: 50,
+      });
+    }
+
+    window.addEventListener(RECHARGE_PENDING_COUNT_REFRESH_EVENT, handleRefresh);
+    return () => {
+      window.removeEventListener(RECHARGE_PENDING_COUNT_REFRESH_EVENT, handleRefresh);
+    };
+  }, [appliedEmail, appliedStatus, appliedUserId, load]);
 
   function handleApplyFilters() {
     setAppliedStatus(filterStatus);
     setAppliedEmail(filterEmail);
+    setAppliedUserId(filterUserId);
   }
 
   function statusLabel(status: string): string {
@@ -99,20 +152,51 @@ export default function FinancialRechargeRequestsPage() {
               className="w-56"
             />
           </div>
+          <div>
+            <Input
+              id="rr-filter-user-id"
+              label={t.admin.financeRechargeQueueFilterUserId}
+              value={filterUserId}
+              onChange={(e) => setFilterUserId(e.target.value)}
+              placeholder={t.admin.financeRechargeQueueFilterUserIdPlaceholder}
+              className="w-56"
+            />
+          </div>
           <Button onClick={handleApplyFilters}>{t.admin.financeRechargeQueueApplyFilters}</Button>
         </div>
       </Card>
 
-      {loading && <p className="text-sm text-muted-foreground">{t.common.loading}</p>}
-      {error && <p className="text-sm text-destructive">{error}</p>}
-
-      {!loading && !error && requests.length === 0 && (
-        <Card className="p-6 text-center text-sm text-muted-foreground">
-          {t.admin.financeRechargeQueueEmpty}
+      {showRetry && (
+        <Card className="p-4 border border-amber-300 bg-amber-50 text-amber-900 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-200">
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-sm">{t.admin.financeRechargeQueueServerError}</p>
+            <Button
+              variant="secondary"
+              onClick={() => {
+                void load({
+                  status: appliedStatus || undefined,
+                  email: appliedEmail || undefined,
+                  user_id: appliedUserId || undefined,
+                  limit: 50,
+                });
+              }}
+            >
+              {t.common.retry}
+            </Button>
+          </div>
         </Card>
       )}
 
-      {!loading && !error && requests.length > 0 && (
+      {loading && <p className="text-sm text-muted-foreground">{t.common.loading}</p>}
+      {error && <p className="text-sm text-destructive">{error}</p>}
+
+      {!loading && !error && !permissionDenied && requests.length === 0 && (
+        <Card className="p-6 text-center text-sm text-muted-foreground">
+          {appliedStatus === "pending_review" ? t.admin.financeRechargeNoPending : t.admin.financeRechargeQueueEmpty}
+        </Card>
+      )}
+
+      {!loading && !error && !permissionDenied && requests.length > 0 && (
         <div className="overflow-x-auto rounded-lg border border-border">
           <table className="w-full text-sm">
             <thead className="bg-muted/50">

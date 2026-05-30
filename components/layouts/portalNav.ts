@@ -28,7 +28,7 @@ export type PortalNavItem = {
 export function getPortalNavItems(
   userType: string | undefined | null,
   t: Translations,
-  options?: { user?: BackendUser | null; profile?: ProfilesMeResponse | null },
+  options?: { user?: BackendUser | null; profile?: ProfilesMeResponse | null; rechargePendingCount?: number },
 ): PortalNavItem[] {
   const allowedAdminSections = getAllowedAdminSections({
     user: options?.user ?? null,
@@ -101,7 +101,14 @@ export function getPortalNavItems(
           ? [{ href: "/app/financial/provider-earnings", label: t.admin.financeProviderEarningsTitle, icon: FileTextIcon }]
           : []),
         ...(hasAdminSection(allowedAdminSections, "recharge_requests")
-          ? [{ href: "/app/financial/recharge-requests", label: t.admin.financeViewRechargeRequests, icon: FileTextIcon }]
+          ? [{
+            href: "/app/financial/recharge-requests",
+            label: t.admin.financeViewRechargeRequests,
+            icon: FileTextIcon,
+            badge: options?.rechargePendingCount && options.rechargePendingCount > 0
+              ? String(options.rechargePendingCount)
+              : undefined,
+          }]
           : []),
         { href: "/app/profile", label: t.portal.profile, icon: UserIcon, exact: true },
       ];
@@ -123,7 +130,14 @@ export function getPortalNavItems(
           ? [{ href: "/app/financial/provider-earnings", label: t.admin.financeProviderEarningsTitle, icon: FileTextIcon }]
           : []),
         ...(hasAdminSection(allowedAdminSections, "recharge_requests")
-          ? [{ href: "/app/financial/recharge-requests", label: t.admin.financeViewRechargeRequests, icon: FileTextIcon }]
+          ? [{
+            href: "/app/financial/recharge-requests",
+            label: t.admin.financeViewRechargeRequests,
+            icon: FileTextIcon,
+            badge: options?.rechargePendingCount && options.rechargePendingCount > 0
+              ? String(options.rechargePendingCount)
+              : undefined,
+          }]
           : []),
         { href: "/app/profile", label: t.portal.profile, icon: UserIcon, exact: true },
       ];

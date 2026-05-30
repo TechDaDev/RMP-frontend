@@ -258,9 +258,15 @@ export interface Translations {
     financeRechargeQueueSubtitle: string;
     financeRechargeQueueLoadFailed: string;
     financeRechargeQueueEmpty: string;
+    financeRechargeNoPending: string;
+    financeRechargePermissionDenied: string;
+    financeRechargeQueueServerError: string;
+    financeRechargeDetailServerError: string;
     financeRechargeQueueFilterStatus: string;
     financeRechargeQueueFilterEmail: string;
     financeRechargeQueueFilterEmailPlaceholder: string;
+    financeRechargeQueueFilterUserId: string;
+    financeRechargeQueueFilterUserIdPlaceholder: string;
     financeRechargeQueueFilterAll: string;
     financeRechargeQueueApplyFilters: string;
     financeRechargeDetailTitle: string;

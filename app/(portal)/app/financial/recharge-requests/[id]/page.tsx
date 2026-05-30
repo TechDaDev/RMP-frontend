@@ -2,18 +2,20 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { ConfirmActionModal } from "@/components/ui/ConfirmActionModal";
+import { ApiError } from "@/lib/api/errors";
 import {
   approveRechargeRequest,
   getRechargeRequestDetail,
   rejectRechargeRequest,
 } from "@/lib/payments/paymentsService";
+import { requestRechargePendingCountRefresh } from "@/lib/payments/rechargeEvents";
 import type { RechargeRequest } from "@/types/payments";
 
 const WALLET_UPDATED_EVENT = "payments:wallet-updated";
@@ -26,6 +28,7 @@ function statusVariant(status: string): "neutral" | "success" | "warning" | "dan
 }
 
 export default function FinancialRechargeRequestDetailPage() {
+  const router = useRouter();
   const { t } = useAppPreferences();
   const params = useParams();
   const id = params.id as string;
@@ -38,14 +41,33 @@ export default function FinancialRechargeRequestDetailPage() {
   const [decisionError, setDecisionError] = useState<string | null>(null);
   const [decisionSuccess, setDecisionSuccess] = useState<string | null>(null);
   const [confirmAction, setConfirmAction] = useState<"approve" | "reject" | null>(null);
+  const [permissionDenied, setPermissionDenied] = useState(false);
+  const [showRetry, setShowRetry] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
+    setShowRetry(false);
     try {
       const data = await getRechargeRequestDetail(id);
       setRequest(data);
+      setPermissionDenied(false);
     } catch (err: unknown) {
+      if (err instanceof ApiError && err.status === 401) {
+        router.push("/login");
+        return;
+      }
+
+      if (err instanceof ApiError && err.status === 403) {
+        setPermissionDenied(true);
+        setError(t.admin.financeRechargePermissionDenied);
+        return;
+      }
+
+      if (err instanceof ApiError && err.status >= 500) {
+        setShowRetry(true);
+      }
+
       if (err && typeof err === "object" && "status" in err && (err as { status: number }).status === 404) {
         setError(t.admin.financeRechargeDetailNotFound);
       } else {
@@ -54,7 +76,13 @@ export default function FinancialRechargeRequestDetailPage() {
     } finally {
       setLoading(false);
     }
-  }, [id, t.admin.financeRechargeDetailNotFound, t.admin.financeRechargeDetailLoadFailed]);
+  }, [
+    id,
+    router,
+    t.admin.financeRechargeDetailLoadFailed,
+    t.admin.financeRechargeDetailNotFound,
+    t.admin.financeRechargePermissionDenied,
+  ]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -79,7 +107,23 @@ export default function FinancialRechargeRequestDetailPage() {
       }
       setRequest(updated);
       setDecisionSuccess(t.admin.financeRechargeDecisionSucceeded);
-    } catch {
+      requestRechargePendingCountRefresh();
+    } catch (err: unknown) {
+      if (err instanceof ApiError && err.status === 401) {
+        router.push("/login");
+        return;
+      }
+
+      if (err instanceof ApiError && err.status === 403) {
+        setPermissionDenied(true);
+        setDecisionError(t.admin.financeRechargePermissionDenied);
+        return;
+      }
+
+      if (err instanceof ApiError && err.status >= 500) {
+        setShowRetry(true);
+      }
+
       setDecisionError(t.admin.financeRechargeDecisionFailed);
     } finally {
       setSubmitting(false);
@@ -108,6 +152,14 @@ export default function FinancialRechargeRequestDetailPage() {
       />
 
       {loading && <p className="text-sm text-muted-foreground">{t.common.loading}</p>}
+      {showRetry && (
+        <Card className="p-4 border border-amber-300 bg-amber-50 text-amber-900 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-200">
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-sm">{t.admin.financeRechargeDetailServerError}</p>
+            <Button variant="secondary" onClick={() => { void load(); }}>{t.common.retry}</Button>
+          </div>
+        </Card>
+      )}
       {error && <p className="text-sm text-destructive">{error}</p>}
 
       {!loading && !error && request && (
@@ -177,7 +229,7 @@ export default function FinancialRechargeRequestDetailPage() {
             )}
           </Card>
 
-          {isPending && (
+          {isPending && !permissionDenied && (
             <Card className="p-6 space-y-4">
               <div>
                 <label htmlFor="review-note" className="block text-sm font-medium mb-1">
