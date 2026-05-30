@@ -16,6 +16,7 @@ export function LaboratoryDashboardSummary({ roleProfile, verification, catalogC
   const { t } = useAppPreferences();
   const isApproved = verification?.is_approved === true;
   const verificationStatus = verification?.status ?? "pending";
+  const isOpenNow = roleProfile?.is_open_now;
 
   return (
     <Card>
@@ -24,7 +25,12 @@ export function LaboratoryDashboardSummary({ roleProfile, verification, catalogC
           <h2 className="text-lg font-bold text-[var(--color-text)]">{t.laboratory.labIdentity}</h2>
           <p className="mt-1 text-sm leading-7 text-[var(--color-muted)]">{t.profile.verificationGuidance}</p>
         </div>
-        <Badge tone={isApproved ? "success" : "primary"}>{verificationStatus}</Badge>
+        <div className="flex flex-wrap items-center gap-2">
+          {typeof isOpenNow === "boolean" ? (
+            <Badge tone={isOpenNow ? "success" : "warning"}>{isOpenNow ? t.profile.open : t.profile.closed}</Badge>
+          ) : null}
+          <Badge tone={isApproved ? "success" : "primary"}>{verificationStatus}</Badge>
+        </div>
       </div>
 
       <div className="mt-5">
@@ -41,7 +47,12 @@ export function LaboratoryDashboardSummary({ roleProfile, verification, catalogC
           {roleProfile?.specialization ? `${t.profile.specialization}: ${roleProfile.specialization}` : t.profile.completeProfilePrompt}
         </p>
         <p className="mt-1">
-          {roleProfile?.working_hours ? `${t.profile.workingHours}: ${roleProfile.working_hours}` : t.profile.verificationGuidance}
+          {roleProfile?.working_days?.length ? `${t.profile.workingDays}: ${roleProfile.working_days.join(", ")}` : t.profile.verificationGuidance}
+        </p>
+        <p className="mt-1">
+          {roleProfile?.opening_time && roleProfile?.closing_time
+            ? `${t.profile.openingTime}: ${roleProfile.opening_time} • ${t.profile.closingTime}: ${roleProfile.closing_time}`
+            : t.profile.verificationGuidance}
         </p>
       </div>
     </Card>

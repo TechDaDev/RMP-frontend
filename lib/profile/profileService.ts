@@ -22,6 +22,8 @@ type Envelope<T> = {
 
 const PROFILE_FILE_FIELD_KEYS = new Set([
   "profile_image",
+  "national_id_front_image",
+  "national_id_back_image",
   "medical_license_image",
   "pharmacist_license_image",
   "pharmacy_license_image",
@@ -81,6 +83,14 @@ function toFormData(payload: Record<string, unknown>): FormData {
     if (value === undefined || value === null) {
       continue;
     }
+
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        formData.append(key, String(item));
+      }
+      continue;
+    }
+
     if (value instanceof File) {
       formData.append(key, normalizeImageMimeType(value));
       continue;

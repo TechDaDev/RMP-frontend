@@ -1,4 +1,4 @@
-import type { InputHTMLAttributes } from "react";
+import { forwardRef, type InputHTMLAttributes } from "react";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   id: string;
@@ -7,19 +7,16 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   errorText?: string;
 }
 
-export function Input({
-  id,
-  label,
-  helperText,
-  errorText,
-  className,
-  ...props
-}: InputProps) {
+export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
+  { id, label, helperText, errorText, className, ...props },
+  ref,
+) {
   return (
     <label className="block space-y-2" htmlFor={id}>
       <span className="text-sm font-semibold text-[var(--color-text)]">{label}</span>
       <input
         id={id}
+        ref={ref}
         className={[
           "min-h-11 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 text-sm text-[var(--color-text)] outline-none transition placeholder:text-[var(--color-muted)] focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[color:color-mix(in_srgb,var(--color-primary)_18%,transparent)]",
           className,
@@ -35,4 +32,4 @@ export function Input({
       ) : null}
     </label>
   );
-}
+});

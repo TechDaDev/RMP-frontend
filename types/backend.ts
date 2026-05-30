@@ -105,6 +105,8 @@ export interface UserProfileData {
   district: string;
   address: string;
   national_id: string;
+  national_id_front_image?: string | null;
+  national_id_back_image?: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -162,14 +164,28 @@ export interface LaboratorianProfileData {
   laboratory_license_number: string;
   laboratory_license_image: string | null;
   laboratory_address: string;
+  laboratory_governorate?: string | null;
+  laboratory_phone_number?: string | null;
   specialization: string;
-  working_hours: string;
+  working_days?: LaboratorianWorkingDay[] | string[] | null;
+  opening_time?: string | null;
+  closing_time?: string | null;
+  is_open_now?: boolean | null;
   verification_status: string;
   verified_at: string | null;
   verification_notes: string;
   created_at: string;
   updated_at: string;
 }
+
+export type LaboratorianWorkingDay =
+  | "saturday"
+  | "sunday"
+  | "monday"
+  | "tuesday"
+  | "wednesday"
+  | "thursday"
+  | "friday";
 
 export interface ProfileCompletion {
   overall_complete?: boolean;
@@ -197,8 +213,8 @@ export interface UpdateUserProfileRequest {
   date_of_birth?: string | null;
   governorate?: string;
   district?: string;
-  address?: string;
-  national_id?: string;
+  national_id_front_image?: File | null;
+  national_id_back_image?: File | null;
 }
 
 export interface UpdatePatientProfileRequest {
@@ -238,8 +254,12 @@ export interface UpdateLaboratorianProfileRequest {
   laboratory_license_number?: string;
   laboratory_license_image?: File | null;
   laboratory_address?: string;
+  laboratory_governorate?: string;
+  laboratory_phone_number?: string;
   specialization?: string;
-  working_hours?: string;
+  working_days?: LaboratorianWorkingDay[] | string[];
+  opening_time?: string | null;
+  closing_time?: string | null;
 }
 
 export interface ProfilesMeResponse {

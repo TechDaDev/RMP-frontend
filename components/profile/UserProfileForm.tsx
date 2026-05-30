@@ -18,7 +18,7 @@ import { ProfileSaveStatus } from "@/components/profile/ProfileSaveStatus";
 /**
  * Shared user profile form for all user types.
  * Updates the common UserProfile with fields required by all roles:
- * - phone_number, gender, date_of_birth, governorate, district, address, national_id
+ * - phone_number, gender, date_of_birth, governorate, district, profile_image, national_id_front_image, national_id_back_image
  * 
  * Note: Role-specific profile fields are handled by separate forms
  * (DoctorProfileForm, PharmacistProfileForm, LaboratorianProfileForm, PatientProfileForm)
@@ -30,9 +30,9 @@ interface UserProfileFormState {
   date_of_birth: string;
   governorate: string;
   district: string;
-  address: string;
-  national_id: string;
   profile_image: File | null;
+  national_id_front_image: File | null;
+  national_id_back_image: File | null;
 }
 
 const initialState: UserProfileFormState = {
@@ -41,15 +41,17 @@ const initialState: UserProfileFormState = {
   date_of_birth: "",
   governorate: "",
   district: "",
-  address: "",
-  national_id: "",
   profile_image: null,
+  national_id_front_image: null,
+  national_id_back_image: null,
 };
 
 export function UserProfileForm() {
   const { t, locale } = useAppPreferences();
   const { profile, refreshProfile } = useAuth();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const frontIdInputRef = useRef<HTMLInputElement | null>(null);
+  const backIdInputRef = useRef<HTMLInputElement | null>(null);
   const [form, setForm] = useState<UserProfileFormState>(initialState);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const [saving, setSaving] = useState(false);
@@ -73,9 +75,9 @@ export function UserProfileForm() {
       date_of_birth: userProfile.date_of_birth ?? "",
       governorate: resolveGovernorateCode(userProfile.governorate ?? "") ?? userProfile.governorate ?? "",
       district: userProfile.district ?? "",
-      address: userProfile.address ?? "",
-      national_id: userProfile.national_id ?? "",
       profile_image: null,
+      national_id_front_image: null,
+      national_id_back_image: null,
     }));
   }, [profile]);
 
@@ -101,13 +103,21 @@ export function UserProfileForm() {
         date_of_birth: form.date_of_birth || null,
         governorate: form.governorate,
         district: form.district,
-        address: form.address,
-        national_id: form.national_id,
         profile_image: form.profile_image,
+        national_id_front_image: form.national_id_front_image,
+        national_id_back_image: form.national_id_back_image,
       });
       await refreshProfile();
       setSuccessMessage(t.profile.savedSuccessfully);
-      setForm((prev) => ({ ...prev, profile_image: null }));
+      setForm((prev) => ({
+        ...prev,
+        profile_image: null,
+        national_id_front_image: null,
+        national_id_back_image: null,
+      }));
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      if (frontIdInputRef.current) frontIdInputRef.current.value = "";
+      if (backIdInputRef.current) backIdInputRef.current.value = "";
     } catch (err) {
       if (err instanceof ApiError) {
         if (err.status === 0) {
@@ -224,29 +234,32 @@ export function UserProfileForm() {
             onChange={(event) => setForm((prev) => ({ ...prev, district: event.target.value }))}
             errorText={fieldErrors.district?.[0]}
           />
-          <Input
-            id="profile-national-id"
-            name="national_id"
-            label={t.profile.nationalId}
-            value={form.national_id}
-            onChange={(event) => setForm((prev) => ({ ...prev, national_id: event.target.value }))}
-            dir="ltr"
-            errorText={fieldErrors.national_id?.[0]}
-          />
         </div>
 
-        <label className="block space-y-2" htmlFor="profile-address">
-          <span className="text-sm font-semibold text-[var(--color-text)]">{t.profile.address}</span>
-          <textarea
-            id="profile-address"
-            className="min-h-24 w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface)] px-4 py-3 text-sm text-[var(--color-text)] outline-none transition focus:border-[var(--color-primary)]"
-            value={form.address}
-            onChange={(event) => setForm((prev) => ({ ...prev, address: event.target.value }))}
+        <div className="grid gap-4 md:grid-cols-2">
+          <Input
+            id="profile-national-id-front"
+            name="national_id_front_image"
+            type="file"
+            label={t.profile.nationalIdFrontImage}
+            accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+            ref={frontIdInputRef}
+            onChange={(event) => setForm((prev) => ({ ...prev, national_id_front_image: event.target.files?.[0] ?? null }))}
+            helperText={form.national_id_front_image ? `${t.profile.selectedFile}: ${form.national_id_front_image.name}` : t.profile.noFileSelected}
+            errorText={fieldErrors.national_id_front_image?.[0]}
           />
-          {fieldErrors.address?.[0] ? (
-            <span className="block text-xs font-medium text-red-600 dark:text-red-300">{fieldErrors.address[0]}</span>
-          ) : null}
-        </label>
+          <Input
+            id="profile-national-id-back"
+            name="national_id_back_image"
+            type="file"
+            label={t.profile.nationalIdBackImage}
+            accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+            ref={backIdInputRef}
+            onChange={(event) => setForm((prev) => ({ ...prev, national_id_back_image: event.target.files?.[0] ?? null }))}
+            helperText={form.national_id_back_image ? `${t.profile.selectedFile}: ${form.national_id_back_image.name}` : t.profile.noFileSelected}
+            errorText={fieldErrors.national_id_back_image?.[0]}
+          />
+        </div>
 
         <label className="block space-y-2" htmlFor="profile-image">
           <span className="text-sm font-semibold text-[var(--color-text)]">{t.profile.profileImage}</span>

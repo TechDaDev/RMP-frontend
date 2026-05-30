@@ -1199,6 +1199,8 @@ export interface Translations {
     district: string;
     address: string;
     nationalId: string;
+    nationalIdFrontImage: string;
+    nationalIdBackImage: string;
     profileImage: string;
     specialty: string;
     specialtyOther: string;
@@ -1218,8 +1220,15 @@ export interface Translations {
     laboratoryName: string;
     laboratoryLicenseNumber: string;
     laboratoryLicenseFile: string;
+    laboratoryGovernorate: string;
+    laboratoryPhoneNumber: string;
     specialization: string;
+    workingDays: string;
+    openingTime: string;
+    closingTime: string;
     workingHours: string;
+    open: string;
+    closed: string;
     uploadFile: string;
     selectedFile: string;
     noFileSelected: string;
