@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import Link from "next/link";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { PatientPageFrame } from "@/components/patient/ui/PatientPageFrame";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -108,7 +109,14 @@ export default function WalletPage() {
       <PageHeader
         title={t.patient.walletTitle}
         description={t.patient.walletSubtitle}
-        actions={<Button variant="secondary" onClick={() => void loadWallet(true)} disabled={loading || refreshing}>{refreshing ? t.common.loading : t.common.retry}</Button>}
+        actions={
+          <div className="flex gap-2 flex-wrap">
+            <Link href="/app/patient/wallet/recharge-request">
+              <Button>{t.patient.rechargeRequestNew}</Button>
+            </Link>
+            <Button variant="secondary" onClick={() => void loadWallet(true)} disabled={loading || refreshing}>{refreshing ? t.common.loading : t.common.retry}</Button>
+          </div>
+        }
       />
       <WalletBalanceCard wallet={wallet} loading={loading} error={error} />
       <TransactionHistoryTable transactions={transactions} loading={loading} error={error} />

@@ -100,6 +100,9 @@ export function getPortalNavItems(
         ...(hasAdminSection(allowedAdminSections, "provider_earnings")
           ? [{ href: "/app/financial/provider-earnings", label: t.admin.financeProviderEarningsTitle, icon: FileTextIcon }]
           : []),
+        ...(hasAdminSection(allowedAdminSections, "recharge_requests")
+          ? [{ href: "/app/financial/recharge-requests", label: t.admin.financeViewRechargeRequests, icon: FileTextIcon }]
+          : []),
         { href: "/app/profile", label: t.portal.profile, icon: UserIcon, exact: true },
       ];
     case "financial":
@@ -118,6 +121,9 @@ export function getPortalNavItems(
           : []),
         ...(hasAdminSection(allowedAdminSections, "provider_earnings")
           ? [{ href: "/app/financial/provider-earnings", label: t.admin.financeProviderEarningsTitle, icon: FileTextIcon }]
+          : []),
+        ...(hasAdminSection(allowedAdminSections, "recharge_requests")
+          ? [{ href: "/app/financial/recharge-requests", label: t.admin.financeViewRechargeRequests, icon: FileTextIcon }]
           : []),
         { href: "/app/profile", label: t.portal.profile, icon: UserIcon, exact: true },
       ];

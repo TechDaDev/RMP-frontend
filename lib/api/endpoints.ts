@@ -153,6 +153,10 @@ export const API_ENDPOINTS = {
   payments: {
     wallet: "/api/payments/wallet/",
     walletTransactions: "/api/payments/wallet/transactions/",
+    rechargeRequests: "/api/payments/wallet/recharge-requests/",
+    rechargeRequestDetail: (id: string) => `/api/payments/wallet/recharge-requests/${id}/`,
+    rechargeRequestApprove: (id: string) => `/api/payments/wallet/recharge-requests/${id}/approve/`,
+    rechargeRequestReject: (id: string) => `/api/payments/wallet/recharge-requests/${id}/reject/`,
     adminWallets: "/api/payments/admin/wallets/",
     adminManualRecharge: "/api/payments/admin/manual-recharge/",
     intents: "/api/payments/intents/",

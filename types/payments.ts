@@ -86,3 +86,46 @@ export interface AdminManualRechargeRequest {
   description?: string;
   note?: string;
 }
+
+export type RechargeRequestStatus =
+  | "pending_review"
+  | "approved"
+  | "rejected";
+
+export interface RechargeRequest {
+  id: string;
+  user?: string;
+  user_email?: string | null;
+  user_full_name?: string | null;
+  amount: string;
+  currency?: string | null;
+  status: RechargeRequestStatus | string;
+  note?: string | null;
+  review_note?: string | null;
+  reviewed_by?: string | null;
+  reviewed_by_email?: string | null;
+  reviewed_at?: string | null;
+  receipt_file?: string | null;
+  receipt_file_url?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface RechargeRequestCreatePayload {
+  amount: string;
+  note?: string;
+  receipt_file: File;
+}
+
+export interface RechargeRequestDecisionPayload {
+  review_note?: string;
+}
+
+export interface RechargeRequestListParams {
+  status?: string;
+  user?: string;
+  user_id?: string;
+  email?: string;
+  page?: number;
+  limit?: number;
+}

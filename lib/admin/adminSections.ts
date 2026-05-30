@@ -12,7 +12,8 @@ export type AdminSection =
   | "wallet_transactions"
   | "payment_intents"
   | "manual_recharge"
-  | "provider_earnings";
+  | "provider_earnings"
+  | "recharge_requests";
 
 const SECTION_ALIASES: Record<string, AdminSection> = {
   verification: "verification",
@@ -46,6 +47,9 @@ const SECTION_ALIASES: Record<string, AdminSection> = {
   recharge: "manual_recharge",
   provider_earnings: "provider_earnings",
   earnings: "provider_earnings",
+  recharge_requests: "recharge_requests",
+  wallet_recharge_requests: "recharge_requests",
+  recharge_request: "recharge_requests",
 };
 
 export const ALL_ADMIN_SECTIONS: AdminSection[] = [
@@ -60,6 +64,7 @@ export const ALL_ADMIN_SECTIONS: AdminSection[] = [
   "payment_intents",
   "manual_recharge",
   "provider_earnings",
+  "recharge_requests",
 ];
 
 export const FINANCIAL_SECTIONS: AdminSection[] = [
@@ -68,6 +73,7 @@ export const FINANCIAL_SECTIONS: AdminSection[] = [
   "payment_intents",
   "manual_recharge",
   "provider_earnings",
+  "recharge_requests",
 ];
 
 export const ADMIN_SECTION_ROUTE_RULES: Array<{ prefix: string; anyOf: AdminSection[] }> = [
@@ -80,6 +86,7 @@ export const ADMIN_SECTION_ROUTE_RULES: Array<{ prefix: string; anyOf: AdminSect
   { prefix: "/app/financial/payment-intents", anyOf: ["payment_intents"] },
   { prefix: "/app/financial/manual-recharge", anyOf: ["manual_recharge"] },
   { prefix: "/app/financial/provider-earnings", anyOf: ["provider_earnings"] },
+  { prefix: "/app/financial/recharge-requests", anyOf: ["recharge_requests"] },
   { prefix: "/app/financial", anyOf: ["finance_dashboard"] },
 ];
 

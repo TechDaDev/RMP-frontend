@@ -6,6 +6,10 @@ import type {
   AdminManualRechargeRequest,
   PaymentIntent,
   PaymentIntentCreateRequest,
+  RechargeRequest,
+  RechargeRequestCreatePayload,
+  RechargeRequestDecisionPayload,
+  RechargeRequestListParams,
   ServiceType,
   Wallet,
   WalletTransaction,
@@ -163,6 +167,75 @@ export async function adminManualRecharge(payload: AdminManualRechargeRequest): 
     {
       auth: true,
       body: normalizedPayload,
+    },
+  );
+
+  return unwrapData(response);
+}
+
+export async function createRechargeRequest(payload: RechargeRequestCreatePayload): Promise<RechargeRequest> {
+  const formData = new FormData();
+  formData.append("amount", payload.amount);
+  formData.append("receipt_file", payload.receipt_file);
+  if (payload.note?.trim()) {
+    formData.append("note", payload.note.trim());
+  }
+
+  const response = await apiRequest<RechargeRequest | ApiEnvelope<RechargeRequest>>(
+    API_ENDPOINTS.payments.rechargeRequests,
+    {
+      auth: true,
+      body: formData,
+    },
+  );
+
+  return unwrapData(response);
+}
+
+export async function getRechargeRequests(params?: RechargeRequestListParams): Promise<RechargeRequest[]> {
+  const queryParams: QueryParams = {};
+  if (params?.status) queryParams.status = params.status;
+  if (params?.user) queryParams.user = params.user;
+  if (params?.user_id) queryParams.user_id = params.user_id;
+  if (params?.email) queryParams.email = params.email;
+  if (params?.page) queryParams.page = params.page;
+  if (params?.limit) queryParams.limit = params.limit;
+
+  const response = await apiRequest<ListResponse<RechargeRequest> | ApiEnvelope<ListResponse<RechargeRequest>>>(
+    withQuery(API_ENDPOINTS.payments.rechargeRequests, queryParams),
+    { auth: true },
+  );
+
+  return normalizeList(unwrapData(response));
+}
+
+export async function getRechargeRequestDetail(id: string): Promise<RechargeRequest> {
+  const response = await apiRequest<RechargeRequest | ApiEnvelope<RechargeRequest>>(
+    API_ENDPOINTS.payments.rechargeRequestDetail(id),
+    { auth: true },
+  );
+
+  return unwrapData(response);
+}
+
+export async function approveRechargeRequest(id: string, payload?: RechargeRequestDecisionPayload): Promise<RechargeRequest> {
+  const response = await apiRequest<RechargeRequest | ApiEnvelope<RechargeRequest>>(
+    API_ENDPOINTS.payments.rechargeRequestApprove(id),
+    {
+      auth: true,
+      body: payload ?? {},
+    },
+  );
+
+  return unwrapData(response);
+}
+
+export async function rejectRechargeRequest(id: string, payload?: RechargeRequestDecisionPayload): Promise<RechargeRequest> {
+  const response = await apiRequest<RechargeRequest | ApiEnvelope<RechargeRequest>>(
+    API_ENDPOINTS.payments.rechargeRequestReject(id),
+    {
+      auth: true,
+      body: payload ?? {},
     },
   );
 
