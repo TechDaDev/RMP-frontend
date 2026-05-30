@@ -451,6 +451,8 @@ export interface Translations {
     rechargeRequestFileSizeError: string;
     rechargeRequestLoadFailed: string;
     rechargeRequestDetailLoadFailed: string;
+    rechargeRequestDetailNotFound: string;
+    rechargeRequestDetailServerError: string;
     rechargeRequestEmpty: string;
     rechargeRequestStatusPendingReview: string;
     rechargeRequestStatusApproved: string;

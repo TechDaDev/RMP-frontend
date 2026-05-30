@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useAppPreferences } from "@/components/AppPreferencesProvider";
 import { PatientPageFrame } from "@/components/patient/ui/PatientPageFrame";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import { getRechargeRequestDetail } from "@/lib/payments/paymentsService";
+import { ApiError } from "@/lib/api/errors";
 import type { RechargeRequest } from "@/types/payments";
 
 function statusLabel(status: string, t: ReturnType<typeof useAppPreferences>["t"]): string {
@@ -29,33 +30,50 @@ function statusVariant(status: string): "neutral" | "success" | "warning" | "dan
 export default function RechargeRequestDetailPage() {
   const { t } = useAppPreferences();
   const params = useParams();
+  const router = useRouter();
   const id = params.id as string;
 
   const [request, setRequest] = useState<RechargeRequest | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [notFound, setNotFound] = useState(false);
+  const [showRetry, setShowRetry] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
+    setNotFound(false);
+    setShowRetry(false);
     try {
       const data = await getRechargeRequestDetail(id);
       setRequest(data);
-    } catch {
+    } catch (err) {
+      if (err instanceof ApiError) {
+        if (err.status === 401) {
+          router.push("/login");
+          return;
+        }
+        if (err.status === 404) {
+          setNotFound(true);
+          return;
+        }
+        if (err.status >= 500) {
+          setShowRetry(true);
+          return;
+        }
+      }
       setError(t.patient.rechargeRequestDetailLoadFailed);
     } finally {
       setLoading(false);
     }
-  }, [id, t.patient.rechargeRequestDetailLoadFailed]);
+  }, [id, router, t.patient.rechargeRequestDetailLoadFailed]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     void load();
   }, [load]);
 
-  const showReceipt =
-    request?.status === "pending_review" &&
-    Boolean(request.receipt_file_url);
+  const showReceipt = Boolean(request?.receipt_file_url);
 
   return (
     <PatientPageFrame>
@@ -71,6 +89,19 @@ export default function RechargeRequestDetailPage() {
 
       {loading && <p className="text-sm text-muted-foreground">{t.common.loading}</p>}
       {error && <p className="text-sm text-destructive">{error}</p>}
+
+      {notFound && (
+        <p className="text-sm text-muted-foreground">{t.patient.rechargeRequestDetailNotFound}</p>
+      )}
+
+      {showRetry && (
+        <div className="rounded-md border border-destructive/30 bg-destructive/5 p-4 flex items-center justify-between gap-4">
+          <p className="text-sm text-destructive">{t.patient.rechargeRequestDetailServerError}</p>
+          <Button variant="secondary" onClick={() => { void load(); }}>
+            {t.common.retry}
+          </Button>
+        </div>
+      )}
 
       {!loading && !error && request && (
         <Card className="max-w-lg p-6 space-y-4">
@@ -139,10 +170,6 @@ export default function RechargeRequestDetailPage() {
                 {t.patient.rechargeRequestReceiptLink}
               </a>
             </div>
-          )}
-
-          {!showReceipt && !request.receipt_file_url && request.status === "pending_review" && (
-            <p className="text-sm text-muted-foreground">{t.patient.rechargeRequestReceiptUnavailable}</p>
           )}
         </Card>
       )}

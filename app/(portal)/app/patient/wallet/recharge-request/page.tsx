@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Card } from "@/components/ui/Card";
 import { createRechargeRequest } from "@/lib/payments/paymentsService";
+import { ApiError } from "@/lib/api/errors";
 
 const WALLET_UPDATED_EVENT = "payments:wallet-updated";
 const MAX_FILE_BYTES = 10 * 1024 * 1024;
@@ -25,6 +26,8 @@ export default function RechargeRequestPage() {
   const [fileError, setFileError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [amountFieldError, setAmountFieldError] = useState<string | null>(null);
+  const [receiptFieldError, setReceiptFieldError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -52,6 +55,8 @@ export default function RechargeRequestPage() {
     e.preventDefault();
     setError(null);
     setSuccess(null);
+    setAmountFieldError(null);
+    setReceiptFieldError(null);
 
     if (!amount.trim() || Number(amount) <= 0) {
       setError(t.patient.rechargeRequestAmountError);
@@ -80,8 +85,13 @@ export default function RechargeRequestPage() {
         fileRef.current.value = "";
       }
     } catch (err: unknown) {
-      if (err && typeof err === "object" && "status" in err && (err as { status: number }).status === 400) {
-        setError(t.patient.rechargeRequestPendingExists);
+      if (err instanceof ApiError && err.status === 400) {
+        const amtErr = err.fieldErrors?.amount?.[0] ?? null;
+        const fileErr = err.fieldErrors?.receipt_file?.[0] ?? null;
+        if (amtErr) setAmountFieldError(amtErr);
+        if (fileErr) setReceiptFieldError(fileErr);
+        const generalMsg = err.message ?? t.patient.rechargeRequestPendingExists;
+        setError(generalMsg);
       } else {
         setError(t.patient.rechargeRequestLoadFailed);
       }
@@ -116,6 +126,7 @@ export default function RechargeRequestPage() {
                 onChange={(e) => setAmount(e.target.value)}
                 placeholder={t.patient.rechargeRequestAmountPlaceholder}
                 required
+                errorText={amountFieldError ?? undefined}
               />
             </div>
 
@@ -147,6 +158,7 @@ export default function RechargeRequestPage() {
               />
               <p className="text-xs text-muted-foreground mt-1">{t.patient.rechargeRequestReceiptHint}</p>
               {fileError && <p className="text-xs text-destructive mt-1">{fileError}</p>}
+              {receiptFieldError && <p className="text-xs text-destructive mt-1">{receiptFieldError}</p>}
             </div>
 
             {error && <p className="text-sm text-destructive">{error}</p>}
